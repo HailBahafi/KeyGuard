@@ -5,6 +5,7 @@
  */
 
 export * from './types';
+export * from './client';
+export * from './storage/memory';
+export * from './storage/browser';
 export { CryptoManager, arrayBufferToBase64, base64ToArrayBuffer } from './core/crypto';
-export { KeyGuardClient } from './client';
-export { BrowserStorageAdapter } from './storage';

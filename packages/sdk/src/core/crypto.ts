@@ -33,6 +33,8 @@ export class CryptoManager {
     } else if (typeof window !== 'undefined' && window.crypto) {
       this.crypto = window.crypto;
     } else {
+      // In Node 19+, globalThis.crypto is available. For older versions, user might need polyfill.
+      // We throw if not available.
       throw new Error('WebCrypto API is not available in this environment');
     }
 
@@ -100,7 +102,7 @@ export class CryptoManager {
    * 
    * @param privateKey - The private CryptoKey (non-extractable)
    * @param payload - The string payload to sign
-   * @returns Base64-encoded ECDSA signature
+   * @returns Base64-encoded ECDSA signature (IEEE P1363 format)
    * @throws Error if signing fails or key is not a private key
    */
   async sign(privateKey: CryptoKey, payload: string): Promise<string> {
@@ -129,30 +131,40 @@ export class CryptoManager {
   }
 
   /**
-   * Create a canonicalized payload for signing
+   * Create a canonicalized payload for signing (V1 Protocol)
    * 
-   * This format is CRITICAL - the backend must parse this exact format
-   * Format: {timestamp}|{METHOD}|{url}|{body}|{nonce}
+   * Format: kg-v1|{timestamp}|{METHOD}|{pathAndQuery}|{bodySha256}|{nonce}|{apiKey}|{keyId}
    * 
-   * @param method - HTTP method (will be uppercased)
-   * @param url - Full request URL
-   * @param body - Request body (empty string if no body)
-   * @param timestamp - ISO 8601 timestamp
-   * @param nonce - Unique nonce for replay prevention
+   * @param params - Payload parameters
    * @returns Canonicalized payload string
    */
-  createPayload(
-    method: string,
-    url: string,
-    body: string,
-    timestamp: string,
-    nonce: string
-  ): string {
+  createPayloadV1(params: {
+    method: string;
+    pathAndQuery: string;
+    bodySha256: string;
+    timestamp: string;
+    nonce: string;
+    apiKey: string;
+    keyId: string;
+  }): string {
     // Ensure method is uppercase for consistency
-    const normalizedMethod = method.toUpperCase();
-    
+    const normalizedMethod = params.method.toUpperCase();
+
     // Create the canonical format with pipe separator
-    return `${timestamp}|${normalizedMethod}|${url}|${body}|${nonce}`;
+    // Protocol version prefix allows future upgrades
+    return `kg-v1|${params.timestamp}|${normalizedMethod}|${params.pathAndQuery}|${params.bodySha256}|${params.nonce}|${params.apiKey}|${params.keyId}`;
+  }
+
+  /**
+   * Calculate SHA-256 hash of data and return as Base64
+   * 
+   * @param input - Data to hash (string or Uint8Array)
+   * @returns Base64 encoded SHA-256 hash
+   */
+  async hashSha256Base64(input: string | Uint8Array): Promise<string> {
+    const data = typeof input === 'string' ? new TextEncoder().encode(input) : input;
+    const hashBuffer = await this.crypto.subtle.digest('SHA-256', data as any);
+    return arrayBufferToBase64(hashBuffer);
   }
 
   /**
@@ -163,7 +175,7 @@ export class CryptoManager {
    */
   generateNonce(length: number = 16): string {
     const randomBytes = new Uint8Array(length);
-    this.crypto.getRandomValues(randomBytes);
+    this.crypto.getRandomValues(randomBytes as any);
     return arrayBufferToBase64(randomBytes);
   }
 }

@@ -5,11 +5,48 @@
  */
 
 /**
+ * Interface for providing device fingerprinting
+ * Allows injection of custom fingerprinting logic (e.g. for Node.js)
+ */
+export interface FingerprintProvider {
+  getFingerprint(): Promise<{
+    visitorId: string;
+    label: string;
+    metadata: Record<string, unknown>;
+  }>;
+}
+
+/**
+ * Storage adapter interface for persisting cryptographic key pairs
+ * Decouples storage logic from specific implementations (IndexedDB, Keytar, etc.)
+ */
+export interface StorageAdapter {
+  /**
+   * Persist a CryptoKey pair to secure storage
+   * @param publicKey - The public key (extractable)
+   * @param privateKey - The private key (non-extractable)
+   */
+  saveKeyPair(publicKey: CryptoKey, privateKey: CryptoKey): Promise<void>;
+
+  /**
+   * Retrieve the stored CryptoKey pair
+   * @returns The key pair if exists, null otherwise
+   */
+  getKeyPair(): Promise<{ publicKey: CryptoKey; privateKey: CryptoKey } | null>;
+
+  /**
+   * Clear all stored keys from storage
+   */
+  clear(): Promise<void>;
+}
+
+/**
  * Configuration object for initializing the KeyGuard SDK
  */
 export interface KeyGuardConfig {
   /**
    * Project API key (e.g., "kg_prod_...")
+   * REQUIRED for signing requests to identify the project
    */
   apiKey: string;
 
@@ -21,9 +58,16 @@ export interface KeyGuardConfig {
 
   /**
    * Storage strategy for cryptographic keys
-   * @default 'browser'
+   * @default 'browser' (IndexedDB)
+   * Provide a custom adapter for Node.js or specific requirements
    */
-  storage?: 'browser' | 'memory';
+  storage?: 'browser' | 'memory' | StorageAdapter;
+
+  /**
+   * Custom fingerprint provider
+   * Required for Node.js environments where FingerprintJS is not available
+   */
+  fingerprintProvider?: FingerprintProvider;
 }
 
 /**
@@ -34,6 +78,11 @@ export interface EnrollmentPayload {
    * Public key in Base64 SPKI format
    */
   publicKey: string;
+
+  /**
+   * Key ID (SHA-256 hash of public key, first 16 bytes hex)
+   */
+  keyId: string;
 
   /**
    * Unique hardware/device identifier (FingerprintJS visitorId)
@@ -62,46 +111,37 @@ export interface EnrollmentPayload {
  */
 export interface SignedRequestHeaders {
   /**
-   * Base64-encoded ECDSA signature of the request
+   * Project API Key
    */
-  'X-KeyGuard-Signature': string;
-
-  /**
-   * ISO 8601 timestamp of when the request was signed
-   */
-  'X-KeyGuard-Timestamp': string;
-
-  /**
-   * Unique nonce to prevent replay attacks
-   */
-  'X-KeyGuard-Nonce': string;
+  'x-keyguard-api-key': string;
 
   /**
    * Identifier of the enrolled cryptographic key
    */
-  'X-KeyGuard-Key-ID': string;
-}
-
-/**
- * Storage adapter interface for persisting cryptographic key pairs
- * Decouples storage logic from specific implementations (IndexedDB, Keytar, etc.)
- */
-export interface StorageAdapter {
-  /**
-   * Persist a CryptoKey pair to secure storage
-   * @param publicKey - The public key (extractable)
-   * @param privateKey - The private key (non-extractable)
-   */
-  saveKeyPair(publicKey: CryptoKey, privateKey: CryptoKey): Promise<void>;
+  'x-keyguard-key-id': string;
 
   /**
-   * Retrieve the stored CryptoKey pair
-   * @returns The key pair if exists, null otherwise
+   * ISO 8601 timestamp of when the request was signed
    */
-  getKeyPair(): Promise<{ publicKey: CryptoKey; privateKey: CryptoKey } | null>;
+  'x-keyguard-timestamp': string;
 
   /**
-   * Clear all stored keys from storage
+   * Unique nonce to prevent replay attacks
    */
-  clear(): Promise<void>;
+  'x-keyguard-nonce': string;
+
+  /**
+   * SHA-256 hash of the request body (Base64)
+   */
+  'x-keyguard-body-sha256': string;
+
+  /**
+   * Algorithm used for signing (e.g., "ECDSA_P256_SHA256_P1363")
+   */
+  'x-keyguard-alg': string;
+
+  /**
+   * Base64-encoded ECDSA signature of the request
+   */
+  'x-keyguard-signature': string;
 }

@@ -4,11 +4,47 @@
  * Core TypeScript interfaces and types for device binding and secure API key management
  */
 /**
+ * Interface for providing device fingerprinting
+ * Allows injection of custom fingerprinting logic (e.g. for Node.js)
+ */
+interface FingerprintProvider {
+    getFingerprint(): Promise<{
+        visitorId: string;
+        label: string;
+        metadata: Record<string, unknown>;
+    }>;
+}
+/**
+ * Storage adapter interface for persisting cryptographic key pairs
+ * Decouples storage logic from specific implementations (IndexedDB, Keytar, etc.)
+ */
+interface StorageAdapter {
+    /**
+     * Persist a CryptoKey pair to secure storage
+     * @param publicKey - The public key (extractable)
+     * @param privateKey - The private key (non-extractable)
+     */
+    saveKeyPair(publicKey: CryptoKey, privateKey: CryptoKey): Promise<void>;
+    /**
+     * Retrieve the stored CryptoKey pair
+     * @returns The key pair if exists, null otherwise
+     */
+    getKeyPair(): Promise<{
+        publicKey: CryptoKey;
+        privateKey: CryptoKey;
+    } | null>;
+    /**
+     * Clear all stored keys from storage
+     */
+    clear(): Promise<void>;
+}
+/**
  * Configuration object for initializing the KeyGuard SDK
  */
 interface KeyGuardConfig {
     /**
      * Project API key (e.g., "kg_prod_...")
+     * REQUIRED for signing requests to identify the project
      */
     apiKey: string;
     /**
@@ -18,9 +54,15 @@ interface KeyGuardConfig {
     apiBaseUrl?: string;
     /**
      * Storage strategy for cryptographic keys
-     * @default 'browser'
+     * @default 'browser' (IndexedDB)
+     * Provide a custom adapter for Node.js or specific requirements
      */
-    storage?: 'browser' | 'memory';
+    storage?: 'browser' | 'memory' | StorageAdapter;
+    /**
+     * Custom fingerprint provider
+     * Required for Node.js environments where FingerprintJS is not available
+     */
+    fingerprintProvider?: FingerprintProvider;
 }
 /**
  * Payload sent to the backend during device enrollment/registration
@@ -30,6 +72,10 @@ interface EnrollmentPayload {
      * Public key in Base64 SPKI format
      */
     publicKey: string;
+    /**
+     * Key ID (SHA-256 hash of public key, first 16 bytes hex)
+     */
+    keyId: string;
     /**
      * Unique hardware/device identifier (FingerprintJS visitorId)
      */
@@ -53,43 +99,172 @@ interface EnrollmentPayload {
  */
 interface SignedRequestHeaders {
     /**
-     * Base64-encoded ECDSA signature of the request
+     * Project API Key
      */
-    'X-KeyGuard-Signature': string;
-    /**
-     * ISO 8601 timestamp of when the request was signed
-     */
-    'X-KeyGuard-Timestamp': string;
-    /**
-     * Unique nonce to prevent replay attacks
-     */
-    'X-KeyGuard-Nonce': string;
+    'x-keyguard-api-key': string;
     /**
      * Identifier of the enrolled cryptographic key
      */
-    'X-KeyGuard-Key-ID': string;
-}
-/**
- * Storage adapter interface for persisting cryptographic key pairs
- * Decouples storage logic from specific implementations (IndexedDB, Keytar, etc.)
- */
-interface StorageAdapter {
+    'x-keyguard-key-id': string;
     /**
-     * Persist a CryptoKey pair to secure storage
-     * @param publicKey - The public key (extractable)
-     * @param privateKey - The private key (non-extractable)
+     * ISO 8601 timestamp of when the request was signed
+     */
+    'x-keyguard-timestamp': string;
+    /**
+     * Unique nonce to prevent replay attacks
+     */
+    'x-keyguard-nonce': string;
+    /**
+     * SHA-256 hash of the request body (Base64)
+     */
+    'x-keyguard-body-sha256': string;
+    /**
+     * Algorithm used for signing (e.g., "ECDSA_P256_SHA256_P1363")
+     */
+    'x-keyguard-alg': string;
+    /**
+     * Base64-encoded ECDSA signature of the request
+     */
+    'x-keyguard-signature': string;
+}
+
+/**
+ * KeyGuard SDK - Main Client
+ *
+ * Secure Device Binding SDK for protecting LLM API keys
+ */
+
+/**
+ * KeyGuard Client - Main SDK interface
+ *
+ * Provides device binding capabilities for securing LLM API keys
+ */
+declare class KeyGuardClient {
+    private config;
+    private crypto;
+    private storage;
+    private fingerprintProvider?;
+    /**
+     * Create a new KeyGuard client instance
+     *
+     * @param config - SDK configuration
+     * @throws Error if configuration is invalid or storage is unavailable
+     */
+    constructor(config: KeyGuardConfig);
+    /**
+     * Enroll this device by generating and storing a cryptographic key pair
+     *
+     * This method:
+     * 1. Collects device fingerprint
+     * 2. Checks if device is already enrolled
+     * 3. Generates a new ECDSA P-256 key pair
+     * 4. Stores the keys securely
+     * 5. Exports the public key
+     * 6. Returns enrollment payload for backend registration
+     *
+     * @param deviceName - Optional user-friendly device label
+     * @returns Enrollment payload to send to backend
+     * @throws Error if device is already enrolled or enrollment fails
+     */
+    enroll(deviceName?: string): Promise<EnrollmentPayload>;
+    /**
+     * Sign an HTTP request with device credentials
+     *
+     * This method:
+     * 1. Retrieves stored cryptographic keys
+     * 2. Generates timestamp and nonce
+     * 3. Calculates body hash
+     * 4. Creates canonical payload string (V1)
+     * 5. Signs the payload with private key
+     * 6. Returns headers to attach to the request
+     *
+     * @param request - Request details to sign
+     * @returns Signed request headers to attach to HTTP request
+     * @throws Error if device is not enrolled or signing fails
+     */
+    signRequest(request: {
+        method: string;
+        url: string;
+        body?: string;
+    }): Promise<SignedRequestHeaders>;
+    /**
+     * Unenroll this device by clearing all stored keys
+     *
+     * @throws Error if clearing keys fails
+     */
+    unenroll(): Promise<void>;
+    /**
+     * Check if this device is enrolled
+     *
+     * @returns true if device has stored keys, false otherwise
+     */
+    isEnrolled(): Promise<boolean>;
+    /**
+     * Generate a unique key ID from the public key
+     *
+     * @param publicKey - Public CryptoKey
+     * @returns Key identifier (hash of public key)
+     */
+    private generateKeyId;
+    /**
+     * Get the user agent string
+     *
+     * @returns User agent or undefined
+     */
+    private getUserAgent;
+}
+
+/**
+ * KeyGuard SDK - Memory Storage Adapter
+ *
+ * In-memory storage implementation for testing or non-persistent environments
+ */
+
+declare class MemoryStorageAdapter implements StorageAdapter {
+    private publicKey;
+    private privateKey;
+    saveKeyPair(publicKey: CryptoKey, privateKey: CryptoKey): Promise<void>;
+    getKeyPair(): Promise<{
+        publicKey: CryptoKey;
+        privateKey: CryptoKey;
+    } | null>;
+    clear(): Promise<void>;
+}
+
+/**
+ * KeyGuard SDK - Browser Storage Adapter
+ *
+ * IndexedDB-based storage implementation using idb-keyval
+ * Stores CryptoKey objects directly using structured cloning
+ */
+
+/**
+ * Browser storage adapter using IndexedDB
+ * Leverages IndexedDB's structured cloning to store CryptoKey objects directly
+ */
+declare class BrowserStorageAdapter implements StorageAdapter {
+    /**
+     * Save a CryptoKey pair to IndexedDB
+     *
+     * @param publicKey - Public CryptoKey (extractable)
+     * @param privateKey - Private CryptoKey (non-extractable)
+     * @throws Error if storage operation fails
      */
     saveKeyPair(publicKey: CryptoKey, privateKey: CryptoKey): Promise<void>;
     /**
-     * Retrieve the stored CryptoKey pair
-     * @returns The key pair if exists, null otherwise
+     * Retrieve the stored CryptoKey pair from IndexedDB
+     *
+     * @returns Key pair if exists, null if not found
+     * @throws Error if storage operation fails
      */
     getKeyPair(): Promise<{
         publicKey: CryptoKey;
         privateKey: CryptoKey;
     } | null>;
     /**
-     * Clear all stored keys from storage
+     * Clear all stored keys from IndexedDB
+     *
+     * @throws Error if storage operation fails
      */
     clear(): Promise<void>;
 }
@@ -134,24 +309,34 @@ declare class CryptoManager {
      *
      * @param privateKey - The private CryptoKey (non-extractable)
      * @param payload - The string payload to sign
-     * @returns Base64-encoded ECDSA signature
+     * @returns Base64-encoded ECDSA signature (IEEE P1363 format)
      * @throws Error if signing fails or key is not a private key
      */
     sign(privateKey: CryptoKey, payload: string): Promise<string>;
     /**
-     * Create a canonicalized payload for signing
+     * Create a canonicalized payload for signing (V1 Protocol)
      *
-     * This format is CRITICAL - the backend must parse this exact format
-     * Format: {timestamp}|{METHOD}|{url}|{body}|{nonce}
+     * Format: kg-v1|{timestamp}|{METHOD}|{pathAndQuery}|{bodySha256}|{nonce}|{apiKey}|{keyId}
      *
-     * @param method - HTTP method (will be uppercased)
-     * @param url - Full request URL
-     * @param body - Request body (empty string if no body)
-     * @param timestamp - ISO 8601 timestamp
-     * @param nonce - Unique nonce for replay prevention
+     * @param params - Payload parameters
      * @returns Canonicalized payload string
      */
-    createPayload(method: string, url: string, body: string, timestamp: string, nonce: string): string;
+    createPayloadV1(params: {
+        method: string;
+        pathAndQuery: string;
+        bodySha256: string;
+        timestamp: string;
+        nonce: string;
+        apiKey: string;
+        keyId: string;
+    }): string;
+    /**
+     * Calculate SHA-256 hash of data and return as Base64
+     *
+     * @param input - Data to hash (string or Uint8Array)
+     * @returns Base64 encoded SHA-256 hash
+     */
+    hashSha256Base64(input: string | Uint8Array): Promise<string>;
     /**
      * Generate a cryptographically secure random nonce
      *
@@ -175,127 +360,4 @@ declare function arrayBufferToBase64(buffer: ArrayBuffer | ArrayBufferView): str
  */
 declare function base64ToArrayBuffer(base64: string): ArrayBuffer;
 
-/**
- * KeyGuard SDK - Main Client
- *
- * Secure Device Binding SDK for protecting LLM API keys
- */
-
-/**
- * KeyGuard Client - Main SDK interface
- *
- * Provides device binding capabilities for securing LLM API keys
- */
-declare class KeyGuardClient {
-    private config;
-    private crypto;
-    private storage;
-    /**
-     * Create a new KeyGuard client instance
-     *
-     * @param config - SDK configuration
-     * @throws Error if configuration is invalid or storage is unavailable
-     */
-    constructor(config: KeyGuardConfig);
-    /**
-     * Enroll this device by generating and storing a cryptographic key pair
-     *
-     * This method:
-     * 1. Collects device fingerprint using FingerprintJS
-     * 2. Checks if device is already enrolled
-     * 3. Generates a new ECDSA P-256 key pair
-     * 4. Stores the keys securely
-     * 5. Exports the public key
-     * 6. Returns enrollment payload for backend registration
-     *
-     * @param deviceName - Optional user-friendly device label (e.g., "Ahmed's MacBook")
-     *                    If not provided, auto-generates from device info (e.g., "Chrome on macOS")
-     * @returns Enrollment payload to send to backend
-     * @throws Error if device is already enrolled or enrollment fails
-     */
-    enroll(deviceName?: string): Promise<EnrollmentPayload>;
-    /**
-     * Sign an HTTP request with device credentials
-     *
-     * This method:
-     * 1. Retrieves stored cryptographic keys
-     * 2. Generates timestamp and nonce
-     * 3. Creates canonical payload string
-     * 4. Signs the payload with private key
-     * 5. Returns headers to attach to the request
-     *
-     * @param request - Request details to sign
-     * @returns Signed request headers to attach to HTTP request
-     * @throws Error if device is not enrolled or signing fails
-     */
-    signRequest(request: {
-        method: string;
-        url: string;
-        body?: string;
-    }): Promise<SignedRequestHeaders>;
-    /**
-     * Unenroll this device by clearing all stored keys
-     *
-     * @throws Error if clearing keys fails
-     */
-    unenroll(): Promise<void>;
-    /**
-     * Check if this device is enrolled
-     *
-     * @returns true if device has stored keys, false otherwise
-     */
-    isEnrolled(): Promise<boolean>;
-    /**
-     * Generate a unique key ID from the public key
-     *
-     * @param publicKey - Public CryptoKey
-     * @returns Key identifier (hash of public key)
-     */
-    private generateKeyId;
-    /**
-     * Get the user agent string
-     *
-     * @returns User agent or undefined
-     */
-    private getUserAgent;
-}
-
-/**
- * KeyGuard SDK - Browser Storage Adapter
- *
- * IndexedDB-based storage implementation using idb-keyval
- * Stores CryptoKey objects directly using structured cloning
- */
-
-/**
- * Browser storage adapter using IndexedDB
- * Leverages IndexedDB's structured cloning to store CryptoKey objects directly
- */
-declare class BrowserStorageAdapter implements StorageAdapter {
-    /**
-     * Save a CryptoKey pair to IndexedDB
-     *
-     * @param publicKey - Public CryptoKey (extractable)
-     * @param privateKey - Private CryptoKey (non-extractable)
-     * @throws Error if storage operation fails
-     */
-    saveKeyPair(publicKey: CryptoKey, privateKey: CryptoKey): Promise<void>;
-    /**
-     * Retrieve the stored CryptoKey pair from IndexedDB
-     *
-     * @returns Key pair if exists, null if not found
-     * @throws Error if storage operation fails
-     */
-    getKeyPair(): Promise<{
-        publicKey: CryptoKey;
-        privateKey: CryptoKey;
-    } | null>;
-    /**
-     * Clear all stored keys from IndexedDB
-     *
-     * @throws Error if storage operation fails
-     */
-    clear(): Promise<void>;
-}
-
-export { BrowserStorageAdapter, CryptoManager, type EnrollmentPayload, KeyGuardClient, type KeyGuardConfig, type SignedRequestHeaders, type StorageAdapter, arrayBufferToBase64, base64ToArrayBuffer };
+export { BrowserStorageAdapter, CryptoManager, type EnrollmentPayload, type FingerprintProvider, KeyGuardClient, type KeyGuardConfig, MemoryStorageAdapter, type SignedRequestHeaders, type StorageAdapter, arrayBufferToBase64, base64ToArrayBuffer };
