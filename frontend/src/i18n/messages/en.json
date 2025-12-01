@@ -211,10 +211,10 @@
             "viewDetails": "View Details",
             "dismiss": "Dismiss",
             "types": {
-                "rateLimit": "Rate limit exceeded",
-                "suspiciousActivity": "Suspicious activity detected",
-                "authFailed": "Authentication failed",
-                "keyExpiring": "Key expiring soon"
+                "rate_limit": "Rate limit exceeded",
+                "suspicious_activity": "Suspicious activity detected",
+                "auth_failed": "Authentication failed",
+                "key_expiring": "Key expiring soon"
             }
         },
         "empty": {
