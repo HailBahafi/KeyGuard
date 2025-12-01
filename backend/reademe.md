@@ -1,7 +1,8 @@
-Start Backend Phase 1 Testing
+Backend README  — Start Backend Phase 1 Testing
 
-Create a file (for backend team) like: BACKEND_PHASE1_README.md
+Create a file (for backend team) like: `BACKEND_PHASE1_README.md`
 
+````md
 # KeyGuard Backend Phase 1 — Enrollment + Signature Verification (SDK Test)
 
 This README describes the minimal backend required to test the KeyGuard SDK end-to-end.
@@ -27,156 +28,144 @@ Body (from SDK):
   "userAgent": "<browser UA>",
   "metadata": {}
 }
-
+````
 
 Backend must store:
 
-projectApiKey (from your project table or API key record)
+* projectApiKey (from your project table or API key record)
+* keyId
+* publicKey (SPKI base64)
+* device fingerprint + label + status
 
-keyId
-
-publicKey (SPKI base64)
-
-device fingerprint + label + status
-
-Signed Request Headers (from SDK)
+### Signed Request Headers (from SDK)
 
 The SDK will add:
 
-x-keyguard-api-key: project key (e.g., kg_prod_123)
+* `x-keyguard-api-key`: project key (e.g., `kg_prod_123`)
+* `x-keyguard-key-id`: stable key identifier (hash-based)
+* `x-keyguard-timestamp`: ISO8601 timestamp
+* `x-keyguard-nonce`: random nonce (unique per request)
+* `x-keyguard-body-sha256`: SHA-256 hash of RAW request body bytes (empty body is allowed)
+* `x-keyguard-alg`: `ECDSA_P256_SHA256_P1363`
+* `x-keyguard-signature`: Base64 signature
 
-x-keyguard-key-id: stable key identifier (hash-based)
+> NOTE: The SDK uses WebCrypto ECDSA. The signature format is typically **IEEE-P1363 (r||s)**.
+> Your verification code must match that format.
 
-x-keyguard-timestamp: ISO8601 timestamp
+---
 
-x-keyguard-nonce: random nonce (unique per request)
-
-x-keyguard-body-sha256: SHA-256 hash of RAW request body bytes (empty body is allowed)
-
-x-keyguard-alg: ECDSA_P256_SHA256_P1363
-
-x-keyguard-signature: Base64 signature
-
-NOTE: The SDK uses WebCrypto ECDSA. The signature format is typically IEEE-P1363 (r||s).
-Your verification code must match that format.
-
-2) Canonical Payload to Verify
+## 2) Canonical Payload to Verify
 
 Backend must rebuild the exact signed payload:
 
+```
 kg-v1|{timestamp}|{METHOD}|{pathAndQuery}|{bodySha256}|{nonce}|{apiKey}|{keyId}
-
+```
 
 Rules:
 
-METHOD must be uppercase
+* METHOD must be uppercase
+* pathAndQuery must be ONLY `/path?query` (no scheme/host)
+* bodySha256 must be computed from the **raw request body bytes** exactly as received
 
-pathAndQuery must be ONLY /path?query (no scheme/host)
-
-bodySha256 must be computed from the raw request body bytes exactly as received
-
-empty body is allowed
+  * empty body is allowed
 
 If payload reconstruction differs by even 1 character, verification fails.
 
-3) Minimal Database Schema (Example)
+---
+
+## 3) Minimal Database Schema (Example)
 
 You need two tables:
 
-Projects (API Keys)
+### Projects (API Keys)
 
-id
+* `id`
+* `apiKey` (unique, e.g., `kg_prod_123`)
+* `status`
 
-apiKey (unique, e.g., kg_prod_123)
+### DeviceKeys (registered devices)
 
-status
-
-DeviceKeys (registered devices)
-
-id
-
-projectId
-
-keyId (string from SDK)
-
-publicKeySpkiBase64
-
-status (ACTIVE, REVOKED, etc.)
-
-createdAt, lastSeenAt
+* `id`
+* `projectId`
+* `keyId` (string from SDK)
+* `publicKeySpkiBase64`
+* `status` (`ACTIVE`, `REVOKED`, etc.)
+* `createdAt`, `lastSeenAt`
 
 Uniqueness:
 
-unique(projectId, keyId)
+* unique(projectId, keyId)
 
-4) Endpoints to Implement
-A) POST /api/v1/enroll
+---
 
-Purpose: store the public key under a project.
+## 4) Endpoints to Implement
 
-Request
+### A) POST `/api/v1/enroll`
 
-Header or body must identify the project (recommended: x-keyguard-api-key, or include apiKey in body)
+**Purpose:** store the public key under a project.
 
-Logic
+**Request**
 
-validate project API key exists and active
+* Header or body must identify the project (recommended: `x-keyguard-api-key`, or include `apiKey` in body)
 
-insert device key record:
+**Logic**
 
-keyId
+1. validate project API key exists and active
+2. insert device key record:
 
-publicKeySpkiBase64
+   * keyId
+   * publicKeySpkiBase64
+   * status ACTIVE
+   * optional: fingerprint, label, userAgent, metadata
+3. return `deviceId` and status
 
-status ACTIVE
+**Response**
 
-optional: fingerprint, label, userAgent, metadata
-
-return deviceId and status
-
-Response
-
+```json
 { "id": "device-uuid", "status": "ACTIVE" }
+```
 
-B) POST /api/v1/verify-test
+---
 
-Purpose: test signature verification (later becomes middleware).
+### B) POST `/api/v1/verify-test`
 
-Request
+**Purpose:** test signature verification (later becomes middleware).
 
-Any method/path/body is fine, but for testing this endpoint returns { valid: true/false }.
+**Request**
 
-Must receive the signed headers listed above.
+* Any method/path/body is fine, but for testing this endpoint returns `{ valid: true/false }`.
+* Must receive the signed headers listed above.
 
-Logic
+**Logic**
 
-Read headers: apiKey, keyId, signature, timestamp, nonce, bodySha256, alg
+1. Read headers: apiKey, keyId, signature, timestamp, nonce, bodySha256, alg
+2. DB lookup:
 
-DB lookup:
+   * project by apiKey
+   * device key by (projectId, keyId) -> get publicKeySpkiBase64
+3. Replay protection (required for a real system):
 
-project by apiKey
+   * timestamp must be within a window (e.g., 120 seconds)
+   * nonce must be unique per (projectId,keyId) within TTL (store in Redis with TTL)
+4. Reconstruct payload string:
+   `kg-v1|timestamp|METHOD|pathAndQuery|bodySha256|nonce|apiKey|keyId`
+5. Verify signature using the stored public key.
+6. Return `{ valid: true }` if verification passes.
 
-device key by (projectId, keyId) -> get publicKeySpkiBase64
+**Response**
 
-Replay protection (required for a real system):
-
-timestamp must be within a window (e.g., 120 seconds)
-
-nonce must be unique per (projectId,keyId) within TTL (store in Redis with TTL)
-
-Reconstruct payload string:
-kg-v1|timestamp|METHOD|pathAndQuery|bodySha256|nonce|apiKey|keyId
-
-Verify signature using the stored public key.
-
-Return { valid: true } if verification passes.
-
-Response
-
+```json
 { "valid": true }
+```
 
-5) Verification Code (Node.js)
-Option 1 (Recommended): Node WebCrypto verify (matches browser WebCrypto)
+---
+
+## 5) Verification Code (Node.js)
+
+### Option 1 (Recommended): Node WebCrypto verify (matches browser WebCrypto)
+
+```ts
 import { webcrypto } from "node:crypto";
 const subtle = webcrypto.subtle;
 
@@ -205,8 +194,11 @@ export async function verifySignatureWebCrypto(
     Buffer.from(payload, "utf8")
   );
 }
+```
 
-Option 2: node:crypto.verify with P1363 support
+### Option 2: node:crypto.verify with P1363 support
+
+```ts
 import { verify, createPublicKey } from "node:crypto";
 
 export function verifySignatureNodeCrypto(
@@ -227,41 +219,52 @@ export function verifySignatureNodeCrypto(
     Buffer.from(signatureBase64, "base64")
   );
 }
+```
 
-6) Raw Body Handling (Important)
+---
 
-To compute/compare x-keyguard-body-sha256, you must hash the raw request body bytes before parsing JSON.
+## 6) Raw Body Handling (Important)
 
-In Express, use a verify function in the JSON middleware to capture raw body:
+To compute/compare `x-keyguard-body-sha256`, you must hash the **raw request body bytes** before parsing JSON.
 
+In Express, use a `verify` function in the JSON middleware to capture raw body:
+
+```ts
 app.use(express.json({
   verify: (req: any, _res, buf) => {
     req.rawBody = buf; // Buffer
   }
 }));
+```
 
+Then compute SHA-256 on `req.rawBody` and compare with `x-keyguard-body-sha256`.
 
-Then compute SHA-256 on req.rawBody and compare with x-keyguard-body-sha256.
+---
 
-7) “Definition of Done” (Phase 1)
+## 7) “Definition of Done” (Phase 1)
 
 Backend is ready when:
 
-POST /api/v1/enroll stores a device public key under a project
+1. `POST /api/v1/enroll` stores a device public key under a project
+2. A browser client using the SDK can call `POST /api/v1/verify-test`
+   and backend returns:
 
-A browser client using the SDK can call POST /api/v1/verify-test
-and backend returns:
+   ```json
+   { "valid": true }
+   ```
 
-{ "valid": true }
+---
 
-8) Troubleshooting
+## 8) Troubleshooting
 
-If valid=false, the most common causes are:
+If `valid=false`, the most common causes are:
 
-Payload mismatch: backend used full URL instead of path+query
+* Payload mismatch: backend used full URL instead of path+query
+* Body mismatch: backend hashed parsed JSON instead of raw bytes
+* Signature format mismatch: backend assumed DER instead of IEEE-P1363
+* Timestamp window too strict or nonce reused
 
-Body mismatch: backend hashed parsed JSON instead of raw bytes
+```
 
-Signature format mismatch: backend assumed DER instead of IEEE-P1363
+---
 
-Timestamp window too strict or nonce reused
