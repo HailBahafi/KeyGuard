@@ -79,7 +79,7 @@ var CryptoManager = class {
    * 
    * @param privateKey - The private CryptoKey (non-extractable)
    * @param payload - The string payload to sign
-   * @returns Base64-encoded ECDSA signature
+   * @returns Base64-encoded ECDSA signature (IEEE P1363 format)
    * @throws Error if signing fails or key is not a private key
    */
   async sign(privateKey, payload) {
@@ -102,21 +102,27 @@ var CryptoManager = class {
     }
   }
   /**
-   * Create a canonicalized payload for signing
+   * Create a canonicalized payload for signing (V1 Protocol)
    * 
-   * This format is CRITICAL - the backend must parse this exact format
-   * Format: {timestamp}|{METHOD}|{url}|{body}|{nonce}
+   * Format: kg-v1|{timestamp}|{METHOD}|{pathAndQuery}|{bodySha256}|{nonce}|{apiKey}|{keyId}
    * 
-   * @param method - HTTP method (will be uppercased)
-   * @param url - Full request URL
-   * @param body - Request body (empty string if no body)
-   * @param timestamp - ISO 8601 timestamp
-   * @param nonce - Unique nonce for replay prevention
+   * @param params - Payload parameters
    * @returns Canonicalized payload string
    */
-  createPayload(method, url, body, timestamp, nonce) {
-    const normalizedMethod = method.toUpperCase();
-    return `${timestamp}|${normalizedMethod}|${url}|${body}|${nonce}`;
+  createPayloadV1(params) {
+    const normalizedMethod = params.method.toUpperCase();
+    return `kg-v1|${params.timestamp}|${normalizedMethod}|${params.pathAndQuery}|${params.bodySha256}|${params.nonce}|${params.apiKey}|${params.keyId}`;
+  }
+  /**
+   * Calculate SHA-256 hash of data and return as Base64
+   * 
+   * @param input - Data to hash (string or Uint8Array)
+   * @returns Base64 encoded SHA-256 hash
+   */
+  async hashSha256Base64(input) {
+    const data = typeof input === "string" ? new TextEncoder().encode(input) : input;
+    const hashBuffer = await this.crypto.subtle.digest("SHA-256", data);
+    return arrayBufferToBase64(hashBuffer);
   }
   /**
    * Generate a cryptographically secure random nonce
@@ -310,8 +316,7 @@ function generateDeviceLabel(components) {
 
 // src/client.ts
 var DEFAULT_CONFIG = {
-  apiBaseUrl: "https://api.keyguard.dev",
-  storage: "browser"
+  apiBaseUrl: "https://api.keyguard.dev"
 };
 var KeyGuardClient = class {
   /**
@@ -321,36 +326,62 @@ var KeyGuardClient = class {
    * @throws Error if configuration is invalid or storage is unavailable
    */
   constructor(config) {
+    if (!config.apiKey) {
+      throw new Error("KeyGuard SDK requires an apiKey");
+    }
     this.config = {
       ...DEFAULT_CONFIG,
       ...config
     };
     this.crypto = new CryptoManager();
-    if (this.config.storage === "browser") {
-      this.storage = new BrowserStorageAdapter();
+    if (this.config.storage) {
+      if (typeof this.config.storage === "string") {
+        if (this.config.storage === "browser") {
+          this.storage = new BrowserStorageAdapter();
+        } else if (this.config.storage === "memory") {
+          throw new Error("Memory storage string shortcut not fully implemented. Pass instance of MemoryStorageAdapter instead.");
+        } else {
+          throw new Error(`Unsupported storage type: ${this.config.storage}`);
+        }
+      } else {
+        this.storage = this.config.storage;
+      }
     } else {
-      throw new Error(`Unsupported storage type: ${this.config.storage}`);
+      if (typeof window !== "undefined" && typeof indexedDB !== "undefined") {
+        this.storage = new BrowserStorageAdapter();
+      } else {
+        throw new Error("No storage adapter provided and browser environment not detected. Please provide a custom storage adapter for Node.js environments.");
+      }
+    }
+    if (this.config.fingerprintProvider) {
+      this.fingerprintProvider = this.config.fingerprintProvider;
     }
   }
   /**
    * Enroll this device by generating and storing a cryptographic key pair
    * 
    * This method:
-   * 1. Collects device fingerprint using FingerprintJS
+   * 1. Collects device fingerprint
    * 2. Checks if device is already enrolled
    * 3. Generates a new ECDSA P-256 key pair
    * 4. Stores the keys securely
    * 5. Exports the public key
    * 6. Returns enrollment payload for backend registration
    * 
-   * @param deviceName - Optional user-friendly device label (e.g., "Ahmed's MacBook")
-   *                    If not provided, auto-generates from device info (e.g., "Chrome on macOS")
+   * @param deviceName - Optional user-friendly device label
    * @returns Enrollment payload to send to backend
    * @throws Error if device is already enrolled or enrollment fails
    */
   async enroll(deviceName) {
     try {
-      const fingerprint = await getDeviceFingerprint();
+      let fingerprint;
+      if (this.fingerprintProvider) {
+        fingerprint = await this.fingerprintProvider.getFingerprint();
+      } else if (typeof window !== "undefined") {
+        fingerprint = await getDeviceFingerprint();
+      } else {
+        throw new Error("No fingerprint provider configured and browser environment not detected.");
+      }
       const existingKeys = await this.storage.getKeyPair();
       if (existingKeys) {
         throw new Error(
@@ -360,9 +391,11 @@ var KeyGuardClient = class {
       const keyPair = await this.crypto.generateKeyPair();
       await this.storage.saveKeyPair(keyPair.publicKey, keyPair.privateKey);
       const publicKeyBase64 = await this.crypto.exportPublicKey(keyPair.publicKey);
+      const keyId = await this.generateKeyId(keyPair.publicKey);
       const label = deviceName || fingerprint.label;
       const enrollmentPayload = {
         publicKey: publicKeyBase64,
+        keyId,
         deviceFingerprint: fingerprint.visitorId,
         label,
         userAgent: this.getUserAgent(),
@@ -381,9 +414,10 @@ var KeyGuardClient = class {
    * This method:
    * 1. Retrieves stored cryptographic keys
    * 2. Generates timestamp and nonce
-   * 3. Creates canonical payload string
-   * 4. Signs the payload with private key
-   * 5. Returns headers to attach to the request
+   * 3. Calculates body hash
+   * 4. Creates canonical payload string (V1)
+   * 5. Signs the payload with private key
+   * 6. Returns headers to attach to the request
    * 
    * @param request - Request details to sign
    * @returns Signed request headers to attach to HTTP request
@@ -399,20 +433,37 @@ var KeyGuardClient = class {
       }
       const timestamp = (/* @__PURE__ */ new Date()).toISOString();
       const nonce = this.crypto.generateNonce();
-      const payload = this.crypto.createPayload(
-        request.method,
-        request.url,
-        request.body || "",
-        timestamp,
-        nonce
-      );
-      const signature = await this.crypto.sign(keyPair.privateKey, payload);
       const keyId = await this.generateKeyId(keyPair.publicKey);
+      const bodySha256 = await this.crypto.hashSha256Base64(request.body || "");
+      let pathAndQuery;
+      if (request.url.startsWith("/")) {
+        pathAndQuery = request.url;
+      } else {
+        try {
+          const urlObj = new URL(request.url);
+          pathAndQuery = urlObj.pathname + urlObj.search;
+        } catch (e) {
+          pathAndQuery = request.url;
+        }
+      }
+      const payload = this.crypto.createPayloadV1({
+        method: request.method,
+        pathAndQuery,
+        bodySha256,
+        timestamp,
+        nonce,
+        apiKey: this.config.apiKey,
+        keyId
+      });
+      const signature = await this.crypto.sign(keyPair.privateKey, payload);
       const headers = {
-        "X-KeyGuard-Signature": signature,
-        "X-KeyGuard-Timestamp": timestamp,
-        "X-KeyGuard-Nonce": nonce,
-        "X-KeyGuard-Key-ID": keyId
+        "x-keyguard-api-key": this.config.apiKey,
+        "x-keyguard-key-id": keyId,
+        "x-keyguard-timestamp": timestamp,
+        "x-keyguard-nonce": nonce,
+        "x-keyguard-body-sha256": bodySha256,
+        "x-keyguard-alg": "ECDSA_P256_SHA256_P1363",
+        "x-keyguard-signature": signature
       };
       return headers;
     } catch (error) {
@@ -476,6 +527,31 @@ var KeyGuardClient = class {
   }
 };
 
-export { BrowserStorageAdapter, CryptoManager, KeyGuardClient, arrayBufferToBase64, base64ToArrayBuffer };
+// src/storage/memory.ts
+var MemoryStorageAdapter = class {
+  constructor() {
+    this.publicKey = null;
+    this.privateKey = null;
+  }
+  async saveKeyPair(publicKey, privateKey) {
+    this.publicKey = publicKey;
+    this.privateKey = privateKey;
+  }
+  async getKeyPair() {
+    if (!this.publicKey || !this.privateKey) {
+      return null;
+    }
+    return {
+      publicKey: this.publicKey,
+      privateKey: this.privateKey
+    };
+  }
+  async clear() {
+    this.publicKey = null;
+    this.privateKey = null;
+  }
+};
+
+export { BrowserStorageAdapter, CryptoManager, KeyGuardClient, MemoryStorageAdapter, arrayBufferToBase64, base64ToArrayBuffer };
 //# sourceMappingURL=index.mjs.map
 //# sourceMappingURL=index.mjs.map

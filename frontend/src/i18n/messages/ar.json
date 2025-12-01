@@ -1,0 +1,463 @@
+{
+    "LandingPage": {
+        "hero": {
+            "headline": "أمان بدون ثقة لمفاتيح LLM الخاصة بك",
+            "subheadline": "توقف عن الاعتماد على القائمة البيضاء لعناوين IP. اربط مفاتيح API بالأجهزة المادية باستخدام التوقيعات التشفيرية.",
+            "ctaPrimary": "ابدأ الاستضافة الذاتية",
+            "ctaSecondary": "اقرأ الوثائق",
+            "badge": "مفتوح المصدر",
+            "trustUptime": "99.99% وقت التشغيل",
+            "trustSelfHosted": "مستضاف ذاتياً",
+            "trustLatency": "0ms زمن الاستجابة"
+        },
+        "features": {
+            "title": "أمان على مستوى المؤسسات",
+            "subtitle": "مصمم للامتثال والسيادة",
+            "deviceBinding": {
+                "title": "ربط الجهاز",
+                "description": "مفاتيح غير قابلة للاستخراج مخزنة في مخزن الأجهزة. بنية حقيقية خالية من الثقة."
+            },
+            "dataSovereignty": {
+                "title": "سيادة البيانات",
+                "description": "متوافق مع المملكة. بياناتك لا تغادر VPC الخاص بك أبداً. تحكم كامل، بدون قفل البائع."
+            },
+            "realTimeLogs": {
+                "title": "سجلات التدقيق في الوقت الفعلي",
+                "description": "تسجيل على مستوى الطب الشرعي لكل استدعاء API. تتبع الاستخدام، واكتشف الحالات الشاذة فوراً."
+            },
+            "costControl": {
+                "title": "التحكم في التكاليف",
+                "description": "مفاتيح إيقاف تلقائية لتجاوزات الميزانية. حصص لكل جهاز وتحديد المعدل."
+            }
+        },
+        "howItWorks": {
+            "title": "كيف يعمل",
+            "subtitle": "ثلاث خطوات لتأمين مفاتيح API الخاصة بك",
+            "step1": {
+                "title": "التسجيل",
+                "description": "ي قوم المطور بتشغيل أمر واحد لتسجيل جهازه مع البوابة"
+            },
+            "step2": {
+                "title": "التوقيع",
+                "description": "SDK يوقع تلقائياً كل طلب بمفتاح تشفير الجهاز"
+            },
+            "step3": {
+                "title": "التحقق",
+                "description": "البوابة تتحقق من صحة التوقيع وتعيد توجيه الطلبات المصادق عليها فقط إلى OpenAI"
+            }
+        },
+        "socialProof": {
+            "title": "مصمم للامتثال",
+            "metrics": {
+                "requests": "+10,000 طلب مؤمن",
+                "latency": "0ms زمن انتقال مضاف",
+                "uptime": "99.99% وقت التشغيل"
+            },
+            "badges": {
+                "nca": "متوافق مع NCA",
+                "sama": "جاهز لـ SAMA",
+                "selfHosted": "مستضاف ذاتياً"
+            }
+        },
+        "pricing": {
+            "title": "تسعير بسيط وشفاف",
+            "subtitle": "ابدأ مجاناً، وتوسع عندما تكون جاهزاً",
+            "community": {
+                "title": "المجتمع",
+                "price": "مجاني",
+                "description": "مثالي للأفراد والفرق الصغيرة",
+                "features": [
+                    "أجهزة غير محدودة",
+                    "تسجيل تدقيق أساسي",
+                    "دعم المجتمع",
+                    "نشر Docker"
+                ],
+                "cta": "ابدأ الآن"
+            },
+            "enterprise": {
+                "title": "المؤسسات",
+                "price": "مخصص",
+                "description": "للمؤسسات التي تتطلب الامتثال واتفاقيات SLA",
+                "features": [
+                    "كل ما في المجتمع",
+                    "امتثال متقدم (NCA/SAMA)",
+                    "دعم مخصص",
+                    "اتفاقيات SLA مخصصة"
+                ],
+                "cta": "اتصل بالمبيعات"
+            }
+        },
+        "footer": {
+            "product": "المنتج",
+            "features": "الميزات",
+            "pricing": "التسعير",
+            "docs": "الوثائق",
+            "resources": "الموارد",
+            "github": "GitHub",
+            "blog": "المدونة",
+            "company": "الشركة",
+            "about": "حول",
+            "contact": "اتصل",
+            "copyright": "مصمم لسيادة البيانات"
+        }
+    },
+    "LanguageSwitcher": {
+        "english": "الإنجليزية",
+        "arabic": "العربية"
+    },
+    "ThemeToggle": {
+        "light": "فاتح",
+        "dark": "داكن",
+        "system": "النظام"
+    },
+    "Auth": {
+        "login": {
+            "title": "مرحبًا بعودتك",
+            "subtitle": "تسجيل الدخول إلى حساب KeyGuard الخاص بك",
+            "emailLabel": "البريد الإلكتروني",
+            "emailPlaceholder": "admin@company.com",
+            "passwordLabel": "كلمة المرور",
+            "passwordPlaceholder": "أدخل كلمة المرور",
+            "submitButton": "تسجيل الدخول",
+            "forgotPassword": "نسيت كلمة المرور؟",
+            "loadingButton": "جارٍ تسجيل الدخول..."
+        },
+        "setup": {
+            "title": "مرحبًا بك في KeyGuard",
+            "subtitle": "قم بإعداد النسخة المستضافة ذاتيًا",
+            "orgNameLabel": "اسم المؤسسة",
+            "orgNamePlaceholder": "مؤسستك",
+            "adminEmailLabel": "البريد الإلكتروني للمسؤول",
+            "adminEmailPlaceholder": "admin@company.com",
+            "passwordLabel": "كلمة المرور",
+            "passwordPlaceholder": "أنشئ كلمة مرور قوية",
+            "confirmPasswordLabel": "تأكيد كلمة المرور",
+            "confirmPasswordPlaceholder": "أعد إدخال كلمة المرور",
+            "submitButton": "إكمال الإعداد",
+            "loadingButton": "جارٍ الإعداد..."
+        },
+        "errors": {
+            "required": "هذا الحقل مطلوب",
+            "invalidEmail": "يرجى إدخال بريد إلكتروني صحيح",
+            "passwordTooShort": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",
+            "passwordsDontMatch": "كلمات المرور غير متطابقة",
+            "minLength": "يجب أن يكون {min} أحرف على الأقل"
+        }
+    },
+    "Dashboard": {
+        "title": "لوحة التحكم",
+        "welcome": "مرحبًا بعودتك، {name}",
+        "lastUpdated": "آخر تحديث",
+        "metrics": {
+            "activeKeys": "المفاتيح النشطة",
+            "totalDevices": "إجمالي الأجهزة",
+            "apiCallsToday": "طلبات API اليوم",
+            "securityAlerts": "تنبيهات الأمان",
+            "trend": {
+                "from": "من الأسبوع الماضي",
+                "new": "جديد",
+                "resolved": "تم الحل"
+            }
+        },
+        "sections": {
+            "usageChart": "استخدام API",
+            "recentActivity": "النشاط الأخير",
+            "deviceStatus": "حالة الأجهزة",
+            "topDevices": "الأجهزة الأكثر نشاطًا",
+            "securityAlerts": "تنبيهات الأمان"
+        },
+        "dateRange": {
+            "label": "نطاق التاريخ",
+            "last7days": "آخر 7 أيام",
+            "last30days": "آخر 30 يومًا",
+            "last90days": "آخر 90 يومًا",
+            "custom": "نطاق مخصص",
+            "apply": "تطبيق",
+            "cancel": "إلغاء"
+        },
+        "chart": {
+            "successful": "ناجح",
+            "failed": "فشل",
+            "total": "إجمالي الطلبات",
+            "requests": "الطلبات"
+        },
+        "activity": {
+            "viewAll": "عرض الكل",
+            "deviceName": "الجهاز",
+            "action": "الإجراء",
+            "timestamp": "الوقت",
+            "status": "الحالة",
+            "actions": {
+                "keyRetrieved": "تم استرجاع مفتاح {keyName}",
+                "deviceEnrolled": "تسجيل جهاز جديد",
+                "keyRotated": "تدوير مفتاح {keyName}",
+                "requestMade": "تم إجراء طلب API"
+            },
+            "timeAgo": {
+                "justNow": "الآن",
+                "minutesAgo": "منذ {count} د",
+                "hoursAgo": "منذ {count} س",
+                "daysAgo": "منذ {count} ي"
+            }
+        },
+        "devices": {
+            "active": "نشط",
+            "idle": "خامل",
+            "offline": "غير متصل",
+            "calls": "{count} طلب",
+            "enrollDevice": "تسجيل جهاز"
+        },
+        "alerts": {
+            "viewDetails": "عرض التفاصيل",
+            "dismiss": "رفض",
+            "types": {
+                "rateLimit": "تم تجاوز حد المعدل",
+                "suspiciousActivity": "تم اكتشاف نشاط مشبوه",
+                "authFailed": "فشل المصادقة",
+                "keyExpiring": "المفتاح على وشك الانتهاء"
+            }
+        },
+        "empty": {
+            "noActivity": "لا يوجد نشاط بعد",
+            "noActivitySubtext": "ستظهر طلبات API هنا",
+            "noDevices": "لم يتم تسجيل أي أجهزة بعد",
+            "noDevicesSubtext": "سجل جهازك الأول للبدء",
+            "noAlerts": "جميع الأنظمة آمنة",
+            "noAlertsSubtext": "لا توجد تنبيهات أمنية في هذا الوقت"
+        },
+        "actions": {
+            "addDevice": "إضافة جهاز",
+            "refresh": "تحديث",
+            "export": "تصدير البيانات"
+        }
+    },
+    "KeyVault": {
+        "title": "خزينة المفاتيح",
+        "subtitle": "إدارة مفاتيح API بشكل آمن",
+        "search": {
+            "placeholder": "البحث عن المفاتيح...",
+            "clear": "مسح البحث"
+        },
+        "filters": {
+            "environment": {
+                "label": "البيئة",
+                "all": "جميع المفاتيح",
+                "production": "الإنتاج",
+                "development": "التطوير",
+                "staging": "التجهيز",
+                "archived": "المؤرشف"
+            },
+            "status": {
+                "label": "الحالة",
+                "all": "الكل",
+                "active": "نشط",
+                "idle": "خامل",
+                "expired": "منتهي",
+                "revoked": "ملغى"
+            },
+            "provider": {
+                "label": "المزود",
+                "all": "جميع المزودين",
+                "openai": "OpenAI",
+                "anthropic": "Anthropic",
+                "google": "Google (Gemini)",
+                "azure": "Azure OpenAI",
+                "other": "آخر"
+            },
+            "sort": {
+                "label": "الترتيب",
+                "recent": "الأحدث",
+                "nameAsc": "الاسم (أ-ي)",
+                "nameDesc": "الاسم (ي-أ)",
+                "mostUsed": "الأكثر استخداماً",
+                "expiringSoon": "ينتهي قريباً"
+            },
+            "clearAll": "مسح جميع الفلاتر"
+        },
+        "table": {
+            "columns": {
+                "name": "الاسم",
+                "provider": "المزود",
+                "status": "الحالة",
+                "usedBy": "مستخدم من قبل",
+                "expiration": "الانتهاء",
+                "actions": "الإجراءات"
+            },
+            "status": {
+                "active": "نشط",
+                "idle": "خامل",
+                "expired": "منتهي",
+                "revoked": "ملغى"
+            },
+            "usedBy": {
+                "devices": "{count} أجهزة",
+                "device": "{count} جهاز",
+                "notUsed": "غير مستخدم"
+            },
+            "expiration": {
+                "daysLeft": "{count} يوم متبقي",
+                "expiresOn": "ينتهي {date}",
+                "never": "أبداً",
+                "expired": "منتهي"
+            }
+        },
+        "actions": {
+            "create": "إنشاء مفتاح",
+            "viewDetails": "عرض التفاصيل",
+            "copy": "نسخ المفتاح",
+            "copied": "تم النسخ!",
+            "rotate": "تدوير المفتاح",
+            "edit": "تحرير",
+            "revoke": "إلغاء المفتاح",
+            "delete": "حذف المفتاح"
+        },
+        "createDialog": {
+            "title": "إنشاء مفتاح API جديد",
+            "steps": {
+                "basic": "المعلومات الأساسية",
+                "apiKey": "قيمة المفتاح",
+                "security": "إعدادات الأمان",
+                "review": "المراجعة والإنشاء"
+            },
+            "basicInfo": {
+                "keyName": "اسم المفتاح",
+                "keyNamePlaceholder": "openai-production-key",
+                "keyNameHelp": "أحرف صغيرة وأرقام وشرطات فقط",
+                "provider": "المزود",
+                "providerPlaceholder": "اختر مزوداً",
+                "environment": "البيئة",
+                "environments": {
+                    "production": "الإنتاج",
+                    "development": "التطوير",
+                    "staging": "التجهيز"
+                },
+                "description": "الوصف",
+                "descriptionPlaceholder": "ملاحظات اختيارية"
+            },
+            "apiKeyValue": {
+                "inputMethod": "كيف تريد إضافة المفتاح؟",
+                "pasteExisting": "لصق مفتاح موجود",
+                "generatePlaceholder": "إنشاء نائب",
+                "apiKeyLabel": "مفتاح API",
+                "apiKeyPlaceholder": "sk-...",
+                "showKey": "إظهار",
+                "hideKey": "إخفاء",
+                "securityNotice": "يخزن KeyGuard المفاتيح مشفرة."
+            },
+            "securitySettings": {
+                "expiration": "انتهاء الصلاحية",
+                "expirationOptions": {
+                    "never": "أبداً",
+                    "30days": "30 يوم",
+                    "60days": "60 يوم",
+                    "90days": "90 يوم",
+                    "1year": "سنة",
+                    "custom": "تاريخ مخصص"
+                },
+                "rateLimit": "تفعيل حد المعدل",
+                "rateLimitLabel": "الحد الأقصى للطلبات",
+                "rateLimitPlaceholder": "100",
+                "allowedDevices": "الأجهزة المسموحة",
+                "allDevices": "جميع الأجهزة",
+                "specificDevices": "أجهزة محددة",
+                "notifications": "الإشعارات",
+                "notifyUsage": "إشعار عند الاستخدام",
+                "notifyExpiring": "تنبيه قبل 7 أيام"
+            },
+            "review": {
+                "summary": "راجع الإعدادات",
+                "edit": "تحرير"
+            },
+            "buttons": {
+                "next": "التالي",
+                "back": "السابق",
+                "create": "إنشاء",
+                "done": "تم"
+            },
+            "success": {
+                "title": "تم الإنشاء بنجاح!",
+                "warning": "هذه المرة الوحيدة لرؤية القيمة الكاملة",
+                "copyButton": "نسخ المفتاح"
+            }
+        },
+        "detailsSheet": {
+            "title": "تفاصيل المفتاح",
+            "information": {
+                "created": "تم الإنشاء",
+                "lastUsed": "آخر استخدام",
+                "totalUses": "إجمالي الاستخدامات",
+                "expiration": "الانتهاء",
+                "description": "الوصف",
+                "editDescription": "تحرير الوصف"
+            },
+            "usageStats": {
+                "title": "إحصائيات الاستخدام",
+                "totalCalls": "إجمالي المكالمات",
+                "successRate": "معدل النجاح"
+            },
+            "devices": {
+                "title": "الأجهزة المصرح بها",
+                "lastAccess": "آخر وصول: {time}",
+                "removeAccess": "إزالة الوصول",
+                "addDevice": "إضافة جهاز"
+            },
+            "activity": {
+                "title": "النشاط الأخير",
+                "viewAll": "عرض السجل الكامل"
+            },
+            "dangerZone": {
+                "title": "منطقة الخطر",
+                "rotateTitle": "تدوير المفتاح",
+                "rotateDescription": "ينشئ قيمة جديدة",
+                "revokeTitle": "إلغاء المفتاح",
+                "revokeDescription": "تعطيل نهائي"
+            }
+        },
+        "revokeDialog": {
+            "title": "إلغاء مفتاح API",
+            "description": "لا يمكن التراجع",
+            "confirmLabel": "اكتب اسم المفتاح",
+            "confirmPlaceholder": "أدخل الاسم",
+            "reasonLabel": "السبب",
+            "reasonPlaceholder": "اختياري",
+            "cancel": "إلغاء",
+            "confirm": "تأكيد الإلغاء"
+        },
+        "rotateDialog": {
+            "title": "تدوير المفتاح",
+            "description": "سيتم إبطال القديم",
+            "newKeyLabel": "القيمة الجديدة",
+            "newKeyPlaceholder": "sk-...",
+            "generateNew": "إنشاء",
+            "cancel": "إلغاء",
+            "confirm": "تدوير",
+            "success": "تم التدوير!"
+        },
+        "empty": {
+            "noKeys": "لا مفاتيح بعد",
+            "noKeysDescription": "أنشئ مفتاحك الأول",
+            "noResults": "لا نتائج لـ \"{query}\"",
+            "noResultsDescription": "جرب مصطلحات أخرى",
+            "noFilterResults": "لا توجد نتائج",
+            "createButton": "إنشاء مفتاح"
+        },
+        "validation": {
+            "nameRequired": "الاسم مطلوب",
+            "nameMinLength": "3 أحرف على الأقل",
+            "nameMaxLength": "أقل من 50 حرفاً",
+            "nameFormat": "أحرف صغيرة وأرقام وشرطات فقط",
+            "providerRequired": "المزود مطلوب",
+            "apiKeyRequired": "المفتاح مطلوب",
+            "apiKeyMinLength": "10 أحرف على الأقل",
+            "rateLimitMin": "1 على الأقل",
+            "rateLimitMax": "لا يتجاوز 10,000",
+            "descriptionMaxLength": "أقل من 500 حرف"
+        },
+        "pagination": {
+            "previous": "السابق",
+            "next": "التالي",
+            "page": "صفحة {current} من {total}",
+            "showing": "عرض {from}-{to} من {total}"
+        }
+    }
+}
