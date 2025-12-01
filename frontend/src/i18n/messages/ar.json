@@ -211,10 +211,10 @@
             "viewDetails": "عرض التفاصيل",
             "dismiss": "رفض",
             "types": {
-                "rateLimit": "تم تجاوز حد المعدل",
-                "suspiciousActivity": "تم اكتشاف نشاط مشبوه",
-                "authFailed": "فشل المصادقة",
-                "keyExpiring": "المفتاح على وشك الانتهاء"
+                "rate_limit": "تم تجاوز حد المعدل",
+                "suspicious_activity": "تم اكتشاف نشاط مشبوه",
+                "auth_failed": "فشل المصادقة",
+                "key_expiring": "المفتاح على وشك الانتهاء"
             }
         },
         "empty": {
