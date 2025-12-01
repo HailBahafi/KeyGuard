@@ -1,168 +1,267 @@
-# Backend Phase 1 Technical Specification
+Start Backend Phase 1 Testing
 
-## Overview
+Create a file (for backend team) like: BACKEND_PHASE1_README.md
 
-This document outlines the backend requirements to support the SDK functionality for device enrollment and signature verification. You need to implement **2 endpoints**, **2 database tables**, and **cryptographic verification logic**.
+# KeyGuard Backend Phase 1 — Enrollment + Signature Verification (SDK Test)
 
----
+This README describes the minimal backend required to test the KeyGuard SDK end-to-end.
 
-## 1. Database Schema
-
-We need two core tables in Prisma to link devices to projects.
-
-```prisma
-// schema.prisma
-
-// 1. API Keys for projects (e.g., kg_prod_123)
-model ApiKey {
-  id        String   @id @default(uuid())
-  keyPrefix String   @unique // The ID sent from the SDK
-  name      String
-  devices   Device[] // One-to-many: one key has many devices
-  createdAt DateTime @default(now())
-}
-
-// 2. Registered devices (developer laptops)
-model Device {
-  id                String   @id @default(uuid())
-  publicKey         String   @unique // Most important field (Base64 SPKI)
-  fingerprint       String   // Device fingerprint from FingerprintJS
-  label             String   // Device name (e.g., "Ahmed's Mac")
-  status            String   @default("ACTIVE") // ACTIVE, PENDING, REVOKED
-  
-  apiKeyId          String
-  apiKey            ApiKey   @relation(fields: [apiKeyId], references: [id])
-  
-  lastSeenAt        DateTime @default(now())
-  createdAt         DateTime @default(now())
-  
-  @@unique([apiKeyId, publicKey]) // Prevent duplicate device for same key
-}
-```
+The SDK performs **device binding** by:
+- generating an ECDSA P-256 key pair on the client
+- sending the **public key** to the backend during enrollment
+- signing each request using the device **private key**
+- backend verifies signed requests using the stored **public key**
 
 ---
 
-## 2. Endpoint #1: Device Enrollment
+## 1) Protocol Summary (What the SDK Sends)
 
-**Purpose:** The SDK will send you the public key, and you store it in the database.
-
-### Request
-
-- **Method:** `POST`
-- **Path:** `/api/v1/enroll`
-- **Body:**
-
+### Enrollment (`POST /api/v1/enroll`)
+Body (from SDK):
 ```json
 {
-  "apiKey": "kg_prod_12345",       // Project API key
-  "publicKey": "MFkwEwYHKoZ...",   // Public key (Base64)
-  "deviceFingerprint": "a1b2c3d4", // Device fingerprint
-  "label": "Chrome on MacOS",      // Device name
-  "metadata": {}                   // Optional additional data
+  "publicKey": "<Base64 SPKI>",
+  "keyId": "<string key id>",
+  "deviceFingerprint": "<fingerprintjs visitorId>",
+  "label": "Ahmed’s MacBook",
+  "userAgent": "<browser UA>",
+  "metadata": {}
 }
-```
 
-### Required Logic
 
-1. Verify that `apiKey` exists in the `ApiKey` table
-2. Save the data to the `Device` table
-3. Return the `deviceId`
+Backend must store:
 
-### Response
+projectApiKey (from your project table or API key record)
 
-```json
-{
-  "id": "device-uuid-here",
-  "status": "ACTIVE"
+keyId
+
+publicKey (SPKI base64)
+
+device fingerprint + label + status
+
+Signed Request Headers (from SDK)
+
+The SDK will add:
+
+x-keyguard-api-key: project key (e.g., kg_prod_123)
+
+x-keyguard-key-id: stable key identifier (hash-based)
+
+x-keyguard-timestamp: ISO8601 timestamp
+
+x-keyguard-nonce: random nonce (unique per request)
+
+x-keyguard-body-sha256: SHA-256 hash of RAW request body bytes (empty body is allowed)
+
+x-keyguard-alg: ECDSA_P256_SHA256_P1363
+
+x-keyguard-signature: Base64 signature
+
+NOTE: The SDK uses WebCrypto ECDSA. The signature format is typically IEEE-P1363 (r||s).
+Your verification code must match that format.
+
+2) Canonical Payload to Verify
+
+Backend must rebuild the exact signed payload:
+
+kg-v1|{timestamp}|{METHOD}|{pathAndQuery}|{bodySha256}|{nonce}|{apiKey}|{keyId}
+
+
+Rules:
+
+METHOD must be uppercase
+
+pathAndQuery must be ONLY /path?query (no scheme/host)
+
+bodySha256 must be computed from the raw request body bytes exactly as received
+
+empty body is allowed
+
+If payload reconstruction differs by even 1 character, verification fails.
+
+3) Minimal Database Schema (Example)
+
+You need two tables:
+
+Projects (API Keys)
+
+id
+
+apiKey (unique, e.g., kg_prod_123)
+
+status
+
+DeviceKeys (registered devices)
+
+id
+
+projectId
+
+keyId (string from SDK)
+
+publicKeySpkiBase64
+
+status (ACTIVE, REVOKED, etc.)
+
+createdAt, lastSeenAt
+
+Uniqueness:
+
+unique(projectId, keyId)
+
+4) Endpoints to Implement
+A) POST /api/v1/enroll
+
+Purpose: store the public key under a project.
+
+Request
+
+Header or body must identify the project (recommended: x-keyguard-api-key, or include apiKey in body)
+
+Logic
+
+validate project API key exists and active
+
+insert device key record:
+
+keyId
+
+publicKeySpkiBase64
+
+status ACTIVE
+
+optional: fingerprint, label, userAgent, metadata
+
+return deviceId and status
+
+Response
+
+{ "id": "device-uuid", "status": "ACTIVE" }
+
+B) POST /api/v1/verify-test
+
+Purpose: test signature verification (later becomes middleware).
+
+Request
+
+Any method/path/body is fine, but for testing this endpoint returns { valid: true/false }.
+
+Must receive the signed headers listed above.
+
+Logic
+
+Read headers: apiKey, keyId, signature, timestamp, nonce, bodySha256, alg
+
+DB lookup:
+
+project by apiKey
+
+device key by (projectId, keyId) -> get publicKeySpkiBase64
+
+Replay protection (required for a real system):
+
+timestamp must be within a window (e.g., 120 seconds)
+
+nonce must be unique per (projectId,keyId) within TTL (store in Redis with TTL)
+
+Reconstruct payload string:
+kg-v1|timestamp|METHOD|pathAndQuery|bodySha256|nonce|apiKey|keyId
+
+Verify signature using the stored public key.
+
+Return { valid: true } if verification passes.
+
+Response
+
+{ "valid": true }
+
+5) Verification Code (Node.js)
+Option 1 (Recommended): Node WebCrypto verify (matches browser WebCrypto)
+import { webcrypto } from "node:crypto";
+const subtle = webcrypto.subtle;
+
+const importParams: EcKeyImportParams = { name: "ECDSA", namedCurve: "P-256" };
+const verifyParams: EcdsaParams = { name: "ECDSA", hash: { name: "SHA-256" } };
+
+const b64 = (s: string) => Buffer.from(s, "base64");
+
+export async function verifySignatureWebCrypto(
+  publicKeySpkiBase64: string,
+  payload: string,
+  signatureBase64: string
+) {
+  const publicKey = await subtle.importKey(
+    "spki",
+    b64(publicKeySpkiBase64),
+    importParams,
+    true,
+    ["verify"]
+  );
+
+  return subtle.verify(
+    verifyParams,
+    publicKey,
+    b64(signatureBase64),
+    Buffer.from(payload, "utf8")
+  );
 }
-```
 
----
+Option 2: node:crypto.verify with P1363 support
+import { verify, createPublicKey } from "node:crypto";
 
-## 3. Endpoint #2: Signature Verification
+export function verifySignatureNodeCrypto(
+  publicKeySpkiBase64: string,
+  payload: string,
+  signatureBase64: string
+) {
+  const publicKey = createPublicKey({
+    key: Buffer.from(publicKeySpkiBase64, "base64"),
+    format: "der",
+    type: "spki",
+  });
 
-**Purpose:** This is the "checkpoint". The SDK will send you a signature, and you verify if it's valid. (Currently for testing; later it will become Middleware).
+  return verify(
+    "sha256",
+    Buffer.from(payload, "utf8"),
+    { key: publicKey, dsaEncoding: "ieee-p1363" },
+    Buffer.from(signatureBase64, "base64")
+  );
+}
 
-### Request
+6) Raw Body Handling (Important)
 
-- **Method:** `POST`
-- **Path:** `/api/v1/verify-test`
+To compute/compare x-keyguard-body-sha256, you must hash the raw request body bytes before parsing JSON.
 
-### Headers You Will Receive
+In Express, use a verify function in the JSON middleware to capture raw body:
 
-- `x-keyguard-signature`: The encrypted signature
-- `x-keyguard-key-id`: The Public Key (or its ID)
-- `x-keyguard-timestamp`: Request timestamp
-- `x-keyguard-nonce`: Random number
-
-### Core Cryptographic Logic
-
-This is the code needed to verify the **ECDSA P-256** algorithm.
-
-```typescript
-import { verify, createPublicKey } from 'node:crypto';
-
-// This function is the heart of the system
-function verifyRequest(publicKeyBase64: string, signatureBase64: string, payloadString: string): boolean {
-  try {
-    // 1. Prepare the public key
-    const publicKey = createPublicKey({
-      key: Buffer.from(publicKeyBase64, 'base64'),
-      format: 'der', // Because we send it as SPKI Raw
-      type: 'spki'
-    });
-
-    // 2. Verify
-    const isValid = verify(
-      "sha256", 
-      Buffer.from(payloadString), 
-      publicKey, 
-      Buffer.from(signatureBase64, 'base64')
-    );
-
-    return isValid;
-  } catch (e) {
-    console.error("Crypto Error:", e);
-    return false;
+app.use(express.json({
+  verify: (req: any, _res, buf) => {
+    req.rawBody = buf; // Buffer
   }
-}
-```
+}));
 
-**Note:** The `payloadString` is a concatenation of: `timestamp|METHOD|url|body|nonce`
 
-### Response
+Then compute SHA-256 on req.rawBody and compare with x-keyguard-body-sha256.
 
-```json
-{
-  "valid": true
-}
-```
+7) “Definition of Done” (Phase 1)
 
----
+Backend is ready when:
 
-## 4. Definition of Done (This Week)
+POST /api/v1/enroll stores a device public key under a project
 
-The server should be ready so that:
+A browser client using the SDK can call POST /api/v1/verify-test
+and backend returns:
 
-1. I can send `POST /enroll` and my device gets saved in the database
-2. I can send `POST /verify-test` with a signature from my device, and the server responds with `{ "valid": true }`
+{ "valid": true }
 
----
+8) Troubleshooting
 
-## Technical Notes
+If valid=false, the most common causes are:
 
-- **Database:** Use Prisma with the schema provided above
-- **Crypto Library:** Node.js built-in `crypto` module
-- **Algorithm:** ECDSA with P-256 curve and SHA-256 hashing
-- **Key Format:** SPKI (SubjectPublicKeyInfo) in Base64
-- **Signature Format:** Base64-encoded raw signature bytes
+Payload mismatch: backend used full URL instead of path+query
 
----
+Body mismatch: backend hashed parsed JSON instead of raw bytes
 
-## Next Steps
+Signature format mismatch: backend assumed DER instead of IEEE-P1363
 
-Once these endpoints are functional:
-1. We'll integrate the SDK with the server
-2. Test end-to-end device enrollment
-3. Verify signature validation works correctly
-4. Celebrate the first secure connection! 🚀
+Timestamp window too strict or nonce reused
