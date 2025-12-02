@@ -110,6 +110,16 @@
         "dark": "Dark",
         "system": "System"
     },
+
+    "Navigation": {
+        "home": "Home",
+        "dashboard": "Dashboard",
+        "keys": "API Keys",
+        "devices": "Devices",
+        "audit": "Audit Logs",
+        "integration": "Integration",
+        "settings": "Settings"
+    },
     "Auth": {
         "login": {
             "title": "Welcome Back",
@@ -211,10 +221,10 @@
             "viewDetails": "View Details",
             "dismiss": "Dismiss",
             "types": {
-                "rate_limit": "Rate limit exceeded",
-                "suspicious_activity": "Suspicious activity detected",
-                "auth_failed": "Authentication failed",
-                "key_expiring": "Key expiring soon"
+                "rateLimit": "Rate limit exceeded",
+                "suspiciousActivity": "Suspicious activity detected",
+                "authFailed": "Authentication failed",
+                "keyExpiring": "Key expiring soon"
             }
         },
         "empty": {

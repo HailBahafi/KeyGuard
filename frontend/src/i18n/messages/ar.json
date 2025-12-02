@@ -110,6 +110,15 @@
         "dark": "داكن",
         "system": "النظام"
     },
+    "Navigation": {
+        "home": "الرئيسية",
+        "dashboard": "لوحة التحكم",
+        "keys": "مفاتيح API",
+        "devices": "الأجهزة",
+        "audit": "سجلات التدقيق",
+        "integration": "التكامل",
+        "settings": "الإعدادات"
+    },
     "Auth": {
         "login": {
             "title": "مرحبًا بعودتك",
@@ -211,10 +220,10 @@
             "viewDetails": "عرض التفاصيل",
             "dismiss": "رفض",
             "types": {
-                "rate_limit": "تم تجاوز حد المعدل",
-                "suspicious_activity": "تم اكتشاف نشاط مشبوه",
-                "auth_failed": "فشل المصادقة",
-                "key_expiring": "المفتاح على وشك الانتهاء"
+                "rateLimit": "تم تجاوز حد المعدل",
+                "suspiciousActivity": "تم اكتشاف نشاط مشبوه",
+                "authFailed": "فشل المصادقة",
+                "keyExpiring": "المفتاح على وشك الانتهاء"
             }
         },
         "empty": {
