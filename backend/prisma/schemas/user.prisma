@@ -5,19 +5,19 @@ model User {
   isActive  Boolean  @default(true)
   lastLogin DateTime?
 
-  phone    String?
   email    String   @unique
-  username String   @unique
+  name     String
   password String
   avatar   String?
-  role     UserRole @default(BUYER)
+  role     UserRole @default(USER)
 
+  // Relations
+  auditLogs AuditLog[]
 
   @@map("users")
 }
 
 enum UserRole {
   ADMIN
-  SELLER
-  BUYER
+  USER
 }

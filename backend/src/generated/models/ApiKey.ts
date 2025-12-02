@@ -20,64 +20,124 @@ export type ApiKeyModel = runtime.Types.Result.DefaultSelection<Prisma.$ApiKeyPa
 
 export type AggregateApiKey = {
   _count: ApiKeyCountAggregateOutputType | null
+  _avg: ApiKeyAvgAggregateOutputType | null
+  _sum: ApiKeySumAggregateOutputType | null
   _min: ApiKeyMinAggregateOutputType | null
   _max: ApiKeyMaxAggregateOutputType | null
 }
 
+export type ApiKeyAvgAggregateOutputType = {
+  usageCount: number | null
+}
+
+export type ApiKeySumAggregateOutputType = {
+  usageCount: number | null
+}
+
 export type ApiKeyMinAggregateOutputType = {
   id: string | null
-  keyPrefix: string | null
   name: string | null
+  provider: $Enums.ApiKeyProvider | null
   status: $Enums.ApiKeyStatus | null
+  environment: $Enums.ApiKeyEnvironment | null
   createdAt: Date | null
   updatedAt: Date | null
+  lastUsed: Date | null
+  expiresAt: Date | null
+  description: string | null
+  maskedValue: string | null
+  fullValue: string | null
+  usageCount: number | null
 }
 
 export type ApiKeyMaxAggregateOutputType = {
   id: string | null
-  keyPrefix: string | null
   name: string | null
+  provider: $Enums.ApiKeyProvider | null
   status: $Enums.ApiKeyStatus | null
+  environment: $Enums.ApiKeyEnvironment | null
   createdAt: Date | null
   updatedAt: Date | null
+  lastUsed: Date | null
+  expiresAt: Date | null
+  description: string | null
+  maskedValue: string | null
+  fullValue: string | null
+  usageCount: number | null
 }
 
 export type ApiKeyCountAggregateOutputType = {
   id: number
-  keyPrefix: number
   name: number
+  provider: number
   status: number
+  environment: number
   createdAt: number
   updatedAt: number
+  lastUsed: number
+  expiresAt: number
+  description: number
+  maskedValue: number
+  fullValue: number
+  usageCount: number
   _all: number
 }
 
 
+export type ApiKeyAvgAggregateInputType = {
+  usageCount?: true
+}
+
+export type ApiKeySumAggregateInputType = {
+  usageCount?: true
+}
+
 export type ApiKeyMinAggregateInputType = {
   id?: true
-  keyPrefix?: true
   name?: true
+  provider?: true
   status?: true
+  environment?: true
   createdAt?: true
   updatedAt?: true
+  lastUsed?: true
+  expiresAt?: true
+  description?: true
+  maskedValue?: true
+  fullValue?: true
+  usageCount?: true
 }
 
 export type ApiKeyMaxAggregateInputType = {
   id?: true
-  keyPrefix?: true
   name?: true
+  provider?: true
   status?: true
+  environment?: true
   createdAt?: true
   updatedAt?: true
+  lastUsed?: true
+  expiresAt?: true
+  description?: true
+  maskedValue?: true
+  fullValue?: true
+  usageCount?: true
 }
 
 export type ApiKeyCountAggregateInputType = {
   id?: true
-  keyPrefix?: true
   name?: true
+  provider?: true
   status?: true
+  environment?: true
   createdAt?: true
   updatedAt?: true
+  lastUsed?: true
+  expiresAt?: true
+  description?: true
+  maskedValue?: true
+  fullValue?: true
+  usageCount?: true
   _all?: true
 }
 
@@ -119,6 +179,18 @@ export type ApiKeyAggregateArgs<ExtArgs extends runtime.Types.Extensions.Interna
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: ApiKeyAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: ApiKeySumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: ApiKeyMinAggregateInputType
@@ -149,18 +221,29 @@ export type ApiKeyGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   _count?: ApiKeyCountAggregateInputType | true
+  _avg?: ApiKeyAvgAggregateInputType
+  _sum?: ApiKeySumAggregateInputType
   _min?: ApiKeyMinAggregateInputType
   _max?: ApiKeyMaxAggregateInputType
 }
 
 export type ApiKeyGroupByOutputType = {
   id: string
-  keyPrefix: string
   name: string
+  provider: $Enums.ApiKeyProvider
   status: $Enums.ApiKeyStatus
+  environment: $Enums.ApiKeyEnvironment
   createdAt: Date
   updatedAt: Date
+  lastUsed: Date | null
+  expiresAt: Date | null
+  description: string | null
+  maskedValue: string
+  fullValue: string
+  usageCount: number
   _count: ApiKeyCountAggregateOutputType | null
+  _avg: ApiKeyAvgAggregateOutputType | null
+  _sum: ApiKeySumAggregateOutputType | null
   _min: ApiKeyMinAggregateOutputType | null
   _max: ApiKeyMaxAggregateOutputType | null
 }
@@ -185,47 +268,80 @@ export type ApiKeyWhereInput = {
   OR?: Prisma.ApiKeyWhereInput[]
   NOT?: Prisma.ApiKeyWhereInput | Prisma.ApiKeyWhereInput[]
   id?: Prisma.StringFilter<"ApiKey"> | string
-  keyPrefix?: Prisma.StringFilter<"ApiKey"> | string
   name?: Prisma.StringFilter<"ApiKey"> | string
+  provider?: Prisma.EnumApiKeyProviderFilter<"ApiKey"> | $Enums.ApiKeyProvider
   status?: Prisma.EnumApiKeyStatusFilter<"ApiKey"> | $Enums.ApiKeyStatus
+  environment?: Prisma.EnumApiKeyEnvironmentFilter<"ApiKey"> | $Enums.ApiKeyEnvironment
   createdAt?: Prisma.DateTimeFilter<"ApiKey"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ApiKey"> | Date | string
+  lastUsed?: Prisma.DateTimeNullableFilter<"ApiKey"> | Date | string | null
+  expiresAt?: Prisma.DateTimeNullableFilter<"ApiKey"> | Date | string | null
+  description?: Prisma.StringNullableFilter<"ApiKey"> | string | null
+  maskedValue?: Prisma.StringFilter<"ApiKey"> | string
+  fullValue?: Prisma.StringFilter<"ApiKey"> | string
+  usageCount?: Prisma.IntFilter<"ApiKey"> | number
   devices?: Prisma.DeviceListRelationFilter
+  auditLogs?: Prisma.AuditLogListRelationFilter
 }
 
 export type ApiKeyOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  keyPrefix?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  environment?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  lastUsed?: Prisma.SortOrderInput | Prisma.SortOrder
+  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
+  maskedValue?: Prisma.SortOrder
+  fullValue?: Prisma.SortOrder
+  usageCount?: Prisma.SortOrder
   devices?: Prisma.DeviceOrderByRelationAggregateInput
+  auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
 }
 
 export type ApiKeyWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  keyPrefix?: string
   AND?: Prisma.ApiKeyWhereInput | Prisma.ApiKeyWhereInput[]
   OR?: Prisma.ApiKeyWhereInput[]
   NOT?: Prisma.ApiKeyWhereInput | Prisma.ApiKeyWhereInput[]
   name?: Prisma.StringFilter<"ApiKey"> | string
+  provider?: Prisma.EnumApiKeyProviderFilter<"ApiKey"> | $Enums.ApiKeyProvider
   status?: Prisma.EnumApiKeyStatusFilter<"ApiKey"> | $Enums.ApiKeyStatus
+  environment?: Prisma.EnumApiKeyEnvironmentFilter<"ApiKey"> | $Enums.ApiKeyEnvironment
   createdAt?: Prisma.DateTimeFilter<"ApiKey"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ApiKey"> | Date | string
+  lastUsed?: Prisma.DateTimeNullableFilter<"ApiKey"> | Date | string | null
+  expiresAt?: Prisma.DateTimeNullableFilter<"ApiKey"> | Date | string | null
+  description?: Prisma.StringNullableFilter<"ApiKey"> | string | null
+  maskedValue?: Prisma.StringFilter<"ApiKey"> | string
+  fullValue?: Prisma.StringFilter<"ApiKey"> | string
+  usageCount?: Prisma.IntFilter<"ApiKey"> | number
   devices?: Prisma.DeviceListRelationFilter
-}, "id" | "keyPrefix">
+  auditLogs?: Prisma.AuditLogListRelationFilter
+}, "id">
 
 export type ApiKeyOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  keyPrefix?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  environment?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  lastUsed?: Prisma.SortOrderInput | Prisma.SortOrder
+  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
+  maskedValue?: Prisma.SortOrder
+  fullValue?: Prisma.SortOrder
+  usageCount?: Prisma.SortOrder
   _count?: Prisma.ApiKeyCountOrderByAggregateInput
+  _avg?: Prisma.ApiKeyAvgOrderByAggregateInput
   _max?: Prisma.ApiKeyMaxOrderByAggregateInput
   _min?: Prisma.ApiKeyMinOrderByAggregateInput
+  _sum?: Prisma.ApiKeySumOrderByAggregateInput
 }
 
 export type ApiKeyScalarWhereWithAggregatesInput = {
@@ -233,105 +349,199 @@ export type ApiKeyScalarWhereWithAggregatesInput = {
   OR?: Prisma.ApiKeyScalarWhereWithAggregatesInput[]
   NOT?: Prisma.ApiKeyScalarWhereWithAggregatesInput | Prisma.ApiKeyScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"ApiKey"> | string
-  keyPrefix?: Prisma.StringWithAggregatesFilter<"ApiKey"> | string
   name?: Prisma.StringWithAggregatesFilter<"ApiKey"> | string
+  provider?: Prisma.EnumApiKeyProviderWithAggregatesFilter<"ApiKey"> | $Enums.ApiKeyProvider
   status?: Prisma.EnumApiKeyStatusWithAggregatesFilter<"ApiKey"> | $Enums.ApiKeyStatus
+  environment?: Prisma.EnumApiKeyEnvironmentWithAggregatesFilter<"ApiKey"> | $Enums.ApiKeyEnvironment
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ApiKey"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ApiKey"> | Date | string
+  lastUsed?: Prisma.DateTimeNullableWithAggregatesFilter<"ApiKey"> | Date | string | null
+  expiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ApiKey"> | Date | string | null
+  description?: Prisma.StringNullableWithAggregatesFilter<"ApiKey"> | string | null
+  maskedValue?: Prisma.StringWithAggregatesFilter<"ApiKey"> | string
+  fullValue?: Prisma.StringWithAggregatesFilter<"ApiKey"> | string
+  usageCount?: Prisma.IntWithAggregatesFilter<"ApiKey"> | number
 }
 
 export type ApiKeyCreateInput = {
   id?: string
-  keyPrefix: string
   name: string
+  provider: $Enums.ApiKeyProvider
   status?: $Enums.ApiKeyStatus
+  environment: $Enums.ApiKeyEnvironment
   createdAt?: Date | string
   updatedAt?: Date | string
+  lastUsed?: Date | string | null
+  expiresAt?: Date | string | null
+  description?: string | null
+  maskedValue: string
+  fullValue: string
+  usageCount?: number
   devices?: Prisma.DeviceCreateNestedManyWithoutApiKeyInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutApiKeyInput
 }
 
 export type ApiKeyUncheckedCreateInput = {
   id?: string
-  keyPrefix: string
   name: string
+  provider: $Enums.ApiKeyProvider
   status?: $Enums.ApiKeyStatus
+  environment: $Enums.ApiKeyEnvironment
   createdAt?: Date | string
   updatedAt?: Date | string
+  lastUsed?: Date | string | null
+  expiresAt?: Date | string | null
+  description?: string | null
+  maskedValue: string
+  fullValue: string
+  usageCount?: number
   devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutApiKeyInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutApiKeyInput
 }
 
 export type ApiKeyUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  keyPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumApiKeyProviderFieldUpdateOperationsInput | $Enums.ApiKeyProvider
   status?: Prisma.EnumApiKeyStatusFieldUpdateOperationsInput | $Enums.ApiKeyStatus
+  environment?: Prisma.EnumApiKeyEnvironmentFieldUpdateOperationsInput | $Enums.ApiKeyEnvironment
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastUsed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  maskedValue?: Prisma.StringFieldUpdateOperationsInput | string
+  fullValue?: Prisma.StringFieldUpdateOperationsInput | string
+  usageCount?: Prisma.IntFieldUpdateOperationsInput | number
   devices?: Prisma.DeviceUpdateManyWithoutApiKeyNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutApiKeyNestedInput
 }
 
 export type ApiKeyUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  keyPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumApiKeyProviderFieldUpdateOperationsInput | $Enums.ApiKeyProvider
   status?: Prisma.EnumApiKeyStatusFieldUpdateOperationsInput | $Enums.ApiKeyStatus
+  environment?: Prisma.EnumApiKeyEnvironmentFieldUpdateOperationsInput | $Enums.ApiKeyEnvironment
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastUsed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  maskedValue?: Prisma.StringFieldUpdateOperationsInput | string
+  fullValue?: Prisma.StringFieldUpdateOperationsInput | string
+  usageCount?: Prisma.IntFieldUpdateOperationsInput | number
   devices?: Prisma.DeviceUncheckedUpdateManyWithoutApiKeyNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutApiKeyNestedInput
 }
 
 export type ApiKeyCreateManyInput = {
   id?: string
-  keyPrefix: string
   name: string
+  provider: $Enums.ApiKeyProvider
   status?: $Enums.ApiKeyStatus
+  environment: $Enums.ApiKeyEnvironment
   createdAt?: Date | string
   updatedAt?: Date | string
+  lastUsed?: Date | string | null
+  expiresAt?: Date | string | null
+  description?: string | null
+  maskedValue: string
+  fullValue: string
+  usageCount?: number
 }
 
 export type ApiKeyUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  keyPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumApiKeyProviderFieldUpdateOperationsInput | $Enums.ApiKeyProvider
   status?: Prisma.EnumApiKeyStatusFieldUpdateOperationsInput | $Enums.ApiKeyStatus
+  environment?: Prisma.EnumApiKeyEnvironmentFieldUpdateOperationsInput | $Enums.ApiKeyEnvironment
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastUsed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  maskedValue?: Prisma.StringFieldUpdateOperationsInput | string
+  fullValue?: Prisma.StringFieldUpdateOperationsInput | string
+  usageCount?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type ApiKeyUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  keyPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumApiKeyProviderFieldUpdateOperationsInput | $Enums.ApiKeyProvider
   status?: Prisma.EnumApiKeyStatusFieldUpdateOperationsInput | $Enums.ApiKeyStatus
+  environment?: Prisma.EnumApiKeyEnvironmentFieldUpdateOperationsInput | $Enums.ApiKeyEnvironment
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastUsed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  maskedValue?: Prisma.StringFieldUpdateOperationsInput | string
+  fullValue?: Prisma.StringFieldUpdateOperationsInput | string
+  usageCount?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type ApiKeyCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  keyPrefix?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  environment?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  lastUsed?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
+  description?: Prisma.SortOrder
+  maskedValue?: Prisma.SortOrder
+  fullValue?: Prisma.SortOrder
+  usageCount?: Prisma.SortOrder
+}
+
+export type ApiKeyAvgOrderByAggregateInput = {
+  usageCount?: Prisma.SortOrder
 }
 
 export type ApiKeyMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  keyPrefix?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  environment?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  lastUsed?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
+  description?: Prisma.SortOrder
+  maskedValue?: Prisma.SortOrder
+  fullValue?: Prisma.SortOrder
+  usageCount?: Prisma.SortOrder
 }
 
 export type ApiKeyMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  keyPrefix?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  provider?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  environment?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  lastUsed?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
+  description?: Prisma.SortOrder
+  maskedValue?: Prisma.SortOrder
+  fullValue?: Prisma.SortOrder
+  usageCount?: Prisma.SortOrder
+}
+
+export type ApiKeySumOrderByAggregateInput = {
+  usageCount?: Prisma.SortOrder
+}
+
+export type ApiKeyNullableScalarRelationFilter = {
+  is?: Prisma.ApiKeyWhereInput | null
+  isNot?: Prisma.ApiKeyWhereInput | null
 }
 
 export type ApiKeyScalarRelationFilter = {
@@ -343,12 +553,52 @@ export type StringFieldUpdateOperationsInput = {
   set?: string
 }
 
+export type EnumApiKeyProviderFieldUpdateOperationsInput = {
+  set?: $Enums.ApiKeyProvider
+}
+
 export type EnumApiKeyStatusFieldUpdateOperationsInput = {
   set?: $Enums.ApiKeyStatus
 }
 
+export type EnumApiKeyEnvironmentFieldUpdateOperationsInput = {
+  set?: $Enums.ApiKeyEnvironment
+}
+
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
+}
+
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type ApiKeyCreateNestedOneWithoutAuditLogsInput = {
+  create?: Prisma.XOR<Prisma.ApiKeyCreateWithoutAuditLogsInput, Prisma.ApiKeyUncheckedCreateWithoutAuditLogsInput>
+  connectOrCreate?: Prisma.ApiKeyCreateOrConnectWithoutAuditLogsInput
+  connect?: Prisma.ApiKeyWhereUniqueInput
+}
+
+export type ApiKeyUpdateOneWithoutAuditLogsNestedInput = {
+  create?: Prisma.XOR<Prisma.ApiKeyCreateWithoutAuditLogsInput, Prisma.ApiKeyUncheckedCreateWithoutAuditLogsInput>
+  connectOrCreate?: Prisma.ApiKeyCreateOrConnectWithoutAuditLogsInput
+  upsert?: Prisma.ApiKeyUpsertWithoutAuditLogsInput
+  disconnect?: Prisma.ApiKeyWhereInput | boolean
+  delete?: Prisma.ApiKeyWhereInput | boolean
+  connect?: Prisma.ApiKeyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ApiKeyUpdateToOneWithWhereWithoutAuditLogsInput, Prisma.ApiKeyUpdateWithoutAuditLogsInput>, Prisma.ApiKeyUncheckedUpdateWithoutAuditLogsInput>
 }
 
 export type ApiKeyCreateNestedOneWithoutDevicesInput = {
@@ -365,22 +615,122 @@ export type ApiKeyUpdateOneRequiredWithoutDevicesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ApiKeyUpdateToOneWithWhereWithoutDevicesInput, Prisma.ApiKeyUpdateWithoutDevicesInput>, Prisma.ApiKeyUncheckedUpdateWithoutDevicesInput>
 }
 
-export type ApiKeyCreateWithoutDevicesInput = {
+export type ApiKeyCreateWithoutAuditLogsInput = {
   id?: string
-  keyPrefix: string
   name: string
+  provider: $Enums.ApiKeyProvider
   status?: $Enums.ApiKeyStatus
+  environment: $Enums.ApiKeyEnvironment
   createdAt?: Date | string
   updatedAt?: Date | string
+  lastUsed?: Date | string | null
+  expiresAt?: Date | string | null
+  description?: string | null
+  maskedValue: string
+  fullValue: string
+  usageCount?: number
+  devices?: Prisma.DeviceCreateNestedManyWithoutApiKeyInput
+}
+
+export type ApiKeyUncheckedCreateWithoutAuditLogsInput = {
+  id?: string
+  name: string
+  provider: $Enums.ApiKeyProvider
+  status?: $Enums.ApiKeyStatus
+  environment: $Enums.ApiKeyEnvironment
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastUsed?: Date | string | null
+  expiresAt?: Date | string | null
+  description?: string | null
+  maskedValue: string
+  fullValue: string
+  usageCount?: number
+  devices?: Prisma.DeviceUncheckedCreateNestedManyWithoutApiKeyInput
+}
+
+export type ApiKeyCreateOrConnectWithoutAuditLogsInput = {
+  where: Prisma.ApiKeyWhereUniqueInput
+  create: Prisma.XOR<Prisma.ApiKeyCreateWithoutAuditLogsInput, Prisma.ApiKeyUncheckedCreateWithoutAuditLogsInput>
+}
+
+export type ApiKeyUpsertWithoutAuditLogsInput = {
+  update: Prisma.XOR<Prisma.ApiKeyUpdateWithoutAuditLogsInput, Prisma.ApiKeyUncheckedUpdateWithoutAuditLogsInput>
+  create: Prisma.XOR<Prisma.ApiKeyCreateWithoutAuditLogsInput, Prisma.ApiKeyUncheckedCreateWithoutAuditLogsInput>
+  where?: Prisma.ApiKeyWhereInput
+}
+
+export type ApiKeyUpdateToOneWithWhereWithoutAuditLogsInput = {
+  where?: Prisma.ApiKeyWhereInput
+  data: Prisma.XOR<Prisma.ApiKeyUpdateWithoutAuditLogsInput, Prisma.ApiKeyUncheckedUpdateWithoutAuditLogsInput>
+}
+
+export type ApiKeyUpdateWithoutAuditLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumApiKeyProviderFieldUpdateOperationsInput | $Enums.ApiKeyProvider
+  status?: Prisma.EnumApiKeyStatusFieldUpdateOperationsInput | $Enums.ApiKeyStatus
+  environment?: Prisma.EnumApiKeyEnvironmentFieldUpdateOperationsInput | $Enums.ApiKeyEnvironment
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastUsed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  maskedValue?: Prisma.StringFieldUpdateOperationsInput | string
+  fullValue?: Prisma.StringFieldUpdateOperationsInput | string
+  usageCount?: Prisma.IntFieldUpdateOperationsInput | number
+  devices?: Prisma.DeviceUpdateManyWithoutApiKeyNestedInput
+}
+
+export type ApiKeyUncheckedUpdateWithoutAuditLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumApiKeyProviderFieldUpdateOperationsInput | $Enums.ApiKeyProvider
+  status?: Prisma.EnumApiKeyStatusFieldUpdateOperationsInput | $Enums.ApiKeyStatus
+  environment?: Prisma.EnumApiKeyEnvironmentFieldUpdateOperationsInput | $Enums.ApiKeyEnvironment
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastUsed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  maskedValue?: Prisma.StringFieldUpdateOperationsInput | string
+  fullValue?: Prisma.StringFieldUpdateOperationsInput | string
+  usageCount?: Prisma.IntFieldUpdateOperationsInput | number
+  devices?: Prisma.DeviceUncheckedUpdateManyWithoutApiKeyNestedInput
+}
+
+export type ApiKeyCreateWithoutDevicesInput = {
+  id?: string
+  name: string
+  provider: $Enums.ApiKeyProvider
+  status?: $Enums.ApiKeyStatus
+  environment: $Enums.ApiKeyEnvironment
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastUsed?: Date | string | null
+  expiresAt?: Date | string | null
+  description?: string | null
+  maskedValue: string
+  fullValue: string
+  usageCount?: number
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutApiKeyInput
 }
 
 export type ApiKeyUncheckedCreateWithoutDevicesInput = {
   id?: string
-  keyPrefix: string
   name: string
+  provider: $Enums.ApiKeyProvider
   status?: $Enums.ApiKeyStatus
+  environment: $Enums.ApiKeyEnvironment
   createdAt?: Date | string
   updatedAt?: Date | string
+  lastUsed?: Date | string | null
+  expiresAt?: Date | string | null
+  description?: string | null
+  maskedValue: string
+  fullValue: string
+  usageCount?: number
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutApiKeyInput
 }
 
 export type ApiKeyCreateOrConnectWithoutDevicesInput = {
@@ -401,20 +751,36 @@ export type ApiKeyUpdateToOneWithWhereWithoutDevicesInput = {
 
 export type ApiKeyUpdateWithoutDevicesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  keyPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumApiKeyProviderFieldUpdateOperationsInput | $Enums.ApiKeyProvider
   status?: Prisma.EnumApiKeyStatusFieldUpdateOperationsInput | $Enums.ApiKeyStatus
+  environment?: Prisma.EnumApiKeyEnvironmentFieldUpdateOperationsInput | $Enums.ApiKeyEnvironment
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastUsed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  maskedValue?: Prisma.StringFieldUpdateOperationsInput | string
+  fullValue?: Prisma.StringFieldUpdateOperationsInput | string
+  usageCount?: Prisma.IntFieldUpdateOperationsInput | number
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutApiKeyNestedInput
 }
 
 export type ApiKeyUncheckedUpdateWithoutDevicesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  keyPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.EnumApiKeyProviderFieldUpdateOperationsInput | $Enums.ApiKeyProvider
   status?: Prisma.EnumApiKeyStatusFieldUpdateOperationsInput | $Enums.ApiKeyStatus
+  environment?: Prisma.EnumApiKeyEnvironmentFieldUpdateOperationsInput | $Enums.ApiKeyEnvironment
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastUsed?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  maskedValue?: Prisma.StringFieldUpdateOperationsInput | string
+  fullValue?: Prisma.StringFieldUpdateOperationsInput | string
+  usageCount?: Prisma.IntFieldUpdateOperationsInput | number
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutApiKeyNestedInput
 }
 
 
@@ -424,10 +790,12 @@ export type ApiKeyUncheckedUpdateWithoutDevicesInput = {
 
 export type ApiKeyCountOutputType = {
   devices: number
+  auditLogs: number
 }
 
 export type ApiKeyCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   devices?: boolean | ApiKeyCountOutputTypeCountDevicesArgs
+  auditLogs?: boolean | ApiKeyCountOutputTypeCountAuditLogsArgs
 }
 
 /**
@@ -447,48 +815,85 @@ export type ApiKeyCountOutputTypeCountDevicesArgs<ExtArgs extends runtime.Types.
   where?: Prisma.DeviceWhereInput
 }
 
+/**
+ * ApiKeyCountOutputType without action
+ */
+export type ApiKeyCountOutputTypeCountAuditLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AuditLogWhereInput
+}
+
 
 export type ApiKeySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  keyPrefix?: boolean
   name?: boolean
+  provider?: boolean
   status?: boolean
+  environment?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  lastUsed?: boolean
+  expiresAt?: boolean
+  description?: boolean
+  maskedValue?: boolean
+  fullValue?: boolean
+  usageCount?: boolean
   devices?: boolean | Prisma.ApiKey$devicesArgs<ExtArgs>
+  auditLogs?: boolean | Prisma.ApiKey$auditLogsArgs<ExtArgs>
   _count?: boolean | Prisma.ApiKeyCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["apiKey"]>
 
 export type ApiKeySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  keyPrefix?: boolean
   name?: boolean
+  provider?: boolean
   status?: boolean
+  environment?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  lastUsed?: boolean
+  expiresAt?: boolean
+  description?: boolean
+  maskedValue?: boolean
+  fullValue?: boolean
+  usageCount?: boolean
 }, ExtArgs["result"]["apiKey"]>
 
 export type ApiKeySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  keyPrefix?: boolean
   name?: boolean
+  provider?: boolean
   status?: boolean
+  environment?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  lastUsed?: boolean
+  expiresAt?: boolean
+  description?: boolean
+  maskedValue?: boolean
+  fullValue?: boolean
+  usageCount?: boolean
 }, ExtArgs["result"]["apiKey"]>
 
 export type ApiKeySelectScalar = {
   id?: boolean
-  keyPrefix?: boolean
   name?: boolean
+  provider?: boolean
   status?: boolean
+  environment?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  lastUsed?: boolean
+  expiresAt?: boolean
+  description?: boolean
+  maskedValue?: boolean
+  fullValue?: boolean
+  usageCount?: boolean
 }
 
-export type ApiKeyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "keyPrefix" | "name" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["apiKey"]>
+export type ApiKeyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "provider" | "status" | "environment" | "createdAt" | "updatedAt" | "lastUsed" | "expiresAt" | "description" | "maskedValue" | "fullValue" | "usageCount", ExtArgs["result"]["apiKey"]>
 export type ApiKeyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   devices?: boolean | Prisma.ApiKey$devicesArgs<ExtArgs>
+  auditLogs?: boolean | Prisma.ApiKey$auditLogsArgs<ExtArgs>
   _count?: boolean | Prisma.ApiKeyCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ApiKeyIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -498,14 +903,22 @@ export type $ApiKeyPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   name: "ApiKey"
   objects: {
     devices: Prisma.$DevicePayload<ExtArgs>[]
+    auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    keyPrefix: string
     name: string
+    provider: $Enums.ApiKeyProvider
     status: $Enums.ApiKeyStatus
+    environment: $Enums.ApiKeyEnvironment
     createdAt: Date
     updatedAt: Date
+    lastUsed: Date | null
+    expiresAt: Date | null
+    description: string | null
+    maskedValue: string
+    fullValue: string
+    usageCount: number
   }, ExtArgs["result"]["apiKey"]>
   composites: {}
 }
@@ -901,6 +1314,7 @@ readonly fields: ApiKeyFieldRefs;
 export interface Prisma__ApiKeyClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   devices<T extends Prisma.ApiKey$devicesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ApiKey$devicesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DevicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  auditLogs<T extends Prisma.ApiKey$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ApiKey$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -931,11 +1345,18 @@ export interface Prisma__ApiKeyClient<T, Null = never, ExtArgs extends runtime.T
  */
 export interface ApiKeyFieldRefs {
   readonly id: Prisma.FieldRef<"ApiKey", 'String'>
-  readonly keyPrefix: Prisma.FieldRef<"ApiKey", 'String'>
   readonly name: Prisma.FieldRef<"ApiKey", 'String'>
+  readonly provider: Prisma.FieldRef<"ApiKey", 'ApiKeyProvider'>
   readonly status: Prisma.FieldRef<"ApiKey", 'ApiKeyStatus'>
+  readonly environment: Prisma.FieldRef<"ApiKey", 'ApiKeyEnvironment'>
   readonly createdAt: Prisma.FieldRef<"ApiKey", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"ApiKey", 'DateTime'>
+  readonly lastUsed: Prisma.FieldRef<"ApiKey", 'DateTime'>
+  readonly expiresAt: Prisma.FieldRef<"ApiKey", 'DateTime'>
+  readonly description: Prisma.FieldRef<"ApiKey", 'String'>
+  readonly maskedValue: Prisma.FieldRef<"ApiKey", 'String'>
+  readonly fullValue: Prisma.FieldRef<"ApiKey", 'String'>
+  readonly usageCount: Prisma.FieldRef<"ApiKey", 'Int'>
 }
     
 
@@ -1345,6 +1766,30 @@ export type ApiKey$devicesArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.DeviceScalarFieldEnum | Prisma.DeviceScalarFieldEnum[]
+}
+
+/**
+ * ApiKey.auditLogs
+ */
+export type ApiKey$auditLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AuditLog
+   */
+  select?: Prisma.AuditLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AuditLog
+   */
+  omit?: Prisma.AuditLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AuditLogInclude<ExtArgs> | null
+  where?: Prisma.AuditLogWhereInput
+  orderBy?: Prisma.AuditLogOrderByWithRelationInput | Prisma.AuditLogOrderByWithRelationInput[]
+  cursor?: Prisma.AuditLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AuditLogScalarFieldEnum | Prisma.AuditLogScalarFieldEnum[]
 }
 
 /**

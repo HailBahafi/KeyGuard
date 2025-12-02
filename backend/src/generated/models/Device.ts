@@ -20,94 +20,154 @@ export type DeviceModel = runtime.Types.Result.DefaultSelection<Prisma.$DevicePa
 
 export type AggregateDevice = {
   _count: DeviceCountAggregateOutputType | null
+  _avg: DeviceAvgAggregateOutputType | null
+  _sum: DeviceSumAggregateOutputType | null
   _min: DeviceMinAggregateOutputType | null
   _max: DeviceMaxAggregateOutputType | null
 }
 
+export type DeviceAvgAggregateOutputType = {
+  totalCalls: number | null
+  keysAccessed: number | null
+}
+
+export type DeviceSumAggregateOutputType = {
+  totalCalls: number | null
+  keysAccessed: number | null
+}
+
 export type DeviceMinAggregateOutputType = {
   id: string | null
+  name: string | null
+  status: $Enums.DeviceStatus | null
+  ownerName: string | null
+  ownerEmail: string | null
+  ipAddress: string | null
+  location: string | null
+  lastSeen: Date | null
+  fingerprintHash: string | null
+  totalCalls: number | null
+  keysAccessed: number | null
   keyId: string | null
   publicKeySpkiBase64: string | null
-  fingerprint: string | null
-  label: string | null
   userAgent: string | null
-  status: $Enums.DeviceStatus | null
   apiKeyId: string | null
-  lastSeenAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
 
 export type DeviceMaxAggregateOutputType = {
   id: string | null
+  name: string | null
+  status: $Enums.DeviceStatus | null
+  ownerName: string | null
+  ownerEmail: string | null
+  ipAddress: string | null
+  location: string | null
+  lastSeen: Date | null
+  fingerprintHash: string | null
+  totalCalls: number | null
+  keysAccessed: number | null
   keyId: string | null
   publicKeySpkiBase64: string | null
-  fingerprint: string | null
-  label: string | null
   userAgent: string | null
-  status: $Enums.DeviceStatus | null
   apiKeyId: string | null
-  lastSeenAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
 
 export type DeviceCountAggregateOutputType = {
   id: number
+  name: number
+  status: number
+  platform: number
+  ownerName: number
+  ownerEmail: number
+  ipAddress: number
+  location: number
+  lastSeen: number
+  fingerprintHash: number
+  totalCalls: number
+  keysAccessed: number
   keyId: number
   publicKeySpkiBase64: number
-  fingerprint: number
-  label: number
   userAgent: number
   metadata: number
-  status: number
   apiKeyId: number
-  lastSeenAt: number
   createdAt: number
   updatedAt: number
   _all: number
 }
 
 
+export type DeviceAvgAggregateInputType = {
+  totalCalls?: true
+  keysAccessed?: true
+}
+
+export type DeviceSumAggregateInputType = {
+  totalCalls?: true
+  keysAccessed?: true
+}
+
 export type DeviceMinAggregateInputType = {
   id?: true
+  name?: true
+  status?: true
+  ownerName?: true
+  ownerEmail?: true
+  ipAddress?: true
+  location?: true
+  lastSeen?: true
+  fingerprintHash?: true
+  totalCalls?: true
+  keysAccessed?: true
   keyId?: true
   publicKeySpkiBase64?: true
-  fingerprint?: true
-  label?: true
   userAgent?: true
-  status?: true
   apiKeyId?: true
-  lastSeenAt?: true
   createdAt?: true
   updatedAt?: true
 }
 
 export type DeviceMaxAggregateInputType = {
   id?: true
+  name?: true
+  status?: true
+  ownerName?: true
+  ownerEmail?: true
+  ipAddress?: true
+  location?: true
+  lastSeen?: true
+  fingerprintHash?: true
+  totalCalls?: true
+  keysAccessed?: true
   keyId?: true
   publicKeySpkiBase64?: true
-  fingerprint?: true
-  label?: true
   userAgent?: true
-  status?: true
   apiKeyId?: true
-  lastSeenAt?: true
   createdAt?: true
   updatedAt?: true
 }
 
 export type DeviceCountAggregateInputType = {
   id?: true
+  name?: true
+  status?: true
+  platform?: true
+  ownerName?: true
+  ownerEmail?: true
+  ipAddress?: true
+  location?: true
+  lastSeen?: true
+  fingerprintHash?: true
+  totalCalls?: true
+  keysAccessed?: true
   keyId?: true
   publicKeySpkiBase64?: true
-  fingerprint?: true
-  label?: true
   userAgent?: true
   metadata?: true
-  status?: true
   apiKeyId?: true
-  lastSeenAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -151,6 +211,18 @@ export type DeviceAggregateArgs<ExtArgs extends runtime.Types.Extensions.Interna
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: DeviceAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: DeviceSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: DeviceMinAggregateInputType
@@ -181,24 +253,35 @@ export type DeviceGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   _count?: DeviceCountAggregateInputType | true
+  _avg?: DeviceAvgAggregateInputType
+  _sum?: DeviceSumAggregateInputType
   _min?: DeviceMinAggregateInputType
   _max?: DeviceMaxAggregateInputType
 }
 
 export type DeviceGroupByOutputType = {
   id: string
-  keyId: string
-  publicKeySpkiBase64: string
-  fingerprint: string
-  label: string
+  name: string
+  status: $Enums.DeviceStatus
+  platform: runtime.JsonValue
+  ownerName: string
+  ownerEmail: string
+  ipAddress: string
+  location: string
+  lastSeen: Date
+  fingerprintHash: string
+  totalCalls: number
+  keysAccessed: number
+  keyId: string | null
+  publicKeySpkiBase64: string | null
   userAgent: string | null
   metadata: runtime.JsonValue | null
-  status: $Enums.DeviceStatus
   apiKeyId: string
-  lastSeenAt: Date
   createdAt: Date
   updatedAt: Date
   _count: DeviceCountAggregateOutputType | null
+  _avg: DeviceAvgAggregateOutputType | null
+  _sum: DeviceSumAggregateOutputType | null
   _min: DeviceMinAggregateOutputType | null
   _max: DeviceMaxAggregateOutputType | null
 }
@@ -223,72 +306,104 @@ export type DeviceWhereInput = {
   OR?: Prisma.DeviceWhereInput[]
   NOT?: Prisma.DeviceWhereInput | Prisma.DeviceWhereInput[]
   id?: Prisma.StringFilter<"Device"> | string
-  keyId?: Prisma.StringFilter<"Device"> | string
-  publicKeySpkiBase64?: Prisma.StringFilter<"Device"> | string
-  fingerprint?: Prisma.StringFilter<"Device"> | string
-  label?: Prisma.StringFilter<"Device"> | string
+  name?: Prisma.StringFilter<"Device"> | string
+  status?: Prisma.EnumDeviceStatusFilter<"Device"> | $Enums.DeviceStatus
+  platform?: Prisma.JsonFilter<"Device">
+  ownerName?: Prisma.StringFilter<"Device"> | string
+  ownerEmail?: Prisma.StringFilter<"Device"> | string
+  ipAddress?: Prisma.StringFilter<"Device"> | string
+  location?: Prisma.StringFilter<"Device"> | string
+  lastSeen?: Prisma.DateTimeFilter<"Device"> | Date | string
+  fingerprintHash?: Prisma.StringFilter<"Device"> | string
+  totalCalls?: Prisma.IntFilter<"Device"> | number
+  keysAccessed?: Prisma.IntFilter<"Device"> | number
+  keyId?: Prisma.StringNullableFilter<"Device"> | string | null
+  publicKeySpkiBase64?: Prisma.StringNullableFilter<"Device"> | string | null
   userAgent?: Prisma.StringNullableFilter<"Device"> | string | null
   metadata?: Prisma.JsonNullableFilter<"Device">
-  status?: Prisma.EnumDeviceStatusFilter<"Device"> | $Enums.DeviceStatus
   apiKeyId?: Prisma.StringFilter<"Device"> | string
-  lastSeenAt?: Prisma.DateTimeFilter<"Device"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Device"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Device"> | Date | string
   apiKey?: Prisma.XOR<Prisma.ApiKeyScalarRelationFilter, Prisma.ApiKeyWhereInput>
+  auditLogs?: Prisma.AuditLogListRelationFilter
 }
 
 export type DeviceOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  keyId?: Prisma.SortOrder
-  publicKeySpkiBase64?: Prisma.SortOrder
-  fingerprint?: Prisma.SortOrder
-  label?: Prisma.SortOrder
+  name?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  platform?: Prisma.SortOrder
+  ownerName?: Prisma.SortOrder
+  ownerEmail?: Prisma.SortOrder
+  ipAddress?: Prisma.SortOrder
+  location?: Prisma.SortOrder
+  lastSeen?: Prisma.SortOrder
+  fingerprintHash?: Prisma.SortOrder
+  totalCalls?: Prisma.SortOrder
+  keysAccessed?: Prisma.SortOrder
+  keyId?: Prisma.SortOrderInput | Prisma.SortOrder
+  publicKeySpkiBase64?: Prisma.SortOrderInput | Prisma.SortOrder
   userAgent?: Prisma.SortOrderInput | Prisma.SortOrder
   metadata?: Prisma.SortOrderInput | Prisma.SortOrder
-  status?: Prisma.SortOrder
   apiKeyId?: Prisma.SortOrder
-  lastSeenAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   apiKey?: Prisma.ApiKeyOrderByWithRelationInput
+  auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
 }
 
 export type DeviceWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  apiKeyId_keyId?: Prisma.DeviceApiKeyIdKeyIdCompoundUniqueInput
+  fingerprintHash?: string
   AND?: Prisma.DeviceWhereInput | Prisma.DeviceWhereInput[]
   OR?: Prisma.DeviceWhereInput[]
   NOT?: Prisma.DeviceWhereInput | Prisma.DeviceWhereInput[]
-  keyId?: Prisma.StringFilter<"Device"> | string
-  publicKeySpkiBase64?: Prisma.StringFilter<"Device"> | string
-  fingerprint?: Prisma.StringFilter<"Device"> | string
-  label?: Prisma.StringFilter<"Device"> | string
+  name?: Prisma.StringFilter<"Device"> | string
+  status?: Prisma.EnumDeviceStatusFilter<"Device"> | $Enums.DeviceStatus
+  platform?: Prisma.JsonFilter<"Device">
+  ownerName?: Prisma.StringFilter<"Device"> | string
+  ownerEmail?: Prisma.StringFilter<"Device"> | string
+  ipAddress?: Prisma.StringFilter<"Device"> | string
+  location?: Prisma.StringFilter<"Device"> | string
+  lastSeen?: Prisma.DateTimeFilter<"Device"> | Date | string
+  totalCalls?: Prisma.IntFilter<"Device"> | number
+  keysAccessed?: Prisma.IntFilter<"Device"> | number
+  keyId?: Prisma.StringNullableFilter<"Device"> | string | null
+  publicKeySpkiBase64?: Prisma.StringNullableFilter<"Device"> | string | null
   userAgent?: Prisma.StringNullableFilter<"Device"> | string | null
   metadata?: Prisma.JsonNullableFilter<"Device">
-  status?: Prisma.EnumDeviceStatusFilter<"Device"> | $Enums.DeviceStatus
   apiKeyId?: Prisma.StringFilter<"Device"> | string
-  lastSeenAt?: Prisma.DateTimeFilter<"Device"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Device"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Device"> | Date | string
   apiKey?: Prisma.XOR<Prisma.ApiKeyScalarRelationFilter, Prisma.ApiKeyWhereInput>
-}, "id" | "apiKeyId_keyId">
+  auditLogs?: Prisma.AuditLogListRelationFilter
+}, "id" | "fingerprintHash">
 
 export type DeviceOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  keyId?: Prisma.SortOrder
-  publicKeySpkiBase64?: Prisma.SortOrder
-  fingerprint?: Prisma.SortOrder
-  label?: Prisma.SortOrder
+  name?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  platform?: Prisma.SortOrder
+  ownerName?: Prisma.SortOrder
+  ownerEmail?: Prisma.SortOrder
+  ipAddress?: Prisma.SortOrder
+  location?: Prisma.SortOrder
+  lastSeen?: Prisma.SortOrder
+  fingerprintHash?: Prisma.SortOrder
+  totalCalls?: Prisma.SortOrder
+  keysAccessed?: Prisma.SortOrder
+  keyId?: Prisma.SortOrderInput | Prisma.SortOrder
+  publicKeySpkiBase64?: Prisma.SortOrderInput | Prisma.SortOrder
   userAgent?: Prisma.SortOrderInput | Prisma.SortOrder
   metadata?: Prisma.SortOrderInput | Prisma.SortOrder
-  status?: Prisma.SortOrder
   apiKeyId?: Prisma.SortOrder
-  lastSeenAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.DeviceCountOrderByAggregateInput
+  _avg?: Prisma.DeviceAvgOrderByAggregateInput
   _max?: Prisma.DeviceMaxOrderByAggregateInput
   _min?: Prisma.DeviceMinOrderByAggregateInput
+  _sum?: Prisma.DeviceSumOrderByAggregateInput
 }
 
 export type DeviceScalarWhereWithAggregatesInput = {
@@ -296,119 +411,179 @@ export type DeviceScalarWhereWithAggregatesInput = {
   OR?: Prisma.DeviceScalarWhereWithAggregatesInput[]
   NOT?: Prisma.DeviceScalarWhereWithAggregatesInput | Prisma.DeviceScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Device"> | string
-  keyId?: Prisma.StringWithAggregatesFilter<"Device"> | string
-  publicKeySpkiBase64?: Prisma.StringWithAggregatesFilter<"Device"> | string
-  fingerprint?: Prisma.StringWithAggregatesFilter<"Device"> | string
-  label?: Prisma.StringWithAggregatesFilter<"Device"> | string
+  name?: Prisma.StringWithAggregatesFilter<"Device"> | string
+  status?: Prisma.EnumDeviceStatusWithAggregatesFilter<"Device"> | $Enums.DeviceStatus
+  platform?: Prisma.JsonWithAggregatesFilter<"Device">
+  ownerName?: Prisma.StringWithAggregatesFilter<"Device"> | string
+  ownerEmail?: Prisma.StringWithAggregatesFilter<"Device"> | string
+  ipAddress?: Prisma.StringWithAggregatesFilter<"Device"> | string
+  location?: Prisma.StringWithAggregatesFilter<"Device"> | string
+  lastSeen?: Prisma.DateTimeWithAggregatesFilter<"Device"> | Date | string
+  fingerprintHash?: Prisma.StringWithAggregatesFilter<"Device"> | string
+  totalCalls?: Prisma.IntWithAggregatesFilter<"Device"> | number
+  keysAccessed?: Prisma.IntWithAggregatesFilter<"Device"> | number
+  keyId?: Prisma.StringNullableWithAggregatesFilter<"Device"> | string | null
+  publicKeySpkiBase64?: Prisma.StringNullableWithAggregatesFilter<"Device"> | string | null
   userAgent?: Prisma.StringNullableWithAggregatesFilter<"Device"> | string | null
   metadata?: Prisma.JsonNullableWithAggregatesFilter<"Device">
-  status?: Prisma.EnumDeviceStatusWithAggregatesFilter<"Device"> | $Enums.DeviceStatus
   apiKeyId?: Prisma.StringWithAggregatesFilter<"Device"> | string
-  lastSeenAt?: Prisma.DateTimeWithAggregatesFilter<"Device"> | Date | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Device"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Device"> | Date | string
 }
 
 export type DeviceCreateInput = {
   id?: string
-  keyId: string
-  publicKeySpkiBase64: string
-  fingerprint: string
-  label: string
+  name: string
+  status?: $Enums.DeviceStatus
+  platform: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerName: string
+  ownerEmail: string
+  ipAddress: string
+  location: string
+  lastSeen?: Date | string
+  fingerprintHash: string
+  totalCalls?: number
+  keysAccessed?: number
+  keyId?: string | null
+  publicKeySpkiBase64?: string | null
   userAgent?: string | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  status?: $Enums.DeviceStatus
-  lastSeenAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
   apiKey: Prisma.ApiKeyCreateNestedOneWithoutDevicesInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutDeviceInput
 }
 
 export type DeviceUncheckedCreateInput = {
   id?: string
-  keyId: string
-  publicKeySpkiBase64: string
-  fingerprint: string
-  label: string
+  name: string
+  status?: $Enums.DeviceStatus
+  platform: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerName: string
+  ownerEmail: string
+  ipAddress: string
+  location: string
+  lastSeen?: Date | string
+  fingerprintHash: string
+  totalCalls?: number
+  keysAccessed?: number
+  keyId?: string | null
+  publicKeySpkiBase64?: string | null
   userAgent?: string | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  status?: $Enums.DeviceStatus
   apiKeyId: string
-  lastSeenAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutDeviceInput
 }
 
 export type DeviceUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  keyId?: Prisma.StringFieldUpdateOperationsInput | string
-  publicKeySpkiBase64?: Prisma.StringFieldUpdateOperationsInput | string
-  fingerprint?: Prisma.StringFieldUpdateOperationsInput | string
-  label?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
+  platform?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerName?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  ipAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  lastSeen?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fingerprintHash?: Prisma.StringFieldUpdateOperationsInput | string
+  totalCalls?: Prisma.IntFieldUpdateOperationsInput | number
+  keysAccessed?: Prisma.IntFieldUpdateOperationsInput | number
+  keyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicKeySpkiBase64?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  status?: Prisma.EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
-  lastSeenAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   apiKey?: Prisma.ApiKeyUpdateOneRequiredWithoutDevicesNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutDeviceNestedInput
 }
 
 export type DeviceUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  keyId?: Prisma.StringFieldUpdateOperationsInput | string
-  publicKeySpkiBase64?: Prisma.StringFieldUpdateOperationsInput | string
-  fingerprint?: Prisma.StringFieldUpdateOperationsInput | string
-  label?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
+  platform?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerName?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  ipAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  lastSeen?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fingerprintHash?: Prisma.StringFieldUpdateOperationsInput | string
+  totalCalls?: Prisma.IntFieldUpdateOperationsInput | number
+  keysAccessed?: Prisma.IntFieldUpdateOperationsInput | number
+  keyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicKeySpkiBase64?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  status?: Prisma.EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
   apiKeyId?: Prisma.StringFieldUpdateOperationsInput | string
-  lastSeenAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutDeviceNestedInput
 }
 
 export type DeviceCreateManyInput = {
   id?: string
-  keyId: string
-  publicKeySpkiBase64: string
-  fingerprint: string
-  label: string
+  name: string
+  status?: $Enums.DeviceStatus
+  platform: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerName: string
+  ownerEmail: string
+  ipAddress: string
+  location: string
+  lastSeen?: Date | string
+  fingerprintHash: string
+  totalCalls?: number
+  keysAccessed?: number
+  keyId?: string | null
+  publicKeySpkiBase64?: string | null
   userAgent?: string | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  status?: $Enums.DeviceStatus
   apiKeyId: string
-  lastSeenAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type DeviceUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  keyId?: Prisma.StringFieldUpdateOperationsInput | string
-  publicKeySpkiBase64?: Prisma.StringFieldUpdateOperationsInput | string
-  fingerprint?: Prisma.StringFieldUpdateOperationsInput | string
-  label?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
+  platform?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerName?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  ipAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  lastSeen?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fingerprintHash?: Prisma.StringFieldUpdateOperationsInput | string
+  totalCalls?: Prisma.IntFieldUpdateOperationsInput | number
+  keysAccessed?: Prisma.IntFieldUpdateOperationsInput | number
+  keyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicKeySpkiBase64?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  status?: Prisma.EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
-  lastSeenAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type DeviceUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  keyId?: Prisma.StringFieldUpdateOperationsInput | string
-  publicKeySpkiBase64?: Prisma.StringFieldUpdateOperationsInput | string
-  fingerprint?: Prisma.StringFieldUpdateOperationsInput | string
-  label?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
+  platform?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerName?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  ipAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  lastSeen?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fingerprintHash?: Prisma.StringFieldUpdateOperationsInput | string
+  totalCalls?: Prisma.IntFieldUpdateOperationsInput | number
+  keysAccessed?: Prisma.IntFieldUpdateOperationsInput | number
+  keyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicKeySpkiBase64?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  status?: Prisma.EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
   apiKeyId?: Prisma.StringFieldUpdateOperationsInput | string
-  lastSeenAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -423,52 +598,81 @@ export type DeviceOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type DeviceApiKeyIdKeyIdCompoundUniqueInput = {
-  apiKeyId: string
-  keyId: string
+export type DeviceNullableScalarRelationFilter = {
+  is?: Prisma.DeviceWhereInput | null
+  isNot?: Prisma.DeviceWhereInput | null
 }
 
 export type DeviceCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  name?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  platform?: Prisma.SortOrder
+  ownerName?: Prisma.SortOrder
+  ownerEmail?: Prisma.SortOrder
+  ipAddress?: Prisma.SortOrder
+  location?: Prisma.SortOrder
+  lastSeen?: Prisma.SortOrder
+  fingerprintHash?: Prisma.SortOrder
+  totalCalls?: Prisma.SortOrder
+  keysAccessed?: Prisma.SortOrder
   keyId?: Prisma.SortOrder
   publicKeySpkiBase64?: Prisma.SortOrder
-  fingerprint?: Prisma.SortOrder
-  label?: Prisma.SortOrder
   userAgent?: Prisma.SortOrder
   metadata?: Prisma.SortOrder
-  status?: Prisma.SortOrder
   apiKeyId?: Prisma.SortOrder
-  lastSeenAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
+export type DeviceAvgOrderByAggregateInput = {
+  totalCalls?: Prisma.SortOrder
+  keysAccessed?: Prisma.SortOrder
+}
+
 export type DeviceMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  name?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  ownerName?: Prisma.SortOrder
+  ownerEmail?: Prisma.SortOrder
+  ipAddress?: Prisma.SortOrder
+  location?: Prisma.SortOrder
+  lastSeen?: Prisma.SortOrder
+  fingerprintHash?: Prisma.SortOrder
+  totalCalls?: Prisma.SortOrder
+  keysAccessed?: Prisma.SortOrder
   keyId?: Prisma.SortOrder
   publicKeySpkiBase64?: Prisma.SortOrder
-  fingerprint?: Prisma.SortOrder
-  label?: Prisma.SortOrder
   userAgent?: Prisma.SortOrder
-  status?: Prisma.SortOrder
   apiKeyId?: Prisma.SortOrder
-  lastSeenAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type DeviceMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  name?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  ownerName?: Prisma.SortOrder
+  ownerEmail?: Prisma.SortOrder
+  ipAddress?: Prisma.SortOrder
+  location?: Prisma.SortOrder
+  lastSeen?: Prisma.SortOrder
+  fingerprintHash?: Prisma.SortOrder
+  totalCalls?: Prisma.SortOrder
+  keysAccessed?: Prisma.SortOrder
   keyId?: Prisma.SortOrder
   publicKeySpkiBase64?: Prisma.SortOrder
-  fingerprint?: Prisma.SortOrder
-  label?: Prisma.SortOrder
   userAgent?: Prisma.SortOrder
-  status?: Prisma.SortOrder
   apiKeyId?: Prisma.SortOrder
-  lastSeenAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type DeviceSumOrderByAggregateInput = {
+  totalCalls?: Prisma.SortOrder
+  keysAccessed?: Prisma.SortOrder
 }
 
 export type DeviceCreateNestedManyWithoutApiKeyInput = {
@@ -513,8 +717,20 @@ export type DeviceUncheckedUpdateManyWithoutApiKeyNestedInput = {
   deleteMany?: Prisma.DeviceScalarWhereInput | Prisma.DeviceScalarWhereInput[]
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
+export type DeviceCreateNestedOneWithoutAuditLogsInput = {
+  create?: Prisma.XOR<Prisma.DeviceCreateWithoutAuditLogsInput, Prisma.DeviceUncheckedCreateWithoutAuditLogsInput>
+  connectOrCreate?: Prisma.DeviceCreateOrConnectWithoutAuditLogsInput
+  connect?: Prisma.DeviceWhereUniqueInput
+}
+
+export type DeviceUpdateOneWithoutAuditLogsNestedInput = {
+  create?: Prisma.XOR<Prisma.DeviceCreateWithoutAuditLogsInput, Prisma.DeviceUncheckedCreateWithoutAuditLogsInput>
+  connectOrCreate?: Prisma.DeviceCreateOrConnectWithoutAuditLogsInput
+  upsert?: Prisma.DeviceUpsertWithoutAuditLogsInput
+  disconnect?: Prisma.DeviceWhereInput | boolean
+  delete?: Prisma.DeviceWhereInput | boolean
+  connect?: Prisma.DeviceWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.DeviceUpdateToOneWithWhereWithoutAuditLogsInput, Prisma.DeviceUpdateWithoutAuditLogsInput>, Prisma.DeviceUncheckedUpdateWithoutAuditLogsInput>
 }
 
 export type EnumDeviceStatusFieldUpdateOperationsInput = {
@@ -523,30 +739,46 @@ export type EnumDeviceStatusFieldUpdateOperationsInput = {
 
 export type DeviceCreateWithoutApiKeyInput = {
   id?: string
-  keyId: string
-  publicKeySpkiBase64: string
-  fingerprint: string
-  label: string
+  name: string
+  status?: $Enums.DeviceStatus
+  platform: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerName: string
+  ownerEmail: string
+  ipAddress: string
+  location: string
+  lastSeen?: Date | string
+  fingerprintHash: string
+  totalCalls?: number
+  keysAccessed?: number
+  keyId?: string | null
+  publicKeySpkiBase64?: string | null
   userAgent?: string | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  status?: $Enums.DeviceStatus
-  lastSeenAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutDeviceInput
 }
 
 export type DeviceUncheckedCreateWithoutApiKeyInput = {
   id?: string
-  keyId: string
-  publicKeySpkiBase64: string
-  fingerprint: string
-  label: string
+  name: string
+  status?: $Enums.DeviceStatus
+  platform: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerName: string
+  ownerEmail: string
+  ipAddress: string
+  location: string
+  lastSeen?: Date | string
+  fingerprintHash: string
+  totalCalls?: number
+  keysAccessed?: number
+  keyId?: string | null
+  publicKeySpkiBase64?: string | null
   userAgent?: string | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  status?: $Enums.DeviceStatus
-  lastSeenAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutDeviceInput
 }
 
 export type DeviceCreateOrConnectWithoutApiKeyInput = {
@@ -580,104 +812,290 @@ export type DeviceScalarWhereInput = {
   OR?: Prisma.DeviceScalarWhereInput[]
   NOT?: Prisma.DeviceScalarWhereInput | Prisma.DeviceScalarWhereInput[]
   id?: Prisma.StringFilter<"Device"> | string
-  keyId?: Prisma.StringFilter<"Device"> | string
-  publicKeySpkiBase64?: Prisma.StringFilter<"Device"> | string
-  fingerprint?: Prisma.StringFilter<"Device"> | string
-  label?: Prisma.StringFilter<"Device"> | string
+  name?: Prisma.StringFilter<"Device"> | string
+  status?: Prisma.EnumDeviceStatusFilter<"Device"> | $Enums.DeviceStatus
+  platform?: Prisma.JsonFilter<"Device">
+  ownerName?: Prisma.StringFilter<"Device"> | string
+  ownerEmail?: Prisma.StringFilter<"Device"> | string
+  ipAddress?: Prisma.StringFilter<"Device"> | string
+  location?: Prisma.StringFilter<"Device"> | string
+  lastSeen?: Prisma.DateTimeFilter<"Device"> | Date | string
+  fingerprintHash?: Prisma.StringFilter<"Device"> | string
+  totalCalls?: Prisma.IntFilter<"Device"> | number
+  keysAccessed?: Prisma.IntFilter<"Device"> | number
+  keyId?: Prisma.StringNullableFilter<"Device"> | string | null
+  publicKeySpkiBase64?: Prisma.StringNullableFilter<"Device"> | string | null
   userAgent?: Prisma.StringNullableFilter<"Device"> | string | null
   metadata?: Prisma.JsonNullableFilter<"Device">
-  status?: Prisma.EnumDeviceStatusFilter<"Device"> | $Enums.DeviceStatus
   apiKeyId?: Prisma.StringFilter<"Device"> | string
-  lastSeenAt?: Prisma.DateTimeFilter<"Device"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Device"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Device"> | Date | string
 }
 
-export type DeviceCreateManyApiKeyInput = {
+export type DeviceCreateWithoutAuditLogsInput = {
   id?: string
-  keyId: string
-  publicKeySpkiBase64: string
-  fingerprint: string
-  label: string
+  name: string
+  status?: $Enums.DeviceStatus
+  platform: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerName: string
+  ownerEmail: string
+  ipAddress: string
+  location: string
+  lastSeen?: Date | string
+  fingerprintHash: string
+  totalCalls?: number
+  keysAccessed?: number
+  keyId?: string | null
+  publicKeySpkiBase64?: string | null
   userAgent?: string | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  apiKey: Prisma.ApiKeyCreateNestedOneWithoutDevicesInput
+}
+
+export type DeviceUncheckedCreateWithoutAuditLogsInput = {
+  id?: string
+  name: string
   status?: $Enums.DeviceStatus
-  lastSeenAt?: Date | string
+  platform: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerName: string
+  ownerEmail: string
+  ipAddress: string
+  location: string
+  lastSeen?: Date | string
+  fingerprintHash: string
+  totalCalls?: number
+  keysAccessed?: number
+  keyId?: string | null
+  publicKeySpkiBase64?: string | null
+  userAgent?: string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  apiKeyId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type DeviceCreateOrConnectWithoutAuditLogsInput = {
+  where: Prisma.DeviceWhereUniqueInput
+  create: Prisma.XOR<Prisma.DeviceCreateWithoutAuditLogsInput, Prisma.DeviceUncheckedCreateWithoutAuditLogsInput>
+}
+
+export type DeviceUpsertWithoutAuditLogsInput = {
+  update: Prisma.XOR<Prisma.DeviceUpdateWithoutAuditLogsInput, Prisma.DeviceUncheckedUpdateWithoutAuditLogsInput>
+  create: Prisma.XOR<Prisma.DeviceCreateWithoutAuditLogsInput, Prisma.DeviceUncheckedCreateWithoutAuditLogsInput>
+  where?: Prisma.DeviceWhereInput
+}
+
+export type DeviceUpdateToOneWithWhereWithoutAuditLogsInput = {
+  where?: Prisma.DeviceWhereInput
+  data: Prisma.XOR<Prisma.DeviceUpdateWithoutAuditLogsInput, Prisma.DeviceUncheckedUpdateWithoutAuditLogsInput>
+}
+
+export type DeviceUpdateWithoutAuditLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
+  platform?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerName?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  ipAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  lastSeen?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fingerprintHash?: Prisma.StringFieldUpdateOperationsInput | string
+  totalCalls?: Prisma.IntFieldUpdateOperationsInput | number
+  keysAccessed?: Prisma.IntFieldUpdateOperationsInput | number
+  keyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicKeySpkiBase64?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  apiKey?: Prisma.ApiKeyUpdateOneRequiredWithoutDevicesNestedInput
+}
+
+export type DeviceUncheckedUpdateWithoutAuditLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
+  platform?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerName?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  ipAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  lastSeen?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fingerprintHash?: Prisma.StringFieldUpdateOperationsInput | string
+  totalCalls?: Prisma.IntFieldUpdateOperationsInput | number
+  keysAccessed?: Prisma.IntFieldUpdateOperationsInput | number
+  keyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicKeySpkiBase64?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  apiKeyId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type DeviceCreateManyApiKeyInput = {
+  id?: string
+  name: string
+  status?: $Enums.DeviceStatus
+  platform: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerName: string
+  ownerEmail: string
+  ipAddress: string
+  location: string
+  lastSeen?: Date | string
+  fingerprintHash: string
+  totalCalls?: number
+  keysAccessed?: number
+  keyId?: string | null
+  publicKeySpkiBase64?: string | null
+  userAgent?: string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type DeviceUpdateWithoutApiKeyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  keyId?: Prisma.StringFieldUpdateOperationsInput | string
-  publicKeySpkiBase64?: Prisma.StringFieldUpdateOperationsInput | string
-  fingerprint?: Prisma.StringFieldUpdateOperationsInput | string
-  label?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
+  platform?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerName?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  ipAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  lastSeen?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fingerprintHash?: Prisma.StringFieldUpdateOperationsInput | string
+  totalCalls?: Prisma.IntFieldUpdateOperationsInput | number
+  keysAccessed?: Prisma.IntFieldUpdateOperationsInput | number
+  keyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicKeySpkiBase64?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  status?: Prisma.EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
-  lastSeenAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutDeviceNestedInput
 }
 
 export type DeviceUncheckedUpdateWithoutApiKeyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  keyId?: Prisma.StringFieldUpdateOperationsInput | string
-  publicKeySpkiBase64?: Prisma.StringFieldUpdateOperationsInput | string
-  fingerprint?: Prisma.StringFieldUpdateOperationsInput | string
-  label?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
+  platform?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerName?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  ipAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  lastSeen?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fingerprintHash?: Prisma.StringFieldUpdateOperationsInput | string
+  totalCalls?: Prisma.IntFieldUpdateOperationsInput | number
+  keysAccessed?: Prisma.IntFieldUpdateOperationsInput | number
+  keyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicKeySpkiBase64?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  status?: Prisma.EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
-  lastSeenAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutDeviceNestedInput
 }
 
 export type DeviceUncheckedUpdateManyWithoutApiKeyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  keyId?: Prisma.StringFieldUpdateOperationsInput | string
-  publicKeySpkiBase64?: Prisma.StringFieldUpdateOperationsInput | string
-  fingerprint?: Prisma.StringFieldUpdateOperationsInput | string
-  label?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
+  platform?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  ownerName?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  ipAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  lastSeen?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fingerprintHash?: Prisma.StringFieldUpdateOperationsInput | string
+  totalCalls?: Prisma.IntFieldUpdateOperationsInput | number
+  keysAccessed?: Prisma.IntFieldUpdateOperationsInput | number
+  keyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicKeySpkiBase64?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  status?: Prisma.EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
-  lastSeenAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
+/**
+ * Count Type DeviceCountOutputType
+ */
+
+export type DeviceCountOutputType = {
+  auditLogs: number
+}
+
+export type DeviceCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  auditLogs?: boolean | DeviceCountOutputTypeCountAuditLogsArgs
+}
+
+/**
+ * DeviceCountOutputType without action
+ */
+export type DeviceCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DeviceCountOutputType
+   */
+  select?: Prisma.DeviceCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * DeviceCountOutputType without action
+ */
+export type DeviceCountOutputTypeCountAuditLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AuditLogWhereInput
+}
+
 
 export type DeviceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  name?: boolean
+  status?: boolean
+  platform?: boolean
+  ownerName?: boolean
+  ownerEmail?: boolean
+  ipAddress?: boolean
+  location?: boolean
+  lastSeen?: boolean
+  fingerprintHash?: boolean
+  totalCalls?: boolean
+  keysAccessed?: boolean
   keyId?: boolean
   publicKeySpkiBase64?: boolean
-  fingerprint?: boolean
-  label?: boolean
   userAgent?: boolean
   metadata?: boolean
-  status?: boolean
   apiKeyId?: boolean
-  lastSeenAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   apiKey?: boolean | Prisma.ApiKeyDefaultArgs<ExtArgs>
+  auditLogs?: boolean | Prisma.Device$auditLogsArgs<ExtArgs>
+  _count?: boolean | Prisma.DeviceCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["device"]>
 
 export type DeviceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  name?: boolean
+  status?: boolean
+  platform?: boolean
+  ownerName?: boolean
+  ownerEmail?: boolean
+  ipAddress?: boolean
+  location?: boolean
+  lastSeen?: boolean
+  fingerprintHash?: boolean
+  totalCalls?: boolean
+  keysAccessed?: boolean
   keyId?: boolean
   publicKeySpkiBase64?: boolean
-  fingerprint?: boolean
-  label?: boolean
   userAgent?: boolean
   metadata?: boolean
-  status?: boolean
   apiKeyId?: boolean
-  lastSeenAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   apiKey?: boolean | Prisma.ApiKeyDefaultArgs<ExtArgs>
@@ -685,15 +1103,22 @@ export type DeviceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
 
 export type DeviceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  name?: boolean
+  status?: boolean
+  platform?: boolean
+  ownerName?: boolean
+  ownerEmail?: boolean
+  ipAddress?: boolean
+  location?: boolean
+  lastSeen?: boolean
+  fingerprintHash?: boolean
+  totalCalls?: boolean
+  keysAccessed?: boolean
   keyId?: boolean
   publicKeySpkiBase64?: boolean
-  fingerprint?: boolean
-  label?: boolean
   userAgent?: boolean
   metadata?: boolean
-  status?: boolean
   apiKeyId?: boolean
-  lastSeenAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   apiKey?: boolean | Prisma.ApiKeyDefaultArgs<ExtArgs>
@@ -701,22 +1126,31 @@ export type DeviceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
 
 export type DeviceSelectScalar = {
   id?: boolean
+  name?: boolean
+  status?: boolean
+  platform?: boolean
+  ownerName?: boolean
+  ownerEmail?: boolean
+  ipAddress?: boolean
+  location?: boolean
+  lastSeen?: boolean
+  fingerprintHash?: boolean
+  totalCalls?: boolean
+  keysAccessed?: boolean
   keyId?: boolean
   publicKeySpkiBase64?: boolean
-  fingerprint?: boolean
-  label?: boolean
   userAgent?: boolean
   metadata?: boolean
-  status?: boolean
   apiKeyId?: boolean
-  lastSeenAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type DeviceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "keyId" | "publicKeySpkiBase64" | "fingerprint" | "label" | "userAgent" | "metadata" | "status" | "apiKeyId" | "lastSeenAt" | "createdAt" | "updatedAt", ExtArgs["result"]["device"]>
+export type DeviceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "status" | "platform" | "ownerName" | "ownerEmail" | "ipAddress" | "location" | "lastSeen" | "fingerprintHash" | "totalCalls" | "keysAccessed" | "keyId" | "publicKeySpkiBase64" | "userAgent" | "metadata" | "apiKeyId" | "createdAt" | "updatedAt", ExtArgs["result"]["device"]>
 export type DeviceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   apiKey?: boolean | Prisma.ApiKeyDefaultArgs<ExtArgs>
+  auditLogs?: boolean | Prisma.Device$auditLogsArgs<ExtArgs>
+  _count?: boolean | Prisma.DeviceCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type DeviceIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   apiKey?: boolean | Prisma.ApiKeyDefaultArgs<ExtArgs>
@@ -729,18 +1163,26 @@ export type $DevicePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   name: "Device"
   objects: {
     apiKey: Prisma.$ApiKeyPayload<ExtArgs>
+    auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    keyId: string
-    publicKeySpkiBase64: string
-    fingerprint: string
-    label: string
+    name: string
+    status: $Enums.DeviceStatus
+    platform: runtime.JsonValue
+    ownerName: string
+    ownerEmail: string
+    ipAddress: string
+    location: string
+    lastSeen: Date
+    fingerprintHash: string
+    totalCalls: number
+    keysAccessed: number
+    keyId: string | null
+    publicKeySpkiBase64: string | null
     userAgent: string | null
     metadata: runtime.JsonValue | null
-    status: $Enums.DeviceStatus
     apiKeyId: string
-    lastSeenAt: Date
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["device"]>
@@ -1138,6 +1580,7 @@ readonly fields: DeviceFieldRefs;
 export interface Prisma__DeviceClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   apiKey<T extends Prisma.ApiKeyDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ApiKeyDefaultArgs<ExtArgs>>): Prisma.Prisma__ApiKeyClient<runtime.Types.Result.GetResult<Prisma.$ApiKeyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  auditLogs<T extends Prisma.Device$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Device$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1168,15 +1611,22 @@ export interface Prisma__DeviceClient<T, Null = never, ExtArgs extends runtime.T
  */
 export interface DeviceFieldRefs {
   readonly id: Prisma.FieldRef<"Device", 'String'>
+  readonly name: Prisma.FieldRef<"Device", 'String'>
+  readonly status: Prisma.FieldRef<"Device", 'DeviceStatus'>
+  readonly platform: Prisma.FieldRef<"Device", 'Json'>
+  readonly ownerName: Prisma.FieldRef<"Device", 'String'>
+  readonly ownerEmail: Prisma.FieldRef<"Device", 'String'>
+  readonly ipAddress: Prisma.FieldRef<"Device", 'String'>
+  readonly location: Prisma.FieldRef<"Device", 'String'>
+  readonly lastSeen: Prisma.FieldRef<"Device", 'DateTime'>
+  readonly fingerprintHash: Prisma.FieldRef<"Device", 'String'>
+  readonly totalCalls: Prisma.FieldRef<"Device", 'Int'>
+  readonly keysAccessed: Prisma.FieldRef<"Device", 'Int'>
   readonly keyId: Prisma.FieldRef<"Device", 'String'>
   readonly publicKeySpkiBase64: Prisma.FieldRef<"Device", 'String'>
-  readonly fingerprint: Prisma.FieldRef<"Device", 'String'>
-  readonly label: Prisma.FieldRef<"Device", 'String'>
   readonly userAgent: Prisma.FieldRef<"Device", 'String'>
   readonly metadata: Prisma.FieldRef<"Device", 'Json'>
-  readonly status: Prisma.FieldRef<"Device", 'DeviceStatus'>
   readonly apiKeyId: Prisma.FieldRef<"Device", 'String'>
-  readonly lastSeenAt: Prisma.FieldRef<"Device", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Device", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Device", 'DateTime'>
 }
@@ -1572,6 +2022,30 @@ export type DeviceDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Limit how many Devices to delete.
    */
   limit?: number
+}
+
+/**
+ * Device.auditLogs
+ */
+export type Device$auditLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AuditLog
+   */
+  select?: Prisma.AuditLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AuditLog
+   */
+  omit?: Prisma.AuditLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AuditLogInclude<ExtArgs> | null
+  where?: Prisma.AuditLogWhereInput
+  orderBy?: Prisma.AuditLogOrderByWithRelationInput | Prisma.AuditLogOrderByWithRelationInput[]
+  cursor?: Prisma.AuditLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AuditLogScalarFieldEnum | Prisma.AuditLogScalarFieldEnum[]
 }
 
 /**

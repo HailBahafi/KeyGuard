@@ -11,27 +11,92 @@
 
 export const ApiKeyStatus = {
   ACTIVE: 'ACTIVE',
-  INACTIVE: 'INACTIVE',
+  IDLE: 'IDLE',
+  EXPIRED: 'EXPIRED',
   REVOKED: 'REVOKED'
 } as const
 
 export type ApiKeyStatus = (typeof ApiKeyStatus)[keyof typeof ApiKeyStatus]
 
 
+export const ApiKeyProvider = {
+  OPENAI: 'OPENAI',
+  ANTHROPIC: 'ANTHROPIC',
+  GOOGLE: 'GOOGLE',
+  AZURE: 'AZURE'
+} as const
+
+export type ApiKeyProvider = (typeof ApiKeyProvider)[keyof typeof ApiKeyProvider]
+
+
+export const ApiKeyEnvironment = {
+  PRODUCTION: 'PRODUCTION',
+  DEVELOPMENT: 'DEVELOPMENT',
+  STAGING: 'STAGING'
+} as const
+
+export type ApiKeyEnvironment = (typeof ApiKeyEnvironment)[keyof typeof ApiKeyEnvironment]
+
+
+export const AuditLogSeverity = {
+  INFO: 'INFO',
+  WARNING: 'WARNING',
+  CRITICAL: 'CRITICAL'
+} as const
+
+export type AuditLogSeverity = (typeof AuditLogSeverity)[keyof typeof AuditLogSeverity]
+
+
+export const AuditLogStatus = {
+  SUCCESS: 'SUCCESS',
+  FAILURE: 'FAILURE'
+} as const
+
+export type AuditLogStatus = (typeof AuditLogStatus)[keyof typeof AuditLogStatus]
+
+
+export const ActorType = {
+  USER: 'USER',
+  DEVICE: 'DEVICE',
+  SYSTEM: 'SYSTEM'
+} as const
+
+export type ActorType = (typeof ActorType)[keyof typeof ActorType]
+
+
 export const DeviceStatus = {
   ACTIVE: 'ACTIVE',
-  INACTIVE: 'INACTIVE',
-  REVOKED: 'REVOKED',
-  SUSPENDED: 'SUSPENDED'
+  PENDING: 'PENDING',
+  SUSPENDED: 'SUSPENDED',
+  REVOKED: 'REVOKED'
 } as const
 
 export type DeviceStatus = (typeof DeviceStatus)[keyof typeof DeviceStatus]
 
 
+export const DeviceOS = {
+  MACOS: 'MACOS',
+  WINDOWS: 'WINDOWS',
+  LINUX: 'LINUX',
+  IOS: 'IOS',
+  ANDROID: 'ANDROID'
+} as const
+
+export type DeviceOS = (typeof DeviceOS)[keyof typeof DeviceOS]
+
+
+export const BackupFrequency = {
+  DAILY: 'DAILY',
+  WEEKLY: 'WEEKLY',
+  MONTHLY: 'MONTHLY'
+} as const
+
+export type BackupFrequency = (typeof BackupFrequency)[keyof typeof BackupFrequency]
+
+
 export const UserRole = {
   ADMIN: 'ADMIN',
-  SELLER: 'SELLER',
-  BUYER: 'BUYER'
+  USER: 'USER'
 } as const
 
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]

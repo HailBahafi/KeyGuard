@@ -21,11 +21,11 @@ export class UsersService {
     const { oldPassword, newPassword, ...rest } = updateProfileDto;
     const userExist = await this.prismaService.prisma.user.findFirst({
       where: {
-        OR: [{ email: updateProfileDto.email }, { username: updateProfileDto.username }],
+        email: updateProfileDto.email,
       },
     });
     if (userExist && userExist.id !== user.id)
-      throw new BadRequestException('email or username already exists');
+      throw new BadRequestException('email already exists');
     const data: any = { ...rest };
     if (oldPassword && newPassword) {
       await Hashing.compareOrFail(oldPassword, user.password, 'password is not correct');

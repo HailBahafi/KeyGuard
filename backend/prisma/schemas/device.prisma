@@ -1,25 +1,46 @@
 enum DeviceStatus {
   ACTIVE
-  INACTIVE
-  REVOKED
+  PENDING
   SUSPENDED
+  REVOKED
+}
+
+enum DeviceOS {
+  MACOS
+  WINDOWS
+  LINUX
+  IOS
+  ANDROID
 }
 
 model Device {
   id                  String       @id @default(uuid())
-  keyId               String
-  publicKeySpkiBase64 String
-  fingerprint         String
-  label               String
+  name                String // Device nickname
+  status              DeviceStatus @default(PENDING)
+  platform            Json // { os, version, browser? }
+  ownerName           String
+  ownerEmail          String
+  ipAddress           String
+  location            String // e.g., "Riyadh, SA"
+  lastSeen            DateTime     @default(now())
+  fingerprintHash     String       @unique
+  totalCalls          Int          @default(0)
+  keysAccessed        Int          @default(0)
+
+  // Legacy fields for backward compatibility
+  keyId               String?
+  publicKeySpkiBase64 String?
   userAgent           String?
   metadata            Json?
-  status              DeviceStatus @default(ACTIVE)
+
   apiKeyId            String
-  lastSeenAt          DateTime     @default(now())
-  createdAt           DateTime     @default(now())
-  updatedAt           DateTime     @updatedAt
   apiKey              ApiKey       @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
 
-  @@unique([apiKeyId, keyId])
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  // Relations
+  auditLogs           AuditLog[]
+
   @@map("devices")
 }

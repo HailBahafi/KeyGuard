@@ -78,16 +78,20 @@ describe('KeyGuard (e2e)', () => {
     publicKeyBase64 = Buffer.from(publicKeyBuffer).toString('base64');
 
     // Create test project/API key
+    const apiKeyValue = `kg_test_e2e_${Date.now()}_key`;
     const project = await prisma.prisma.apiKey.create({
       data: {
-        keyPrefix: 'kg_test',
         name: 'Test Project',
+        provider: 'OPENAI',
+        environment: 'DEVELOPMENT',
+        maskedValue: 'kg_test_...key',
+        fullValue: apiKeyValue,
         status: 'ACTIVE',
       },
     });
 
     testProjectId = project.id;
-    testApiKey = `${project.keyPrefix}_e2e_test_key`;
+    testApiKey = apiKeyValue;
     testKeyId = `kg_key_e2e_test_${Date.now()}`;
   });
 

@@ -1,0 +1,53 @@
+enum AuditLogSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum AuditLogStatus {
+  SUCCESS
+  FAILURE
+}
+
+enum ActorType {
+  USER
+  DEVICE
+  SYSTEM
+}
+
+model AuditLog {
+  id        String            @id @default(uuid())
+  timestamp DateTime          @default(now())
+  severity  AuditLogSeverity  @default(INFO)
+  event     String // e.g., "key.retrieved", "device.enrolled"
+  status    AuditLogStatus    @default(SUCCESS)
+
+  // Actor information
+  actorId       String
+  actorName     String
+  actorType     ActorType
+  actorIp       String
+  actorLocation String?
+
+  // Target information
+  targetId   String?
+  targetName String?
+  targetType String?
+
+  // Security context
+  metadata  Json? // { latency?, tokens?, cost?, error?, userAgent?, requestId? }
+
+  // Relations
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  deviceId  String?
+  device    Device?  @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+  apiKeyId  String?
+  apiKey    ApiKey?  @relation(fields: [apiKeyId], references: [id], onDelete: SetNull)
+
+  @@index([timestamp])
+  @@index([event])
+  @@index([severity])
+  @@index([status])
+  @@map("audit_logs")
+}

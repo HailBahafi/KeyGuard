@@ -1,17 +1,41 @@
 enum ApiKeyStatus {
   ACTIVE
-  INACTIVE
+  IDLE
+  EXPIRED
   REVOKED
 }
 
+enum ApiKeyProvider {
+  OPENAI
+  ANTHROPIC
+  GOOGLE
+  AZURE
+}
+
+enum ApiKeyEnvironment {
+  PRODUCTION
+  DEVELOPMENT
+  STAGING
+}
+
 model ApiKey {
-  id        String       @id @default(uuid())
-  keyPrefix String       @unique
-  name      String
-  status    ApiKeyStatus @default(ACTIVE)
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  id          String            @id @default(uuid())
+  name        String
+  provider    ApiKeyProvider
+  status      ApiKeyStatus      @default(ACTIVE)
+  environment ApiKeyEnvironment
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  lastUsed    DateTime?
+  expiresAt   DateTime?
+  description String?
+  maskedValue String // e.g., "sk-...abc123"
+  fullValue   String // Encrypted full key value
+  usageCount  Int               @default(0)
+
+  // Relations
   devices   Device[]
+  auditLogs AuditLog[]
 
   @@map("api_keys")
 }

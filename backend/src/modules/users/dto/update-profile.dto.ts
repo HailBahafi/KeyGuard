@@ -1,7 +1,6 @@
 import {
   IsEmail,
   IsOptional,
-  IsPhoneNumber,
   IsString,
   IsStrongPassword,
   ValidateIf,
@@ -15,7 +14,7 @@ export class UpdateProfileDto {
 
   @IsOptional()
   @IsString()
-  username: string;
+  name: string;
 
   @ValidateIf(o => o.newPassword)
   @IsOptional()
@@ -27,11 +26,6 @@ export class UpdateProfileDto {
   @IsStrongPassword()
   @IsString()
   newPassword: string;
-
-  @IsOptional()
-  @IsPhoneNumber()
-  @IsString()
-  phone: string;
 
   @IsOptional()
   @IsString()

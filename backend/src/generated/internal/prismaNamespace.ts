@@ -385,8 +385,12 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   ApiKey: 'ApiKey',
+  AuditLog: 'AuditLog',
   Device: 'Device',
   Nonce: 'Nonce',
+  Settings: 'Settings',
+  AdminApiKey: 'AdminApiKey',
+  EnrollmentCode: 'EnrollmentCode',
   User: 'User'
 } as const
 
@@ -403,7 +407,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "apiKey" | "device" | "nonce" | "user"
+    modelProps: "apiKey" | "auditLog" | "device" | "nonce" | "settings" | "adminApiKey" | "enrollmentCode" | "user"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -478,6 +482,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ApiKeyCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ApiKeyCountAggregateOutputType> | number
+        }
+      }
+    }
+    AuditLog: {
+      payload: Prisma.$AuditLogPayload<ExtArgs>
+      fields: Prisma.AuditLogFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AuditLogFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AuditLogFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>
+        }
+        findFirst: {
+          args: Prisma.AuditLogFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AuditLogFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>
+        }
+        findMany: {
+          args: Prisma.AuditLogFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>[]
+        }
+        create: {
+          args: Prisma.AuditLogCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>
+        }
+        createMany: {
+          args: Prisma.AuditLogCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AuditLogCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>[]
+        }
+        delete: {
+          args: Prisma.AuditLogDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>
+        }
+        update: {
+          args: Prisma.AuditLogUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>
+        }
+        deleteMany: {
+          args: Prisma.AuditLogDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AuditLogUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AuditLogUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>[]
+        }
+        upsert: {
+          args: Prisma.AuditLogUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>
+        }
+        aggregate: {
+          args: Prisma.AuditLogAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAuditLog>
+        }
+        groupBy: {
+          args: Prisma.AuditLogGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AuditLogGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AuditLogCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AuditLogCountAggregateOutputType> | number
         }
       }
     }
@@ -629,6 +707,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Settings: {
+      payload: Prisma.$SettingsPayload<ExtArgs>
+      fields: Prisma.SettingsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SettingsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettingsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SettingsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettingsPayload>
+        }
+        findFirst: {
+          args: Prisma.SettingsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettingsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SettingsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettingsPayload>
+        }
+        findMany: {
+          args: Prisma.SettingsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettingsPayload>[]
+        }
+        create: {
+          args: Prisma.SettingsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettingsPayload>
+        }
+        createMany: {
+          args: Prisma.SettingsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SettingsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettingsPayload>[]
+        }
+        delete: {
+          args: Prisma.SettingsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettingsPayload>
+        }
+        update: {
+          args: Prisma.SettingsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettingsPayload>
+        }
+        deleteMany: {
+          args: Prisma.SettingsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SettingsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SettingsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettingsPayload>[]
+        }
+        upsert: {
+          args: Prisma.SettingsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettingsPayload>
+        }
+        aggregate: {
+          args: Prisma.SettingsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSettings>
+        }
+        groupBy: {
+          args: Prisma.SettingsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SettingsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SettingsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SettingsCountAggregateOutputType> | number
+        }
+      }
+    }
+    AdminApiKey: {
+      payload: Prisma.$AdminApiKeyPayload<ExtArgs>
+      fields: Prisma.AdminApiKeyFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AdminApiKeyFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminApiKeyPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AdminApiKeyFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminApiKeyPayload>
+        }
+        findFirst: {
+          args: Prisma.AdminApiKeyFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminApiKeyPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AdminApiKeyFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminApiKeyPayload>
+        }
+        findMany: {
+          args: Prisma.AdminApiKeyFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminApiKeyPayload>[]
+        }
+        create: {
+          args: Prisma.AdminApiKeyCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminApiKeyPayload>
+        }
+        createMany: {
+          args: Prisma.AdminApiKeyCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AdminApiKeyCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminApiKeyPayload>[]
+        }
+        delete: {
+          args: Prisma.AdminApiKeyDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminApiKeyPayload>
+        }
+        update: {
+          args: Prisma.AdminApiKeyUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminApiKeyPayload>
+        }
+        deleteMany: {
+          args: Prisma.AdminApiKeyDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AdminApiKeyUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AdminApiKeyUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminApiKeyPayload>[]
+        }
+        upsert: {
+          args: Prisma.AdminApiKeyUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminApiKeyPayload>
+        }
+        aggregate: {
+          args: Prisma.AdminApiKeyAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAdminApiKey>
+        }
+        groupBy: {
+          args: Prisma.AdminApiKeyGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AdminApiKeyGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AdminApiKeyCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AdminApiKeyCountAggregateOutputType> | number
+        }
+      }
+    }
+    EnrollmentCode: {
+      payload: Prisma.$EnrollmentCodePayload<ExtArgs>
+      fields: Prisma.EnrollmentCodeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.EnrollmentCodeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EnrollmentCodePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.EnrollmentCodeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EnrollmentCodePayload>
+        }
+        findFirst: {
+          args: Prisma.EnrollmentCodeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EnrollmentCodePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.EnrollmentCodeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EnrollmentCodePayload>
+        }
+        findMany: {
+          args: Prisma.EnrollmentCodeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EnrollmentCodePayload>[]
+        }
+        create: {
+          args: Prisma.EnrollmentCodeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EnrollmentCodePayload>
+        }
+        createMany: {
+          args: Prisma.EnrollmentCodeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.EnrollmentCodeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EnrollmentCodePayload>[]
+        }
+        delete: {
+          args: Prisma.EnrollmentCodeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EnrollmentCodePayload>
+        }
+        update: {
+          args: Prisma.EnrollmentCodeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EnrollmentCodePayload>
+        }
+        deleteMany: {
+          args: Prisma.EnrollmentCodeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.EnrollmentCodeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.EnrollmentCodeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EnrollmentCodePayload>[]
+        }
+        upsert: {
+          args: Prisma.EnrollmentCodeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EnrollmentCodePayload>
+        }
+        aggregate: {
+          args: Prisma.EnrollmentCodeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEnrollmentCode>
+        }
+        groupBy: {
+          args: Prisma.EnrollmentCodeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EnrollmentCodeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.EnrollmentCodeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EnrollmentCodeCountAggregateOutputType> | number
+        }
+      }
+    }
     User: {
       payload: Prisma.$UserPayload<ExtArgs>
       fields: Prisma.UserFieldRefs
@@ -744,27 +1044,64 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const ApiKeyScalarFieldEnum = {
   id: 'id',
-  keyPrefix: 'keyPrefix',
   name: 'name',
+  provider: 'provider',
   status: 'status',
+  environment: 'environment',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  lastUsed: 'lastUsed',
+  expiresAt: 'expiresAt',
+  description: 'description',
+  maskedValue: 'maskedValue',
+  fullValue: 'fullValue',
+  usageCount: 'usageCount'
 } as const
 
 export type ApiKeyScalarFieldEnum = (typeof ApiKeyScalarFieldEnum)[keyof typeof ApiKeyScalarFieldEnum]
 
 
+export const AuditLogScalarFieldEnum = {
+  id: 'id',
+  timestamp: 'timestamp',
+  severity: 'severity',
+  event: 'event',
+  status: 'status',
+  actorId: 'actorId',
+  actorName: 'actorName',
+  actorType: 'actorType',
+  actorIp: 'actorIp',
+  actorLocation: 'actorLocation',
+  targetId: 'targetId',
+  targetName: 'targetName',
+  targetType: 'targetType',
+  metadata: 'metadata',
+  userId: 'userId',
+  deviceId: 'deviceId',
+  apiKeyId: 'apiKeyId'
+} as const
+
+export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
+
+
 export const DeviceScalarFieldEnum = {
   id: 'id',
+  name: 'name',
+  status: 'status',
+  platform: 'platform',
+  ownerName: 'ownerName',
+  ownerEmail: 'ownerEmail',
+  ipAddress: 'ipAddress',
+  location: 'location',
+  lastSeen: 'lastSeen',
+  fingerprintHash: 'fingerprintHash',
+  totalCalls: 'totalCalls',
+  keysAccessed: 'keysAccessed',
   keyId: 'keyId',
   publicKeySpkiBase64: 'publicKeySpkiBase64',
-  fingerprint: 'fingerprint',
-  label: 'label',
   userAgent: 'userAgent',
   metadata: 'metadata',
-  status: 'status',
   apiKeyId: 'apiKeyId',
-  lastSeenAt: 'lastSeenAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -784,15 +1121,49 @@ export const NonceScalarFieldEnum = {
 export type NonceScalarFieldEnum = (typeof NonceScalarFieldEnum)[keyof typeof NonceScalarFieldEnum]
 
 
+export const SettingsScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  value: 'value',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SettingsScalarFieldEnum = (typeof SettingsScalarFieldEnum)[keyof typeof SettingsScalarFieldEnum]
+
+
+export const AdminApiKeyScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  keyHash: 'keyHash',
+  scope: 'scope',
+  createdAt: 'createdAt',
+  lastUsedAt: 'lastUsedAt'
+} as const
+
+export type AdminApiKeyScalarFieldEnum = (typeof AdminApiKeyScalarFieldEnum)[keyof typeof AdminApiKeyScalarFieldEnum]
+
+
+export const EnrollmentCodeScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  expiresAt: 'expiresAt',
+  used: 'used',
+  usedAt: 'usedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type EnrollmentCodeScalarFieldEnum = (typeof EnrollmentCodeScalarFieldEnum)[keyof typeof EnrollmentCodeScalarFieldEnum]
+
+
 export const UserScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   isActive: 'isActive',
   lastLogin: 'lastLogin',
-  phone: 'phone',
   email: 'email',
-  username: 'username',
+  name: 'name',
   password: 'password',
   avatar: 'avatar',
   role: 'role'
@@ -817,12 +1188,27 @@ export const NullableJsonNullValueInput = {
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
 export const QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
 } as const
 
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
 export const JsonNullValueFilter = {
@@ -832,14 +1218,6 @@ export const JsonNullValueFilter = {
 } as const
 
 export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
-
-
-export const NullsOrder = {
-  first: 'first',
-  last: 'last'
-} as const
-
-export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
 
@@ -863,6 +1241,20 @@ export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMod
 
 
 /**
+ * Reference to a field of type 'ApiKeyProvider'
+ */
+export type EnumApiKeyProviderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ApiKeyProvider'>
+    
+
+
+/**
+ * Reference to a field of type 'ApiKeyProvider[]'
+ */
+export type ListEnumApiKeyProviderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ApiKeyProvider[]'>
+    
+
+
+/**
  * Reference to a field of type 'ApiKeyStatus'
  */
 export type EnumApiKeyStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ApiKeyStatus'>
@@ -877,6 +1269,20 @@ export type ListEnumApiKeyStatusFieldRefInput<$PrismaModel> = FieldRefInputType<
 
 
 /**
+ * Reference to a field of type 'ApiKeyEnvironment'
+ */
+export type EnumApiKeyEnvironmentFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ApiKeyEnvironment'>
+    
+
+
+/**
+ * Reference to a field of type 'ApiKeyEnvironment[]'
+ */
+export type ListEnumApiKeyEnvironmentFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ApiKeyEnvironment[]'>
+    
+
+
+/**
  * Reference to a field of type 'DateTime'
  */
 export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -887,6 +1293,62 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Int'
+ */
+export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+/**
+ * Reference to a field of type 'Int[]'
+ */
+export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'AuditLogSeverity'
+ */
+export type EnumAuditLogSeverityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AuditLogSeverity'>
+    
+
+
+/**
+ * Reference to a field of type 'AuditLogSeverity[]'
+ */
+export type ListEnumAuditLogSeverityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AuditLogSeverity[]'>
+    
+
+
+/**
+ * Reference to a field of type 'AuditLogStatus'
+ */
+export type EnumAuditLogStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AuditLogStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'AuditLogStatus[]'
+ */
+export type ListEnumAuditLogStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AuditLogStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ActorType'
+ */
+export type EnumActorTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ActorType'>
+    
+
+
+/**
+ * Reference to a field of type 'ActorType[]'
+ */
+export type ListEnumActorTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ActorType[]'>
     
 
 
@@ -940,16 +1402,16 @@ export type ListEnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$Pri
 
 
 /**
- * Reference to a field of type 'Int'
+ * Reference to a field of type 'Float'
  */
-export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
     
 
 
 /**
- * Reference to a field of type 'Int[]'
+ * Reference to a field of type 'Float[]'
  */
-export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
 
 /**
@@ -1032,8 +1494,12 @@ export type PrismaClientOptions = ({
 }
 export type GlobalOmitConfig = {
   apiKey?: Prisma.ApiKeyOmit
+  auditLog?: Prisma.AuditLogOmit
   device?: Prisma.DeviceOmit
   nonce?: Prisma.NonceOmit
+  settings?: Prisma.SettingsOmit
+  adminApiKey?: Prisma.AdminApiKeyOmit
+  enrollmentCode?: Prisma.EnrollmentCodeOmit
   user?: Prisma.UserOmit
 }
 

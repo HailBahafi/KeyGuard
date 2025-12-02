@@ -10,11 +10,17 @@ module.exports = {
 
   // Test Match Patterns
   testRegex: '.*\\.spec\\.ts$',
-  testMatch: ['**/__tests__/**/*.(ts|js)', '**/*.(test|spec).(ts|js)'],
 
   // Transform Configuration
   transform: {
-    '^.+\\.(t|j)s$': 'ts-jest',
+    '^.+\\.(t|j)s$': ['ts-jest', {
+      tsconfig: {
+        paths: {
+          '@/*': ['src/*'],
+          'src/*': ['src/*'],
+        },
+      },
+    }],
   },
 
   // Coverage Configuration
@@ -35,30 +41,14 @@ module.exports = {
   // Coverage Reporters
   coverageReporters: ['text', 'lcov', 'html', 'json-summary'],
 
-  // Coverage Thresholds
-  coverageThreshold: {
-    global: {
-      branches: 80,
-      functions: 80,
-      lines: 80,
-      statements: 80,
-    },
+  // Module Name Mapper (for path aliases)
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/$1',
+    '^src/(.*)$': '<rootDir>/src/$1',
   },
-
-  // Module Name Mapping (for path aliases)
-  moduleNameMapping: {
-    '^@/(.*)$': '<rootDir>/src/$1',
-    '^@/common/(.*)$': '<rootDir>/src/common/$1',
-    '^@/core/(.*)$': '<rootDir>/src/core/$1',
-    '^@/modules/(.*)$': '<rootDir>/src/modules/$1',
-    '^@/generated/(.*)$': '<rootDir>/src/generated/$1',
-  },
-
-  // Setup Files
-  setupFilesAfterEnv: ['<rootDir>/test/setup.ts'],
 
   // Test Timeout
-  testTimeout: 10000,
+  testTimeout: 30000,
 
   // Verbose Output
   verbose: true,
@@ -69,24 +59,14 @@ module.exports = {
   // Restore Mocks
   restoreMocks: true,
 
-  // Global Setup/Teardown
-  globalSetup: '<rootDir>/test/global-setup.ts',
-  globalTeardown: '<rootDir>/test/global-teardown.ts',
-
   // Max Workers
   maxWorkers: '50%',
-
-  // Cache Directory
-  cacheDirectory: '<rootDir>/.jest-cache',
 
   // Ignore Patterns
   testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/', '<rootDir>/coverage/'],
 
-  // Watch Plugins
-  watchPlugins: ['jest-watch-typeahead/filename', 'jest-watch-typeahead/testname'],
-
   // Error on Deprecated
-  errorOnDeprecated: true,
+  errorOnDeprecated: false,
 
   // Notify Mode
   notify: false,

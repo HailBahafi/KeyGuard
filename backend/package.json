@@ -37,6 +37,7 @@
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-fastify": "^11.1.9",
     "@nestjs/swagger": "^11.2.3",
+    "@nestjs/throttler": "^6.4.0",
     "@prisma/client": "^7.0.1",
     "@prisma/extension-accelerate": "^3.0.0",
     "@prisma/extension-optimize": "^2.0.1",
@@ -86,22 +87,5 @@
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.48.0"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
-    "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "collectCoverageFrom": [
-      "**/*.(t|j)s"
-    ],
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
   }
 }

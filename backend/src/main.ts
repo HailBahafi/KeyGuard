@@ -103,8 +103,7 @@ function setupGlobalPipes(app: NestFastifyApplication, isProd: boolean): void {
 }
 
 function setupGlobalFilters(app: NestFastifyApplication): void {
-  const winstonLogger = app.get(WINSTON_MODULE_PROVIDER);
-  app.useGlobalFilters(new HttpExceptionFilter(winstonLogger));
+  app.useGlobalFilters(new HttpExceptionFilter());
 }
 
 async function setupSecurity(app: NestFastifyApplication, isProd: boolean): Promise<void> {

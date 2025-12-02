@@ -7,6 +7,10 @@ export abstract class Hashing {
     return await bcrypt.hash(password, salt);
   }
 
+  static async compare(password: string, hashedPassword: string): Promise<boolean> {
+    return await bcrypt.compare(password, hashedPassword);
+  }
+
   static async compareOrFail(password: string, hashedPassword: string, message: string = 'username or email is incorrect') {
     const isMatch = await bcrypt.compare(password, hashedPassword);
     if (!isMatch) {

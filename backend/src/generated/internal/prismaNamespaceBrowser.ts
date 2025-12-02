@@ -52,8 +52,12 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   ApiKey: 'ApiKey',
+  AuditLog: 'AuditLog',
   Device: 'Device',
   Nonce: 'Nonce',
+  Settings: 'Settings',
+  AdminApiKey: 'AdminApiKey',
+  EnrollmentCode: 'EnrollmentCode',
   User: 'User'
 } as const
 
@@ -75,27 +79,64 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const ApiKeyScalarFieldEnum = {
   id: 'id',
-  keyPrefix: 'keyPrefix',
   name: 'name',
+  provider: 'provider',
   status: 'status',
+  environment: 'environment',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  lastUsed: 'lastUsed',
+  expiresAt: 'expiresAt',
+  description: 'description',
+  maskedValue: 'maskedValue',
+  fullValue: 'fullValue',
+  usageCount: 'usageCount'
 } as const
 
 export type ApiKeyScalarFieldEnum = (typeof ApiKeyScalarFieldEnum)[keyof typeof ApiKeyScalarFieldEnum]
 
 
+export const AuditLogScalarFieldEnum = {
+  id: 'id',
+  timestamp: 'timestamp',
+  severity: 'severity',
+  event: 'event',
+  status: 'status',
+  actorId: 'actorId',
+  actorName: 'actorName',
+  actorType: 'actorType',
+  actorIp: 'actorIp',
+  actorLocation: 'actorLocation',
+  targetId: 'targetId',
+  targetName: 'targetName',
+  targetType: 'targetType',
+  metadata: 'metadata',
+  userId: 'userId',
+  deviceId: 'deviceId',
+  apiKeyId: 'apiKeyId'
+} as const
+
+export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
+
+
 export const DeviceScalarFieldEnum = {
   id: 'id',
+  name: 'name',
+  status: 'status',
+  platform: 'platform',
+  ownerName: 'ownerName',
+  ownerEmail: 'ownerEmail',
+  ipAddress: 'ipAddress',
+  location: 'location',
+  lastSeen: 'lastSeen',
+  fingerprintHash: 'fingerprintHash',
+  totalCalls: 'totalCalls',
+  keysAccessed: 'keysAccessed',
   keyId: 'keyId',
   publicKeySpkiBase64: 'publicKeySpkiBase64',
-  fingerprint: 'fingerprint',
-  label: 'label',
   userAgent: 'userAgent',
   metadata: 'metadata',
-  status: 'status',
   apiKeyId: 'apiKeyId',
-  lastSeenAt: 'lastSeenAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -115,15 +156,49 @@ export const NonceScalarFieldEnum = {
 export type NonceScalarFieldEnum = (typeof NonceScalarFieldEnum)[keyof typeof NonceScalarFieldEnum]
 
 
+export const SettingsScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  value: 'value',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SettingsScalarFieldEnum = (typeof SettingsScalarFieldEnum)[keyof typeof SettingsScalarFieldEnum]
+
+
+export const AdminApiKeyScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  keyHash: 'keyHash',
+  scope: 'scope',
+  createdAt: 'createdAt',
+  lastUsedAt: 'lastUsedAt'
+} as const
+
+export type AdminApiKeyScalarFieldEnum = (typeof AdminApiKeyScalarFieldEnum)[keyof typeof AdminApiKeyScalarFieldEnum]
+
+
+export const EnrollmentCodeScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  expiresAt: 'expiresAt',
+  used: 'used',
+  usedAt: 'usedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type EnrollmentCodeScalarFieldEnum = (typeof EnrollmentCodeScalarFieldEnum)[keyof typeof EnrollmentCodeScalarFieldEnum]
+
+
 export const UserScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   isActive: 'isActive',
   lastLogin: 'lastLogin',
-  phone: 'phone',
   email: 'email',
-  username: 'username',
+  name: 'name',
   password: 'password',
   avatar: 'avatar',
   role: 'role'
@@ -148,12 +223,27 @@ export const NullableJsonNullValueInput = {
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
+export const JsonNullValueInput = {
+  JsonNull: 'JsonNull'
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
 export const QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
 } as const
 
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
 export const JsonNullValueFilter = {
@@ -163,12 +253,4 @@ export const JsonNullValueFilter = {
 } as const
 
 export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
-
-
-export const NullsOrder = {
-  first: 'first',
-  last: 'last'
-} as const
-
-export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 

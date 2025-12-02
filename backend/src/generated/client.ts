@@ -43,6 +43,11 @@ export { Prisma }
  */
 export type ApiKey = Prisma.ApiKeyModel
 /**
+ * Model AuditLog
+ * 
+ */
+export type AuditLog = Prisma.AuditLogModel
+/**
  * Model Device
  * 
  */
@@ -52,6 +57,21 @@ export type Device = Prisma.DeviceModel
  * 
  */
 export type Nonce = Prisma.NonceModel
+/**
+ * Model Settings
+ * 
+ */
+export type Settings = Prisma.SettingsModel
+/**
+ * Model AdminApiKey
+ * 
+ */
+export type AdminApiKey = Prisma.AdminApiKeyModel
+/**
+ * Model EnrollmentCode
+ * 
+ */
+export type EnrollmentCode = Prisma.EnrollmentCodeModel
 /**
  * Model User
  * 

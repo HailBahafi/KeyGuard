@@ -1,0 +1,39 @@
+enum BackupFrequency {
+    DAILY
+    WEEKLY
+    MONTHLY
+}
+
+model Settings {
+    id        String   @id @default(uuid())
+    key       String   @unique
+    value     Json
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("settings")
+}
+
+model AdminApiKey {
+    id         String    @id @default(uuid())
+    name       String
+    keyHash    String    @unique
+    scope      Json // Array of scopes: ['read', 'write']
+    createdAt  DateTime  @default(now())
+    lastUsedAt DateTime?
+
+    @@map("admin_api_keys")
+}
+
+model EnrollmentCode {
+    id        String    @id @default(uuid())
+    code      String    @unique
+    expiresAt DateTime
+    used      Boolean   @default(false)
+    usedAt    DateTime?
+    createdAt DateTime  @default(now())
+
+    @@index([code])
+    @@index([expiresAt])
+    @@map("enrollment_codes")
+}

@@ -43,49 +43,43 @@ export class KeyGuardService {
     // Validate API key and get project
     const project = await this.validateApiKey(apiKey);
 
-    // Check if device with same keyId already exists
+    // Check if device with same fingerprint already exists
     const existingDevice = await this.prisma.prisma.device.findUnique({
       where: {
-        apiKeyId_keyId: {
-          apiKeyId: project.id,
-          keyId: enrollDto.keyId,
-        },
+        fingerprintHash: enrollDto.deviceFingerprint,
       },
     });
 
     if (existingDevice) {
       throw new BadRequestException(
-        `Device with keyId ${enrollDto.keyId} already enrolled`,
+        `Device already enrolled`,
       );
     }
 
     // Validate public key format (basic check)
     this.validatePublicKey(enrollDto.publicKey);
 
-    // Create device record
-    const deviceData: DeviceCreateInput = {
-      keyId: enrollDto.keyId,
-      publicKeySpkiBase64: enrollDto.publicKey,
-      fingerprint: enrollDto.deviceFingerprint,
-      label: enrollDto.label,
-      status: 'ACTIVE',
-      apiKey: {
-        connect: {
-          id: project.id,
+    // Create device record with new schema
+    const device = await this.prisma.prisma.device.create({
+      data: {
+        name: enrollDto.label || 'Unnamed Device',
+        fingerprintHash: enrollDto.deviceFingerprint,
+        status: 'PENDING',
+        platform: enrollDto.metadata || {},
+        ownerName: 'System',
+        ownerEmail: 'system@keyguard.io',
+        ipAddress: '0.0.0.0',
+        location: 'Unknown',
+        keyId: enrollDto.keyId ?? null,
+        publicKeySpkiBase64: enrollDto.publicKey ?? null,
+        userAgent: enrollDto.userAgent ?? null,
+        metadata: enrollDto.metadata as any,
+        apiKey: {
+          connect: {
+            id: project.id,
+          },
         },
       },
-    };
-
-    // Only add optional fields if they exist
-    if (enrollDto.userAgent) {
-      deviceData.userAgent = enrollDto.userAgent;
-    }
-    if (enrollDto.metadata) {
-      deviceData.metadata = enrollDto.metadata;
-    }
-
-    const device = await this.prisma.prisma.device.create({
-      data: deviceData,
     });
 
     this.logger.log(`Device enrolled successfully: ${device.id}`);
@@ -137,12 +131,10 @@ export class KeyGuardService {
       const project = await this.validateApiKey(headers.apiKey);
 
       // 4. Get device and public key
-      const device = await this.prisma.prisma.device.findUnique({
+      const device = await this.prisma.prisma.device.findFirst({
         where: {
-          apiKeyId_keyId: {
-            apiKeyId: project.id,
-            keyId: headers.keyId,
-          },
+          apiKeyId: project.id,
+          keyId: headers.keyId,
         },
       });
 
@@ -204,7 +196,7 @@ export class KeyGuardService {
 
       // 8. Verify signature
       const isValid = await this.signatureVerification.verifySignature(
-        device.publicKeySpkiBase64,
+        device.publicKeySpkiBase64 || '',
         canonicalPayload,
         headers.signature,
       );
@@ -222,7 +214,7 @@ export class KeyGuardService {
       // 10. Update last seen timestamp
       await this.prisma.prisma.device.update({
         where: { id: device.id },
-        data: { lastSeenAt: new Date() },
+        data: { lastSeen: new Date() },
       });
 
       this.logger.log(`Request verified successfully for device: ${device.id}`);
@@ -230,7 +222,7 @@ export class KeyGuardService {
       return {
         valid: true,
         deviceId: device.id,
-        keyId: device.keyId,
+        keyId: device.keyId || '',
       };
     } catch (error) {
       this.logger.error('Verification error:', error);
@@ -305,12 +297,10 @@ export class KeyGuardService {
       throw new BadRequestException('API key is required');
     }
 
-    // Extract key prefix (e.g., kg_prod_123 -> kg_prod)
-    const keyPrefix = apiKey.split('_').slice(0, 2).join('_');
-
+    // Find API key by matching the full value
     const project = await this.prisma.prisma.apiKey.findFirst({
       where: {
-        keyPrefix,
+        fullValue: apiKey,
       },
     });
 

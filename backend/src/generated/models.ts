@@ -9,7 +9,11 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/ApiKey'
+export type * from './models/AuditLog'
 export type * from './models/Device'
 export type * from './models/Nonce'
+export type * from './models/Settings'
+export type * from './models/AdminApiKey'
+export type * from './models/EnrollmentCode'
 export type * from './models/User'
 export type * from './commonInputTypes'
