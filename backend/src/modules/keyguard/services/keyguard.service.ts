@@ -65,7 +65,7 @@ export class KeyGuardService {
         name: enrollDto.label || 'Unnamed Device',
         fingerprintHash: enrollDto.deviceFingerprint,
         status: 'PENDING',
-        platform: enrollDto.metadata || {},
+        platform: enrollDto.metadata ?? {},
         ownerName: 'System',
         ownerEmail: 'system@keyguard.io',
         ipAddress: '0.0.0.0',
@@ -73,7 +73,7 @@ export class KeyGuardService {
         keyId: enrollDto.keyId ?? null,
         publicKeySpkiBase64: enrollDto.publicKey ?? null,
         userAgent: enrollDto.userAgent ?? null,
-        metadata: enrollDto.metadata as any,
+        metadata: enrollDto.metadata ?? {},
         apiKey: {
           connect: {
             id: project.id,
