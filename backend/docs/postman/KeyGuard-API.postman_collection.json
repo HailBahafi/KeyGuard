@@ -1,0 +1,839 @@
+{
+    "info": {
+        "_postman_id": "keyguard-api-collection-v1",
+        "name": "KeyGuard API - Phase 1",
+        "description": "# KeyGuard Backend API\n\nThis collection contains all endpoints for the KeyGuard device binding and signature verification system.\n\n## Overview\n\nKeyGuard performs device binding by:\n- Generating an ECDSA P-256 key pair on the client\n- Sending the public key to the backend during enrollment\n- Signing each request using the device private key\n- Backend verifies signed requests using the stored public key\n\n## Environment Variables Required\n\n- `baseUrl`: API base URL (e.g., http://localhost:3000)\n- `apiKey`: Project API key (e.g., kg_prod_123)\n- `keyId`: Device key identifier\n- `publicKey`: Base64-encoded SPKI public key\n- `privateKey`: Base64-encoded PKCS8 private key (for signing)\n\n## Authentication\n\nAll requests require the `x-keyguard-api-key` header.\n\nSigned requests additionally require:\n- `x-keyguard-key-id`\n- `x-keyguard-timestamp`\n- `x-keyguard-nonce`\n- `x-keyguard-body-sha256`\n- `x-keyguard-alg`\n- `x-keyguard-signature`",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:3000",
+            "type": "string"
+        },
+        {
+            "key": "apiKey",
+            "value": "kg_prod_123",
+            "type": "string"
+        },
+        {
+            "key": "keyId",
+            "value": "kg_key_test_abc123",
+            "type": "string"
+        },
+        {
+            "key": "deviceId",
+            "value": "",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "Device Enrollment",
+            "item": [
+                {
+                    "name": "Enroll Device",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 201', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has id and status', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.have.property('id');",
+                                    "    pm.expect(jsonData).to.have.property('status');",
+                                    "    pm.expect(jsonData.status).to.eql('ACTIVE');",
+                                    "});",
+                                    "",
+                                    "// Save device ID for later use",
+                                    "var jsonData = pm.response.json();",
+                                    "if (jsonData.id) {",
+                                    "    pm.collectionVariables.set('deviceId', jsonData.id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "x-keyguard-api-key",
+                                "value": "{{apiKey}}",
+                                "description": "Project API key"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"publicKey\": \"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEhKMl+ER0xKjBBHdGKn8V0eKF2VwmzYfqLQQp7gxYQVW5tLxI+YwZx8gLYQzCf+9hZF8dZzWYGQhLxLVJGxhZEw==\",\n  \"keyId\": \"{{keyId}}\",\n  \"deviceFingerprint\": \"fp_abc123def456\",\n  \"label\": \"My MacBook Pro\",\n  \"userAgent\": \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36\",\n  \"metadata\": {\n    \"browser\": \"Chrome\",\n    \"os\": \"macOS\",\n    \"version\": \"119.0.0\"\n  }\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/keyguard/enroll",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "keyguard",
+                                "enroll"
+                            ]
+                        },
+                        "description": "Enroll a new device by storing its public key.\n\n## Request Body\n\n| Field | Type | Required | Description |\n|-------|------|----------|-------------|\n| publicKey | string | Yes | Base64-encoded SPKI public key |\n| keyId | string | Yes | Unique device key identifier |\n| deviceFingerprint | string | Yes | Device fingerprint (e.g., from FingerprintJS) |\n| label | string | Yes | Human-readable device name |\n| userAgent | string | No | Browser user agent |\n| metadata | object | No | Additional metadata |\n\n## Response\n\n```json\n{\n  \"id\": \"device-uuid\",\n  \"status\": \"ACTIVE\",\n  \"createdAt\": \"2025-12-02T10:30:00.000Z\"\n}\n```"
+                    },
+                    "response": [
+                        {
+                            "name": "Success - Device Enrolled",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "x-keyguard-api-key",
+                                        "value": "kg_prod_123"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"publicKey\": \"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE...\",\n  \"keyId\": \"kg_key_abc123\",\n  \"deviceFingerprint\": \"fp_abc123\",\n  \"label\": \"My MacBook Pro\"\n}"
+                                },
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v1/keyguard/enroll",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "keyguard",
+                                        "enroll"
+                                    ]
+                                }
+                            },
+                            "status": "Created",
+                            "code": 201,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"id\": \"123e4567-e89b-12d3-a456-426614174000\",\n  \"status\": \"ACTIVE\",\n  \"createdAt\": \"2025-12-02T10:30:00.000Z\"\n}"
+                        },
+                        {
+                            "name": "Error - Device Already Enrolled",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "x-keyguard-api-key",
+                                        "value": "kg_prod_123"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"publicKey\": \"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE...\",\n  \"keyId\": \"kg_key_abc123\",\n  \"deviceFingerprint\": \"fp_abc123\",\n  \"label\": \"My MacBook Pro\"\n}"
+                                },
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v1/keyguard/enroll",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "keyguard",
+                                        "enroll"
+                                    ]
+                                }
+                            },
+                            "status": "Bad Request",
+                            "code": 400,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"statusCode\": 400,\n  \"message\": \"Device with keyId kg_key_abc123 already enrolled\",\n  \"error\": \"Bad Request\"\n}"
+                        }
+                    ]
+                }
+            ],
+            "description": "Endpoints for device enrollment"
+        },
+        {
+            "name": "Signature Verification",
+            "item": [
+                {
+                    "name": "Verify Signed Request",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "// This pre-request script shows how to generate signature headers",
+                                    "// In practice, you'd use the SDK or a signing script",
+                                    "",
+                                    "const timestamp = new Date().toISOString();",
+                                    "const nonce = 'nonce_' + Date.now() + '_' + Math.random().toString(36).substring(7);",
+                                    "",
+                                    "// Set timestamp and nonce as variables",
+                                    "pm.variables.set('timestamp', timestamp);",
+                                    "pm.variables.set('nonce', nonce);",
+                                    "",
+                                    "console.log('Timestamp:', timestamp);",
+                                    "console.log('Nonce:', nonce);",
+                                    "",
+                                    "// Note: Actual signature generation requires the private key",
+                                    "// Use the sign-request.js script or SDK for real signing"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has valid property', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.have.property('valid');",
+                                    "});",
+                                    "",
+                                    "pm.test('Signature verification result', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    if (jsonData.valid) {",
+                                    "        pm.expect(jsonData).to.have.property('deviceId');",
+                                    "        pm.expect(jsonData).to.have.property('keyId');",
+                                    "    } else {",
+                                    "        pm.expect(jsonData).to.have.property('error');",
+                                    "        console.log('Verification failed:', jsonData.error);",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "x-keyguard-api-key",
+                                "value": "{{apiKey}}",
+                                "description": "Project API key"
+                            },
+                            {
+                                "key": "x-keyguard-key-id",
+                                "value": "{{keyId}}",
+                                "description": "Device key identifier"
+                            },
+                            {
+                                "key": "x-keyguard-timestamp",
+                                "value": "{{timestamp}}",
+                                "description": "ISO8601 timestamp (e.g., 2025-12-02T10:30:00.000Z)"
+                            },
+                            {
+                                "key": "x-keyguard-nonce",
+                                "value": "{{nonce}}",
+                                "description": "Unique nonce for this request"
+                            },
+                            {
+                                "key": "x-keyguard-body-sha256",
+                                "value": "{{bodySha256}}",
+                                "description": "SHA-256 hash of raw request body (hex)"
+                            },
+                            {
+                                "key": "x-keyguard-alg",
+                                "value": "ECDSA_P256_SHA256_P1363",
+                                "description": "Signature algorithm"
+                            },
+                            {
+                                "key": "x-keyguard-signature",
+                                "value": "{{signature}}",
+                                "description": "Base64-encoded signature"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"test\": \"data\",\n  \"timestamp\": 1701510600000\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/keyguard/verify-test",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "keyguard",
+                                "verify-test"
+                            ]
+                        },
+                        "description": "Test endpoint for signature verification.\n\n## Required Headers\n\n| Header | Description |\n|--------|-------------|\n| x-keyguard-api-key | Project API key |\n| x-keyguard-key-id | Device key identifier |\n| x-keyguard-timestamp | ISO8601 timestamp |\n| x-keyguard-nonce | Unique nonce |\n| x-keyguard-body-sha256 | SHA-256 hash of raw body |\n| x-keyguard-alg | Algorithm (ECDSA_P256_SHA256_P1363) |\n| x-keyguard-signature | Base64 signature |\n\n## Canonical Payload Format\n\nThe signature is computed over:\n```\nkg-v1|{timestamp}|{METHOD}|{pathAndQuery}|{bodySha256}|{nonce}|{apiKey}|{keyId}\n```\n\n## Response\n\n**Success:**\n```json\n{\n  \"valid\": true,\n  \"deviceId\": \"device-uuid\",\n  \"keyId\": \"kg_key_abc123\"\n}\n```\n\n**Failure:**\n```json\n{\n  \"valid\": false,\n  \"error\": \"Invalid signature\"\n}\n```"
+                    },
+                    "response": [
+                        {
+                            "name": "Success - Valid Signature",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "x-keyguard-api-key",
+                                        "value": "kg_prod_123"
+                                    },
+                                    {
+                                        "key": "x-keyguard-key-id",
+                                        "value": "kg_key_abc123"
+                                    },
+                                    {
+                                        "key": "x-keyguard-timestamp",
+                                        "value": "2025-12-02T10:30:00.000Z"
+                                    },
+                                    {
+                                        "key": "x-keyguard-nonce",
+                                        "value": "nonce_1701510600_abc123"
+                                    },
+                                    {
+                                        "key": "x-keyguard-body-sha256",
+                                        "value": "abc123..."
+                                    },
+                                    {
+                                        "key": "x-keyguard-alg",
+                                        "value": "ECDSA_P256_SHA256_P1363"
+                                    },
+                                    {
+                                        "key": "x-keyguard-signature",
+                                        "value": "MEUCIQD..."
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\"test\":\"data\"}"
+                                },
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v1/keyguard/verify-test",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "keyguard",
+                                        "verify-test"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"valid\": true,\n  \"deviceId\": \"123e4567-e89b-12d3-a456-426614174000\",\n  \"keyId\": \"kg_key_abc123\"\n}"
+                        },
+                        {
+                            "name": "Error - Invalid Signature",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "x-keyguard-api-key",
+                                        "value": "kg_prod_123"
+                                    },
+                                    {
+                                        "key": "x-keyguard-key-id",
+                                        "value": "kg_key_abc123"
+                                    },
+                                    {
+                                        "key": "x-keyguard-timestamp",
+                                        "value": "2025-12-02T10:30:00.000Z"
+                                    },
+                                    {
+                                        "key": "x-keyguard-nonce",
+                                        "value": "nonce_123"
+                                    },
+                                    {
+                                        "key": "x-keyguard-body-sha256",
+                                        "value": "abc123"
+                                    },
+                                    {
+                                        "key": "x-keyguard-alg",
+                                        "value": "ECDSA_P256_SHA256_P1363"
+                                    },
+                                    {
+                                        "key": "x-keyguard-signature",
+                                        "value": "invalid_signature"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\"test\":\"data\"}"
+                                },
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v1/keyguard/verify-test",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "keyguard",
+                                        "verify-test"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"valid\": false,\n  \"error\": \"Invalid signature\"\n}"
+                        },
+                        {
+                            "name": "Error - Replay Attack",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\"test\":\"data\"}"
+                                },
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v1/keyguard/verify-test",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "keyguard",
+                                        "verify-test"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"valid\": false,\n  \"error\": \"Nonce has already been used (replay attack detected)\"\n}"
+                        }
+                    ]
+                }
+            ],
+            "description": "Endpoints for signature verification testing"
+        },
+        {
+            "name": "Device Management",
+            "item": [
+                {
+                    "name": "List All Devices",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response is an array', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.be.an('array');",
+                                    "});",
+                                    "",
+                                    "pm.test('Devices have required properties', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    if (jsonData.length > 0) {",
+                                    "        pm.expect(jsonData[0]).to.have.property('id');",
+                                    "        pm.expect(jsonData[0]).to.have.property('keyId');",
+                                    "        pm.expect(jsonData[0]).to.have.property('status');",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "x-keyguard-api-key",
+                                "value": "{{apiKey}}",
+                                "description": "Project API key"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/keyguard/devices",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "keyguard",
+                                "devices"
+                            ]
+                        },
+                        "description": "List all devices enrolled under the specified API key.\n\n## Response\n\n```json\n[\n  {\n    \"id\": \"device-uuid\",\n    \"keyId\": \"kg_key_abc123\",\n    \"publicKeySpkiBase64\": \"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE...\",\n    \"fingerprint\": \"fp_abc123\",\n    \"label\": \"My MacBook Pro\",\n    \"status\": \"ACTIVE\",\n    \"lastSeenAt\": \"2025-12-02T10:30:00.000Z\",\n    \"createdAt\": \"2025-12-01T08:00:00.000Z\"\n  }\n]\n```"
+                    },
+                    "response": [
+                        {
+                            "name": "Success - Device List",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "x-keyguard-api-key",
+                                        "value": "kg_prod_123"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v1/keyguard/devices",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "keyguard",
+                                        "devices"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "[\n  {\n    \"id\": \"123e4567-e89b-12d3-a456-426614174000\",\n    \"keyId\": \"kg_key_abc123\",\n    \"publicKeySpkiBase64\": \"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE...\",\n    \"fingerprint\": \"fp_abc123def456\",\n    \"label\": \"My MacBook Pro\",\n    \"userAgent\": \"Mozilla/5.0...\",\n    \"status\": \"ACTIVE\",\n    \"apiKeyId\": \"project-uuid\",\n    \"lastSeenAt\": \"2025-12-02T10:30:00.000Z\",\n    \"createdAt\": \"2025-12-01T08:00:00.000Z\",\n    \"updatedAt\": \"2025-12-02T10:30:00.000Z\"\n  },\n  {\n    \"id\": \"223e4567-e89b-12d3-a456-426614174001\",\n    \"keyId\": \"kg_key_def456\",\n    \"publicKeySpkiBase64\": \"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAF...\",\n    \"fingerprint\": \"fp_xyz789\",\n    \"label\": \"iPhone 15 Pro\",\n    \"status\": \"ACTIVE\",\n    \"apiKeyId\": \"project-uuid\",\n    \"lastSeenAt\": \"2025-12-02T09:00:00.000Z\",\n    \"createdAt\": \"2025-12-01T12:00:00.000Z\",\n    \"updatedAt\": \"2025-12-02T09:00:00.000Z\"\n  }\n]"
+                        }
+                    ]
+                },
+                {
+                    "name": "Get Device by ID",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200 or 404', function () {",
+                                    "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                                    "});",
+                                    "",
+                                    "if (pm.response.code === 200) {",
+                                    "    pm.test('Device has required properties', function () {",
+                                    "        var jsonData = pm.response.json();",
+                                    "        pm.expect(jsonData).to.have.property('id');",
+                                    "        pm.expect(jsonData).to.have.property('keyId');",
+                                    "        pm.expect(jsonData).to.have.property('status');",
+                                    "    });",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "x-keyguard-api-key",
+                                "value": "{{apiKey}}",
+                                "description": "Project API key"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/keyguard/devices/{{deviceId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "keyguard",
+                                "devices",
+                                "{{deviceId}}"
+                            ]
+                        },
+                        "description": "Get a specific device by its ID.\n\n## Path Parameters\n\n| Parameter | Description |\n|-----------|-------------|\n| deviceId | The UUID of the device |\n\n## Response\n\n```json\n{\n  \"id\": \"device-uuid\",\n  \"keyId\": \"kg_key_abc123\",\n  \"publicKeySpkiBase64\": \"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE...\",\n  \"fingerprint\": \"fp_abc123\",\n  \"label\": \"My MacBook Pro\",\n  \"status\": \"ACTIVE\",\n  \"lastSeenAt\": \"2025-12-02T10:30:00.000Z\",\n  \"createdAt\": \"2025-12-01T08:00:00.000Z\",\n  \"apiKey\": {\n    \"id\": \"project-uuid\",\n    \"name\": \"Production Project\"\n  }\n}\n```"
+                    },
+                    "response": [
+                        {
+                            "name": "Success - Device Found",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "x-keyguard-api-key",
+                                        "value": "kg_prod_123"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v1/keyguard/devices/123e4567-e89b-12d3-a456-426614174000",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "keyguard",
+                                        "devices",
+                                        "123e4567-e89b-12d3-a456-426614174000"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"id\": \"123e4567-e89b-12d3-a456-426614174000\",\n  \"keyId\": \"kg_key_abc123\",\n  \"publicKeySpkiBase64\": \"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE...\",\n  \"fingerprint\": \"fp_abc123def456\",\n  \"label\": \"My MacBook Pro\",\n  \"userAgent\": \"Mozilla/5.0...\",\n  \"status\": \"ACTIVE\",\n  \"apiKeyId\": \"project-uuid\",\n  \"lastSeenAt\": \"2025-12-02T10:30:00.000Z\",\n  \"createdAt\": \"2025-12-01T08:00:00.000Z\",\n  \"updatedAt\": \"2025-12-02T10:30:00.000Z\",\n  \"apiKey\": {\n    \"id\": \"project-uuid\",\n    \"keyPrefix\": \"kg_prod\",\n    \"name\": \"Production Project\",\n    \"status\": \"ACTIVE\"\n  }\n}"
+                        },
+                        {
+                            "name": "Error - Device Not Found",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "x-keyguard-api-key",
+                                        "value": "kg_prod_123"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v1/keyguard/devices/non-existent-id",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "keyguard",
+                                        "devices",
+                                        "non-existent-id"
+                                    ]
+                                }
+                            },
+                            "status": "Not Found",
+                            "code": 404,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"statusCode\": 404,\n  \"message\": \"Device non-existent-id not found\",\n  \"error\": \"Not Found\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Revoke Device",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200 or 404', function () {",
+                                    "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                                    "});",
+                                    "",
+                                    "if (pm.response.code === 200) {",
+                                    "    pm.test('Device status is REVOKED', function () {",
+                                    "        var jsonData = pm.response.json();",
+                                    "        pm.expect(jsonData.status).to.eql('REVOKED');",
+                                    "    });",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "x-keyguard-api-key",
+                                "value": "{{apiKey}}",
+                                "description": "Project API key"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/keyguard/devices/{{deviceId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "keyguard",
+                                "devices",
+                                "{{deviceId}}"
+                            ]
+                        },
+                        "description": "Revoke a device to prevent it from making authenticated requests.\n\n## Path Parameters\n\n| Parameter | Description |\n|-----------|-------------|\n| deviceId | The UUID of the device to revoke |\n\n## Response\n\nReturns the updated device with `status: \"REVOKED\"`\n\n```json\n{\n  \"id\": \"device-uuid\",\n  \"keyId\": \"kg_key_abc123\",\n  \"status\": \"REVOKED\",\n  ...\n}\n```\n\n## Notes\n\n- Revoked devices cannot authenticate requests\n- This action cannot be undone via API (requires database update)"
+                    },
+                    "response": [
+                        {
+                            "name": "Success - Device Revoked",
+                            "originalRequest": {
+                                "method": "DELETE",
+                                "header": [
+                                    {
+                                        "key": "x-keyguard-api-key",
+                                        "value": "kg_prod_123"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v1/keyguard/devices/123e4567-e89b-12d3-a456-426614174000",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "keyguard",
+                                        "devices",
+                                        "123e4567-e89b-12d3-a456-426614174000"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"id\": \"123e4567-e89b-12d3-a456-426614174000\",\n  \"keyId\": \"kg_key_abc123\",\n  \"publicKeySpkiBase64\": \"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE...\",\n  \"fingerprint\": \"fp_abc123def456\",\n  \"label\": \"My MacBook Pro\",\n  \"status\": \"REVOKED\",\n  \"apiKeyId\": \"project-uuid\",\n  \"lastSeenAt\": \"2025-12-02T10:30:00.000Z\",\n  \"createdAt\": \"2025-12-01T08:00:00.000Z\",\n  \"updatedAt\": \"2025-12-02T11:00:00.000Z\"\n}"
+                        },
+                        {
+                            "name": "Error - Device Not Found",
+                            "originalRequest": {
+                                "method": "DELETE",
+                                "header": [
+                                    {
+                                        "key": "x-keyguard-api-key",
+                                        "value": "kg_prod_123"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/v1/keyguard/devices/non-existent-id",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "v1",
+                                        "keyguard",
+                                        "devices",
+                                        "non-existent-id"
+                                    ]
+                                }
+                            },
+                            "status": "Not Found",
+                            "code": 404,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"statusCode\": 404,\n  \"message\": \"Device non-existent-id not found\",\n  \"error\": \"Not Found\"\n}"
+                        }
+                    ]
+                }
+            ],
+            "description": "Endpoints for managing enrolled devices"
+        }
+    ],
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        }
+    ]
+}
+

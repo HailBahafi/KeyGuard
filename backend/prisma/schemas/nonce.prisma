@@ -1,0 +1,12 @@
+model Nonce {
+  id        String   @id @default(uuid())
+  nonce     String
+  keyId     String
+  apiKeyId  String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@unique([apiKeyId, keyId, nonce])
+  @@index([expiresAt])
+  @@map("nonces")
+}
