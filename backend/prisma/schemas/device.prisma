@@ -33,6 +33,10 @@ model Device {
   userAgent           String?
   metadata            Json?
 
+  // Organization relation
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+
   apiKeyId            String
   apiKey              ApiKey       @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
 

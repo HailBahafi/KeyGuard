@@ -102,8 +102,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/auth/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "auth", "login"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
             },
             "description": "Authenticate user and receive JWT tokens.\n\n**Request Body:**\n```json\n{\n  \"email\": \"admin@keyguard.io\",\n  \"password\": \"admin123\"\n}\n```\n\n**Validation:**\n- email: Required, valid email format\n- password: Required, minimum 8 characters"
           },
@@ -123,7 +130,12 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyM2U0NTY3LWU4OWItMTJkMy1hNDU2LTQyNjYxNDE3NDAwMCIsImVtYWlsIjoiYWRtaW5Aa2V5Z3VhcmQuaW8iLCJpYXQiOjE3MzMxMzk2MjcsImV4cCI6MTczMzE0MDUyN30.abc123\",\n  \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyM2U0NTY3LWU4OWItMTJkMy1hNDU2LTQyNjYxNDE3NDAwMCIsImlhdCI6MTczMzEzOTYyNywiZXhwIjoxNzMzNzQ0NDI3fQ.def456\",\n  \"user\": {\n    \"id\": \"123e4567-e89b-12d3-a456-426614174000\",\n    \"email\": \"admin@keyguard.io\",\n    \"name\": \"Admin User\",\n    \"role\": \"admin\"\n  }\n}"
             },
             {
@@ -138,7 +150,12 @@
               "status": "Unauthorized",
               "code": 401,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"statusCode\": 401,\n  \"message\": \"Invalid credentials\",\n  \"error\": \"Unauthorized\",\n  \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n  \"path\": \"/api/v1/auth/login\"\n}"
             },
             {
@@ -153,7 +170,12 @@
               "status": "Bad Request",
               "code": 400,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"statusCode\": 400,\n  \"message\": \"Validation failed\",\n  \"error\": \"Bad Request\",\n  \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n  \"path\": \"/api/v1/auth/login\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"message\": \"Invalid email format\"\n    },\n    {\n      \"field\": \"password\",\n      \"message\": \"Password must be at least 8 characters\"\n    }\n  ]\n}"
             },
             {
@@ -164,8 +186,134 @@
               "status": "Too Many Requests",
               "code": 429,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"statusCode\": 429,\n  \"message\": \"Too many requests\",\n  \"error\": \"Too Many Requests\",\n  \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n  \"path\": \"/api/v1/auth/login\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Register Organization",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has required fields', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('success');",
+                  "    pm.expect(jsonData).to.have.property('user');",
+                  "    pm.expect(jsonData).to.have.property('token');",
+                  "    ",
+                  "    // Save token",
+                  "    pm.collectionVariables.set('accessToken', jsonData.token);",
+                  "});",
+                  "",
+                  "pm.test('User object is correct', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.user).to.have.property('email');",
+                  "    pm.expect(jsonData.user).to.have.property('organizationName');",
+                  "    pm.expect(jsonData.user).to.have.property('isAuthenticated');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"organizationName\": \"Acme Corporation\",\n  \"email\": \"admin@acme.com\",\n  \"password\": \"SecurePassword123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Register a new organization with admin user.\n\n**Request Body:**\n```json\n{\n  \"organizationName\": \"Acme Corporation\",\n  \"email\": \"admin@acme.com\",\n  \"password\": \"SecurePassword123!\"\n}\n```\n\n**Validation:**\n- organizationName: Required, minimum 3 characters\n- email: Required, valid email format\n- password: Required, minimum 8 characters"
+          },
+          "response": [
+            {
+              "name": "201 - Success",
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"user\": {\n    \"email\": \"admin@acme.com\",\n    \"organizationName\": \"Acme Corporation\",\n    \"isAuthenticated\": true\n  },\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyM2U0NTY3LWU4OWItMTJkMy1hNDU2LTQyNjYxNDE3NDAwMCIsImVtYWlsIjoiYWRtaW5AYWNtZS5jb20iLCJpYXQiOjE3MzMxMzk2MjcsImV4cCI6MTczMzE0MDUyN30.abc123\"\n}"
+            },
+            {
+              "name": "409 - Email Already Exists",
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"statusCode\": 409,\n  \"message\": \"An account with this email already exists\",\n  \"error\": \"Conflict\",\n  \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n  \"path\": \"/api/v1/auth/register\"\n}"
+            },
+            {
+              "name": "400 - Validation Error",
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"statusCode\": 400,\n  \"message\": \"Validation failed\",\n  \"error\": \"Bad Request\",\n  \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n  \"path\": \"/api/v1/auth/register\",\n  \"details\": [\n    {\n      \"field\": \"organizationName\",\n      \"message\": \"Organization name must be at least 3 characters\"\n    },\n    {\n      \"field\": \"email\",\n      \"message\": \"Invalid email format\"\n    },\n    {\n      \"field\": \"password\",\n      \"message\": \"Password must be at least 8 characters\"\n    }\n  ]\n}"
+            },
+            {
+              "name": "500 - Internal Server Error",
+              "status": "Internal Server Error",
+              "code": 500,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"statusCode\": 500,\n  \"message\": \"An unexpected error occurred\",\n  \"error\": \"Internal Server Error\",\n  \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n  \"path\": \"/api/v1/auth/register\"\n}"
             }
           ]
         },
@@ -212,8 +360,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/auth/refresh",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "auth", "refresh"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "refresh"
+              ]
             },
             "description": "Refresh access token using refresh token."
           },
@@ -223,7 +378,12 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.newtoken.abc123\"\n}"
             },
             {
@@ -231,7 +391,12 @@
               "status": "Unauthorized",
               "code": 401,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"statusCode\": 401,\n  \"message\": \"Invalid refresh token\",\n  \"error\": \"Unauthorized\",\n  \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n  \"path\": \"/api/v1/auth/refresh\"\n}"
             }
           ]
@@ -249,15 +414,45 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/v1/keys?page=1&limit=20&status=all&provider=all&environment=all&search=",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "keys"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "keys"
+              ],
               "query": [
-                {"key": "page", "value": "1", "description": "Page number (default: 1)"},
-                {"key": "limit", "value": "20", "description": "Items per page (default: 20, max: 100)"},
-                {"key": "status", "value": "all", "description": "Filter: active, idle, expired, revoked, all"},
-                {"key": "provider", "value": "all", "description": "Filter: openai, anthropic, google, azure, all"},
-                {"key": "environment", "value": "all", "description": "Filter: production, development, staging, all"},
-                {"key": "search", "value": "", "description": "Search by name or provider"}
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (default: 1)"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Items per page (default: 20, max: 100)"
+                },
+                {
+                  "key": "status",
+                  "value": "all",
+                  "description": "Filter: active, idle, expired, revoked, all"
+                },
+                {
+                  "key": "provider",
+                  "value": "all",
+                  "description": "Filter: openai, anthropic, google, azure, all"
+                },
+                {
+                  "key": "environment",
+                  "value": "all",
+                  "description": "Filter: production, development, staging, all"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search by name or provider"
+                }
               ]
             },
             "description": "List all API keys with filtering and pagination."
@@ -268,7 +463,12 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"keys\": [\n    {\n      \"id\": \"123e4567-e89b-12d3-a456-426614174000\",\n      \"name\": \"Production OpenAI Key\",\n      \"provider\": \"openai\",\n      \"status\": \"active\",\n      \"environment\": \"production\",\n      \"created\": \"2025-12-01T10:00:00.000Z\",\n      \"lastUsed\": \"2025-12-02T08:30:00.000Z\",\n      \"expiresAt\": null,\n      \"deviceCount\": 5,\n      \"usageCount\": 1523,\n      \"description\": \"Main production OpenAI API key\",\n      \"maskedValue\": \"kg_17331...abc123\"\n    },\n    {\n      \"id\": \"223e4567-e89b-12d3-a456-426614174001\",\n      \"name\": \"Development Anthropic Key\",\n      \"provider\": \"anthropic\",\n      \"status\": \"active\",\n      \"environment\": \"development\",\n      \"created\": \"2025-11-15T14:00:00.000Z\",\n      \"lastUsed\": \"2025-12-02T07:00:00.000Z\",\n      \"expiresAt\": \"2025-12-31T23:59:59.000Z\",\n      \"deviceCount\": 2,\n      \"usageCount\": 452,\n      \"description\": \"Development testing key\",\n      \"maskedValue\": \"kg_17301...def456\"\n    }\n  ],\n  \"pagination\": {\n    \"total\": 12,\n    \"page\": 1,\n    \"limit\": 20,\n    \"pages\": 1\n  }\n}"
             },
             {
@@ -276,7 +476,12 @@
               "status": "Unauthorized",
               "code": 401,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"statusCode\": 401,\n  \"message\": \"Unauthorized\",\n  \"error\": \"Unauthorized\",\n  \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n  \"path\": \"/api/v1/keys\"\n}"
             }
           ]
@@ -302,8 +507,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/keys",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "keys"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "keys"
+              ]
             },
             "description": "Create a new API key.\n\n**Validation:**\n- name: 3-50 characters, unique\n- provider: openai, anthropic, google, azure\n- environment: production, development, staging\n- expiresAt: Optional, must be future date"
           },
@@ -313,7 +524,12 @@
               "status": "Created",
               "code": 201,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"key\": {\n    \"id\": \"323e4567-e89b-12d3-a456-426614174002\",\n    \"name\": \"Production OpenAI Key\",\n    \"provider\": \"openai\",\n    \"status\": \"active\",\n    \"environment\": \"production\",\n    \"created\": \"2025-12-02T09:48:27.000Z\",\n    \"lastUsed\": null,\n    \"expiresAt\": \"2025-12-31T23:59:59.000Z\",\n    \"deviceCount\": 0,\n    \"usageCount\": 0,\n    \"description\": \"Main OpenAI key for production use\",\n    \"maskedValue\": \"kg_17331...xyz789\"\n  }\n}"
             },
             {
@@ -321,7 +537,12 @@
               "status": "Bad Request",
               "code": 400,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"statusCode\": 400,\n  \"message\": \"Validation failed\",\n  \"error\": \"Bad Request\",\n  \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n  \"path\": \"/api/v1/keys\",\n  \"details\": [\n    {\n      \"field\": \"name\",\n      \"message\": \"Name must be between 3 and 50 characters\"\n    },\n    {\n      \"field\": \"provider\",\n      \"message\": \"Provider must be one of: openai, anthropic, google, azure\"\n    }\n  ]\n}"
             },
             {
@@ -329,7 +550,12 @@
               "status": "Conflict",
               "code": 409,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"statusCode\": 409,\n  \"message\": \"API key with this name already exists\",\n  \"error\": \"Conflict\",\n  \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n  \"path\": \"/api/v1/keys\"\n}"
             },
             {
@@ -337,7 +563,12 @@
               "status": "Unauthorized",
               "code": 401,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"statusCode\": 401,\n  \"message\": \"Unauthorized\",\n  \"error\": \"Unauthorized\",\n  \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n  \"path\": \"/api/v1/keys\"\n}"
             }
           ]
@@ -349,8 +580,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/v1/keys/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "keys", ":id"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "keys",
+                ":id"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -367,7 +605,12 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"success\": true,\n  \"message\": \"API key revoked successfully\"\n}"
             },
             {
@@ -375,7 +618,12 @@
               "status": "Not Found",
               "code": 404,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"statusCode\": 404,\n  \"message\": \"API key not found\",\n  \"error\": \"Not Found\",\n  \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n  \"path\": \"/api/v1/keys/123e4567-e89b-12d3-a456-426614174000\"\n}"
             },
             {
@@ -383,7 +631,12 @@
               "status": "Bad Request",
               "code": 400,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"statusCode\": 400,\n  \"message\": \"API key is already revoked\",\n  \"error\": \"Bad Request\",\n  \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n  \"path\": \"/api/v1/keys/123e4567-e89b-12d3-a456-426614174000\"\n}"
             }
           ]
@@ -401,16 +654,48 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/v1/devices?page=1&limit=20&status=all&platform=all&lastSeen=all&search=&sort=recent",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "devices"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "devices"
+              ],
               "query": [
-                {"key": "page", "value": "1"},
-                {"key": "limit", "value": "20"},
-                {"key": "status", "value": "all", "description": "active, pending, suspended, revoked, offline, all"},
-                {"key": "platform", "value": "all", "description": "macOS, Windows, Linux, iOS, Android, all"},
-                {"key": "lastSeen", "value": "all", "description": "hour, day, week, all"},
-                {"key": "search", "value": "", "description": "Search by name, owner, location"},
-                {"key": "sort", "value": "recent", "description": "recent, name, platform"}
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "status",
+                  "value": "all",
+                  "description": "active, pending, suspended, revoked, offline, all"
+                },
+                {
+                  "key": "platform",
+                  "value": "all",
+                  "description": "macOS, Windows, Linux, iOS, Android, all"
+                },
+                {
+                  "key": "lastSeen",
+                  "value": "all",
+                  "description": "hour, day, week, all"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search by name, owner, location"
+                },
+                {
+                  "key": "sort",
+                  "value": "recent",
+                  "description": "recent, name, platform"
+                }
               ]
             },
             "description": "List all enrolled devices with filtering, sorting, and pagination."
@@ -421,7 +706,12 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"devices\": [\n    {\n      \"id\": \"123e4567-e89b-12d3-a456-426614174000\",\n      \"name\": \"MacBook Pro 16\\\"\",\n      \"status\": \"active\",\n      \"platform\": {\n        \"os\": \"macOS\",\n        \"version\": \"14.1\",\n        \"browser\": \"Chrome 120\"\n      },\n      \"owner\": {\n        \"name\": \"John Doe\",\n        \"email\": \"john@example.com\"\n      },\n      \"ipAddress\": \"192.168.1.100\",\n      \"location\": \"Riyadh, SA\",\n      \"lastSeen\": \"2025-12-02T09:00:00.000Z\",\n      \"fingerprintHash\": \"fp_abc123def456\",\n      \"stats\": {\n        \"totalCalls\": 1523,\n        \"keysAccessed\": 3\n      }\n    },\n    {\n      \"id\": \"223e4567-e89b-12d3-a456-426614174001\",\n      \"name\": \"iPhone 15 Pro\",\n      \"status\": \"pending\",\n      \"platform\": {\n        \"os\": \"iOS\",\n        \"version\": \"17.1\"\n      },\n      \"owner\": {\n        \"name\": \"Jane Smith\",\n        \"email\": \"jane@example.com\"\n      },\n      \"ipAddress\": \"192.168.1.101\",\n      \"location\": \"Dubai, UAE\",\n      \"lastSeen\": \"2025-12-02T08:45:00.000Z\",\n      \"fingerprintHash\": \"fp_xyz789ghi012\",\n      \"stats\": {\n        \"totalCalls\": 0,\n        \"keysAccessed\": 0\n      }\n    }\n  ],\n  \"stats\": {\n    \"total\": 15,\n    \"active\": 10,\n    \"pending\": 3,\n    \"suspended\": 1,\n    \"offline\": 1\n  },\n  \"pagination\": {\n    \"total\": 15,\n    \"page\": 1,\n    \"limit\": 20,\n    \"pages\": 1\n  }\n}"
             },
             {
@@ -429,7 +719,12 @@
               "status": "Unauthorized",
               "code": 401,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"statusCode\": 401,\n  \"message\": \"Unauthorized\",\n  \"error\": \"Unauthorized\",\n  \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n  \"path\": \"/api/v1/devices\"\n}"
             }
           ]
@@ -455,8 +750,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/devices/enrollment-code",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "devices", "enrollment-code"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "devices",
+                "enrollment-code"
+              ]
             },
             "description": "Generate a one-time enrollment code for new device enrollment (expires in 15 minutes)."
           },
@@ -466,7 +768,12 @@
               "status": "Created",
               "code": 201,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"code\": \"KG-ENRL-A7B3\",\n  \"expiresAt\": \"2025-12-02T10:03:27.000Z\"\n}"
             },
             {
@@ -474,7 +781,12 @@
               "status": "Unauthorized",
               "code": 401,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"statusCode\": 401,\n  \"message\": \"Unauthorized\",\n  \"error\": \"Unauthorized\",\n  \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n  \"path\": \"/api/v1/devices/enrollment-code\"\n}"
             }
           ]
@@ -486,8 +798,16 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/v1/devices/:id/approve",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "devices", ":id", "approve"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "devices",
+                ":id",
+                "approve"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -504,7 +824,12 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"success\": true,\n  \"message\": \"Device approved successfully\",\n  \"device\": {\n    \"id\": \"123e4567-e89b-12d3-a456-426614174000\",\n    \"name\": \"iPhone 15 Pro\",\n    \"status\": \"active\",\n    \"platform\": {\n      \"os\": \"iOS\",\n      \"version\": \"17.1\"\n    },\n    \"owner\": {\n      \"name\": \"Jane Smith\",\n      \"email\": \"jane@example.com\"\n    },\n    \"ipAddress\": \"192.168.1.101\",\n    \"location\": \"Dubai, UAE\",\n    \"lastSeen\": \"2025-12-02T09:48:27.000Z\",\n    \"fingerprintHash\": \"fp_xyz789\",\n    \"stats\": {\n      \"totalCalls\": 0,\n      \"keysAccessed\": 0\n    }\n  }\n}"
             },
             {
@@ -512,7 +837,12 @@
               "status": "Not Found",
               "code": 404,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"statusCode\": 404,\n  \"message\": \"Device not found\",\n  \"error\": \"Not Found\",\n  \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n  \"path\": \"/api/v1/devices/123e4567-e89b-12d3-a456-426614174000/approve\"\n}"
             },
             {
@@ -520,7 +850,12 @@
               "status": "Bad Request",
               "code": 400,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"statusCode\": 400,\n  \"message\": \"Only pending devices can be approved\",\n  \"error\": \"Bad Request\",\n  \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n  \"path\": \"/api/v1/devices/123e4567-e89b-12d3-a456-426614174000/approve\"\n}"
             }
           ]
@@ -532,8 +867,16 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/v1/devices/:id/suspend",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "devices", ":id", "suspend"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "devices",
+                ":id",
+                "suspend"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -550,7 +893,12 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"success\": true,\n  \"message\": \"Device suspended successfully\",\n  \"device\": {\n    \"id\": \"123e4567-e89b-12d3-a456-426614174000\",\n    \"name\": \"MacBook Pro\",\n    \"status\": \"suspended\",\n    \"platform\": {\"os\": \"macOS\", \"version\": \"14.1\"},\n    \"owner\": {\"name\": \"John Doe\", \"email\": \"john@example.com\"},\n    \"ipAddress\": \"192.168.1.100\",\n    \"location\": \"Riyadh, SA\",\n    \"lastSeen\": \"2025-12-02T09:48:27.000Z\",\n    \"fingerprintHash\": \"fp_abc123\",\n    \"stats\": {\"totalCalls\": 1523, \"keysAccessed\": 3}\n  }\n}"
             },
             {
@@ -558,7 +906,12 @@
               "status": "Bad Request",
               "code": 400,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"statusCode\": 400,\n  \"message\": \"Only active devices can be suspended\",\n  \"error\": \"Bad Request\",\n  \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n  \"path\": \"/api/v1/devices/123e4567-e89b-12d3-a456-426614174000/suspend\"\n}"
             }
           ]
@@ -570,8 +923,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/v1/devices/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "devices", ":id"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "devices",
+                ":id"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -587,7 +947,12 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"success\": true,\n  \"message\": \"Device revoked successfully\",\n  \"device\": {\n    \"id\": \"123e4567-e89b-12d3-a456-426614174000\",\n    \"name\": \"MacBook Pro\",\n    \"status\": \"revoked\",\n    \"platform\": {\"os\": \"macOS\", \"version\": \"14.1\"},\n    \"owner\": {\"name\": \"John Doe\", \"email\": \"john@example.com\"},\n    \"ipAddress\": \"192.168.1.100\",\n    \"location\": \"Riyadh, SA\",\n    \"lastSeen\": \"2025-12-02T09:48:27.000Z\",\n    \"fingerprintHash\": \"fp_abc123\",\n    \"stats\": {\"totalCalls\": 1523, \"keysAccessed\": 3}\n  }\n}"
             },
             {
@@ -595,7 +960,12 @@
               "status": "Not Found",
               "code": 404,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"statusCode\": 404,\n  \"message\": \"Device not found\",\n  \"error\": \"Not Found\",\n  \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n  \"path\": \"/api/v1/devices/123e4567-e89b-12d3-a456-426614174000\"\n}"
             }
           ]
@@ -613,18 +983,59 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/v1/audit/logs?page=1&limit=50&search=&dateRange=all&eventType=all&status=all&severity=all",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "audit", "logs"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "audit",
+                "logs"
+              ],
               "query": [
-                {"key": "page", "value": "1"},
-                {"key": "limit", "value": "50", "description": "max: 200"},
-                {"key": "search", "value": ""},
-                {"key": "dateRange", "value": "all", "description": "hour, day, week, month, all"},
-                {"key": "eventType", "value": "all", "description": "key, device, auth, system, api, security, all"},
-                {"key": "status", "value": "all", "description": "success, failure, all"},
-                {"key": "severity", "value": "all", "description": "info, warning, critical, all"},
-                {"key": "startDate", "value": "", "description": "ISO 8601"},
-                {"key": "endDate", "value": "", "description": "ISO 8601"}
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "50",
+                  "description": "max: 200"
+                },
+                {
+                  "key": "search",
+                  "value": ""
+                },
+                {
+                  "key": "dateRange",
+                  "value": "all",
+                  "description": "hour, day, week, month, all"
+                },
+                {
+                  "key": "eventType",
+                  "value": "all",
+                  "description": "key, device, auth, system, api, security, all"
+                },
+                {
+                  "key": "status",
+                  "value": "all",
+                  "description": "success, failure, all"
+                },
+                {
+                  "key": "severity",
+                  "value": "all",
+                  "description": "info, warning, critical, all"
+                },
+                {
+                  "key": "startDate",
+                  "value": "",
+                  "description": "ISO 8601"
+                },
+                {
+                  "key": "endDate",
+                  "value": "",
+                  "description": "ISO 8601"
+                }
               ]
             },
             "description": "List system audit logs with comprehensive filtering."
@@ -635,7 +1046,12 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"logs\": [\n    {\n      \"id\": \"123e4567-e89b-12d3-a456-426614174000\",\n      \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n      \"severity\": \"info\",\n      \"event\": \"key.retrieved\",\n      \"status\": \"success\",\n      \"actor\": {\n        \"id\": \"device-uuid\",\n        \"name\": \"MacBook Pro\",\n        \"type\": \"device\",\n        \"ip\": \"192.168.1.100\",\n        \"location\": \"Riyadh, SA\"\n      },\n      \"target\": {\n        \"id\": \"key-uuid\",\n        \"name\": \"Production OpenAI Key\",\n        \"type\": \"key\"\n      },\n      \"metadata\": {\n        \"latency\": 45,\n        \"tokens\": 1250,\n        \"cost\": 0.025,\n        \"requestId\": \"req_abc123\"\n      }\n    },\n    {\n      \"id\": \"223e4567-e89b-12d3-a456-426614174001\",\n      \"timestamp\": \"2025-12-02T09:30:15.000Z\",\n      \"severity\": \"warning\",\n      \"event\": \"auth.failed\",\n      \"status\": \"failure\",\n      \"actor\": {\n        \"id\": \"unknown\",\n        \"name\": \"Unknown User\",\n        \"type\": \"user\",\n        \"ip\": \"203.0.113.42\",\n        \"location\": \"Unknown\"\n      },\n      \"target\": {\n        \"id\": \"login\",\n        \"name\": \"Login Endpoint\",\n        \"type\": \"endpoint\"\n      },\n      \"metadata\": {\n        \"error\": \"Invalid credentials\",\n        \"userAgent\": \"Mozilla/5.0...\",\n        \"requestId\": \"req_def456\"\n      }\n    }\n  ],\n  \"pagination\": {\n    \"total\": 1523,\n    \"page\": 1,\n    \"limit\": 50,\n    \"pages\": 31\n  }\n}"
             }
           ]
@@ -661,8 +1077,16 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/audit/logs/export",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "audit", "logs", "export"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "audit",
+                "logs",
+                "export"
+              ]
             },
             "description": "Export audit logs as CSV or JSON with optional filters."
           },
@@ -672,7 +1096,12 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"url\": \"/api/v1/audit/logs/download/audit-logs-2025-12-02-094827.csv\",\n  \"filename\": \"audit-logs-2025-12-02-094827.csv\"\n}"
             },
             {
@@ -680,7 +1109,12 @@
               "status": "Bad Request",
               "code": 400,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"statusCode\": 400,\n  \"message\": \"Validation failed\",\n  \"error\": \"Bad Request\",\n  \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n  \"path\": \"/api/v1/audit/logs/export\",\n  \"details\": [\n    {\n      \"field\": \"format\",\n      \"message\": \"Format must be one of: csv, json\"\n    }\n  ]\n}"
             }
           ]
@@ -698,8 +1132,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/v1/settings",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "settings"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "settings"
+              ]
             },
             "description": "Fetch all system settings."
           },
@@ -709,7 +1149,12 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"general\": {\n    \"instanceName\": \"KeyGuard Production\",\n    \"adminEmail\": \"admin@keyguard.io\",\n    \"timezone\": \"Asia/Riyadh\",\n    \"baseUrl\": \"https://keyguard.example.com\"\n  },\n  \"security\": {\n    \"sessionTimeoutSeconds\": 3600,\n    \"enforce2FA\": false,\n    \"ipWhitelist\": [\"192.168.1.0/24\", \"10.0.0.1\"]\n  },\n  \"notifications\": {\n    \"smtpHost\": \"smtp.gmail.com\",\n    \"smtpPort\": 587,\n    \"smtpUsername\": \"notifications@keyguard.io\",\n    \"smtpPassword\": \"***************\",\n    \"emailAlerts\": true\n  },\n  \"api\": {\n    \"keys\": [\n      {\n        \"id\": \"key-uuid-1\",\n        \"name\": \"Admin API Key\",\n        \"key\": \"***************\",\n        \"scope\": [\"read\", \"write\"],\n        \"createdAt\": \"2025-12-01T10:00:00.000Z\",\n        \"lastUsedAt\": \"2025-12-02T08:30:00.000Z\"\n      }\n    ]\n  },\n  \"backup\": {\n    \"logRetentionDays\": 90,\n    \"autoBackupEnabled\": true,\n    \"autoBackupFrequency\": \"daily\",\n    \"lastBackupAt\": \"2025-12-02T00:00:00.000Z\"\n  }\n}"
             }
           ]
@@ -735,8 +1180,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/settings/general",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "settings", "general"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "settings",
+                "general"
+              ]
             },
             "description": "Update general instance settings."
           },
@@ -746,7 +1198,12 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"success\": true,\n  \"data\": {\n    \"instanceName\": \"KeyGuard Production\",\n    \"adminEmail\": \"admin@keyguard.io\",\n    \"timezone\": \"Asia/Riyadh\",\n    \"baseUrl\": \"https://keyguard.example.com\"\n  }\n}"
             },
             {
@@ -754,7 +1211,12 @@
               "status": "Bad Request",
               "code": 400,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"statusCode\": 400,\n  \"message\": \"Validation failed\",\n  \"error\": \"Bad Request\",\n  \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n  \"path\": \"/api/v1/settings/general\",\n  \"details\": [\n    {\n      \"field\": \"instanceName\",\n      \"message\": \"Name must be between 3 and 50 characters\"\n    },\n    {\n      \"field\": \"adminEmail\",\n      \"message\": \"Invalid email format\"\n    }\n  ]\n}"
             }
           ]
@@ -780,8 +1242,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/settings/security",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "settings", "security"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "settings",
+                "security"
+              ]
             },
             "description": "Update security settings.\n\n**Validation:**\n- sessionTimeoutSeconds: 300-2592000\n- ipWhitelist: Valid IP or CIDR notation"
           },
@@ -791,7 +1260,12 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"success\": true,\n  \"data\": {\n    \"sessionTimeoutSeconds\": 7200,\n    \"enforce2FA\": true,\n    \"ipWhitelist\": [\"192.168.1.0/24\", \"10.0.0.1\"]\n  }\n}"
             },
             {
@@ -799,7 +1273,12 @@
               "status": "Bad Request",
               "code": 400,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"statusCode\": 400,\n  \"message\": \"Validation failed\",\n  \"error\": \"Bad Request\",\n  \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n  \"path\": \"/api/v1/settings/security\",\n  \"details\": [\n    {\n      \"field\": \"ipWhitelist.0\",\n      \"message\": \"Each IP must be a valid IP address or CIDR notation\"\n    }\n  ]\n}"
             }
           ]
@@ -825,8 +1304,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/settings/notifications",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "settings", "notifications"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "settings",
+                "notifications"
+              ]
             },
             "description": "Update SMTP notification settings."
           },
@@ -836,7 +1322,12 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"success\": true,\n  \"data\": {\n    \"smtpHost\": \"smtp.gmail.com\",\n    \"smtpPort\": 587,\n    \"smtpUsername\": \"notifications@keyguard.io\",\n    \"smtpPassword\": \"app-specific-password\",\n    \"emailAlerts\": true\n  }\n}"
             }
           ]
@@ -857,8 +1348,16 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/settings/notifications/test",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "settings", "notifications", "test"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "settings",
+                "notifications",
+                "test"
+              ]
             },
             "description": "Test SMTP connection with current settings."
           },
@@ -868,7 +1367,12 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"success\": true,\n  \"message\": \"Test email sent successfully\"\n}"
             },
             {
@@ -876,7 +1380,12 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"success\": false,\n  \"message\": \"Failed to connect to SMTP server: Connection refused\"\n}"
             }
           ]
@@ -921,8 +1430,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/settings/api-keys",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "settings", "api-keys"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "settings",
+                "api-keys"
+              ]
             },
             "description": "Generate a new admin API key.\n\n**IMPORTANT**: The `rawKey` is returned ONLY at creation time. Save it securely!"
           },
@@ -932,7 +1448,12 @@
               "status": "Created",
               "code": 201,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"key\": {\n    \"id\": \"423e4567-e89b-12d3-a456-426614174003\",\n    \"name\": \"Admin Dashboard Key\",\n    \"key\": \"kg_17331...abc123\",\n    \"scope\": [\"read\", \"write\"],\n    \"createdAt\": \"2025-12-02T09:48:27.000Z\",\n    \"lastUsedAt\": null\n  },\n  \"rawKey\": \"kg_1733139627000_abc123def456ghi789jkl012mno345pqr678stu901vwx234yz\"\n}"
             },
             {
@@ -940,7 +1461,12 @@
               "status": "Bad Request",
               "code": 400,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"statusCode\": 400,\n  \"message\": \"Validation failed\",\n  \"error\": \"Bad Request\",\n  \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n  \"path\": \"/api/v1/settings/api-keys\",\n  \"details\": [\n    {\n      \"field\": \"name\",\n      \"message\": \"Name must be between 3 and 50 characters\"\n    },\n    {\n      \"field\": \"scope\",\n      \"message\": \"Scope must have at least one value\"\n    }\n  ]\n}"
             }
           ]
@@ -952,8 +1478,16 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/v1/settings/api-keys/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "settings", "api-keys", ":id"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "settings",
+                "api-keys",
+                ":id"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -969,7 +1503,12 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"success\": true,\n  \"message\": \"API key revoked successfully\"\n}"
             },
             {
@@ -977,7 +1516,12 @@
               "status": "Not Found",
               "code": 404,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"statusCode\": 404,\n  \"message\": \"API key not found\",\n  \"error\": \"Not Found\",\n  \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n  \"path\": \"/api/v1/settings/api-keys/423e4567-e89b-12d3-a456-426614174003\"\n}"
             }
           ]
@@ -998,8 +1542,16 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/settings/backup/download",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "settings", "backup", "download"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "settings",
+                "backup",
+                "download"
+              ]
             },
             "description": "Generate and download a backup of the KeyGuard instance."
           },
@@ -1009,7 +1561,12 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"url\": \"/api/v1/settings/backup/download/keyguard-backup-2025-12-02.zip\",\n  \"filename\": \"keyguard-backup-2025-12-02.zip\"\n}"
             }
           ]
@@ -1049,8 +1606,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/keyguard/enroll",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "keyguard", "enroll"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "keyguard",
+                "enroll"
+              ]
             },
             "description": "Legacy endpoint for SDK device enrollment."
           },
@@ -1060,7 +1624,12 @@
               "status": "Created",
               "code": 201,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"id\": \"123e4567-e89b-12d3-a456-426614174000\",\n  \"status\": \"PENDING\",\n  \"createdAt\": \"2025-12-02T09:48:27.000Z\"\n}"
             },
             {
@@ -1068,7 +1637,12 @@
               "status": "Bad Request",
               "code": 400,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"statusCode\": 400,\n  \"message\": \"Device already enrolled\",\n  \"error\": \"Bad Request\",\n  \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n  \"path\": \"/api/v1/keyguard/enroll\"\n}"
             },
             {
@@ -1076,7 +1650,12 @@
               "status": "Unauthorized",
               "code": 401,
               "_postman_previewlanguage": "json",
-              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
               "body": "{\n  \"statusCode\": 401,\n  \"message\": \"Invalid API key\",\n  \"error\": \"Unauthorized\",\n  \"timestamp\": \"2025-12-02T09:48:27.000Z\",\n  \"path\": \"/api/v1/keyguard/enroll\"\n}"
             }
           ]
@@ -1090,7 +1669,10 @@
       "listen": "prerequest",
       "script": {
         "type": "text/javascript",
-        "exec": ["// Global pre-request script", "console.log('Request to:', pm.request.url);"]
+        "exec": [
+          "// Global pre-request script",
+          "console.log('Request to:', pm.request.url);"
+        ]
       }
     },
     {
@@ -1111,4 +1693,3 @@
     }
   ]
 }
-

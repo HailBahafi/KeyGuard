@@ -5,6 +5,9 @@ import { AuthService } from './auth.service';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { RegisterDto } from './dto/register.dto';
+import { RegisterResponseDto } from './dto/register-response.dto';
+import { RegisterErrorDto } from './dto/register-error.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -37,5 +40,33 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Invalid refresh token' })
   async refresh(@Body() refreshTokenDto: RefreshTokenDto) {
     return this.authService.refreshAccessToken(refreshTokenDto.refreshToken);
+  }
+
+  @Public()
+  @Post('register')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Register new organization and admin user' })
+  @ApiResponse({
+    status: 201,
+    description: 'Organization and admin user created successfully',
+    type: RegisterResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Validation error',
+    type: RegisterErrorDto,
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Email already exists',
+    type: RegisterErrorDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error',
+    type: RegisterErrorDto,
+  })
+  register(@Body() registerDto: RegisterDto): Promise<RegisterResponseDto> {
+    return this.authService.register(registerDto);
   }
 }

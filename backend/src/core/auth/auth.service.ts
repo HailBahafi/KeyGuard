@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Injectable,
   UnauthorizedException
 } from '@nestjs/common';
@@ -8,6 +9,9 @@ import { Hashing } from 'src/common/utils/hashing.util';
 import { PrismaService } from '../database/prisma.service';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
+import { RegisterResponseDto } from './dto/register-response.dto';
+import { Prisma } from '@/src/generated/client';
 
 @Injectable()
 export class AuthService {
@@ -119,5 +123,89 @@ export class AuthService {
     }
 
     return user;
+  }
+
+  async register(registerDto: RegisterDto): Promise<RegisterResponseDto> {
+    // Check if user with this email already exists
+    const existingUser = await this.prismaService.prisma.user.findUnique({
+      where: { email: registerDto.email },
+    });
+
+    if (existingUser) {
+      throw new ConflictException('An account with this email already exists');
+    }
+
+    // Create organization slug from name
+    const slug = registerDto.organizationName
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+
+    // Check if organization slug already exists
+    const existingOrg = await this.prismaService.prisma.organization.findUnique({
+      where: { slug },
+    });
+
+    if (existingOrg) {
+      // If slug exists, append random string
+      const randomSuffix = Math.random().toString(36).substring(2, 6);
+      const uniqueSlug = `${slug}-${randomSuffix}`;
+
+      return await this.createOrganizationAndUser(
+        registerDto,
+        uniqueSlug,
+      );
+    }
+
+    return await this.createOrganizationAndUser(registerDto, slug);
+  }
+
+  private async createOrganizationAndUser(
+    registerDto: RegisterDto,
+    slug: string,
+  ): Promise<RegisterResponseDto> {
+    // Hash password
+    const hashedPassword = await Hashing.hash(registerDto.password);
+
+    // Create organization and admin user in a transaction
+    const result = await this.prismaService.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      // Create organization
+      const organization = await tx.organization.create({
+        data: {
+          name: registerDto.organizationName,
+          slug,
+        },
+      });
+
+      // Create admin user
+      const user = await tx.user.create({
+        data: {
+          email: registerDto.email,
+          name: registerDto.email.split('@')[0] ?? 'Admin', // Extract name from email
+          password: hashedPassword,
+          role: 'ADMIN',
+          organizationId: organization.id,
+        },
+      });
+
+      return { organization, user };
+    });
+
+    // Generate JWT token
+    const token = await this.generateAccessToken(
+      result.user.id,
+      result.user.email,
+    );
+
+    // Return response
+    return {
+      success: true,
+      user: {
+        email: result.user.email,
+        organizationName: result.organization.name,
+        isAuthenticated: true,
+      },
+      token,
+    };
   }
 }

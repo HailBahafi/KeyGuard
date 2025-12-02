@@ -1,15 +1,19 @@
 model User {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  isActive  Boolean  @default(true)
-  lastLogin DateTime?
+  id             String   @id @default(uuid())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  isActive       Boolean  @default(true)
+  lastLogin      DateTime?
 
-  email    String   @unique
-  name     String
-  password String
-  avatar   String?
-  role     UserRole @default(USER)
+  email          String   @unique
+  name           String
+  password       String
+  avatar         String?
+  role           UserRole @default(USER)
+
+  // Organization relation
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
 
   // Relations
   auditLogs AuditLog[]

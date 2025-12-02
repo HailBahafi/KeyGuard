@@ -1,0 +1,18 @@
+// Organization model for multi-tenancy support
+model Organization {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive  Boolean  @default(true)
+
+  name        String
+  slug        String  @unique
+  description String?
+
+  // Relations
+  users   User[]
+  apiKeys ApiKey[]
+  devices Device[]
+
+  @@map("organizations")
+}

@@ -33,6 +33,10 @@ model ApiKey {
   fullValue   String // Encrypted full key value
   usageCount  Int               @default(0)
 
+  // Organization relation
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+
   // Relations
   devices   Device[]
   auditLogs AuditLog[]
