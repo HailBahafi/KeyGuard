@@ -473,48 +473,4 @@ async function generateText(prompt: string) {
     }
 ];
 
-// Mock API responses for playground
-export const mockApiResponses = {
-    openai: {
-        success: {
-            id: 'chatcmpl-8gFk3xZ9y',
-            object: 'chat.completion',
-            created: Date.now(),
-            model: 'gpt-4',
-            choices: [
-                {
-                    index: 0,
-                    message: {
-                        role: 'assistant',
-                        content: 'Hello! How can I assist you today?'
-                    },
-                    finish_reason: 'stop'
-                }
-            ],
-            usage: {
-                prompt_tokens: 10,
-                completion_tokens: 9,
-                total_tokens: 19
-            }
-        }
-    },
-    anthropic: {
-        success: {
-            id: 'msg_01XFDUDYJgAACzvnptvVoYEL',
-            type: 'message',
-            role: 'assistant',
-            content: [
-                {
-                    type: 'text',
-                    text: 'Hello! How can I help you today?'
-                }
-            ],
-            model: 'claude-3-opus-20240229',
-            stop_reason: 'end_turn',
-            usage: {
-                input_tokens: 10,
-                output_tokens: 25
-            }
-        }
-    }
-};
+// Note: mockApiResponses removed - API Playground now generates demo responses inline

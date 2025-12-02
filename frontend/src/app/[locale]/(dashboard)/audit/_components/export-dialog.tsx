@@ -12,7 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Download, FileJson, FileSpreadsheet } from 'lucide-react';
-import { exportLogs } from '@/lib/mock-api/audit-logs';
+import { apiClient } from '@/lib/api';
+import { toast } from 'sonner';
 import { LogFilters } from '@/types/audit';
 
 interface ExportDialogProps {
@@ -34,19 +35,36 @@ export function ExportDialog({
     const handleExport = async () => {
         try {
             setLoading(true);
-            const result = await exportLogs(format, filters);
+            // TODO: Replace with real endpoint when available: GET /logs/export?format=json&...
+            const searchParams = new URLSearchParams();
+            searchParams.append('format', format);
+            if (filters) {
+                Object.entries(filters).forEach(([key, value]) => {
+                    if (value && value !== 'all') {
+                        searchParams.append(key, value);
+                    }
+                });
+            }
 
-            // In a real implementation, this would trigger a download
-            // For now, we just show a success message
-            console.log('Export completed:', result);
+            const response = await apiClient.get(`/logs/export?${searchParams.toString()}`, {
+                responseType: 'blob',
+            });
 
-            // Simulate download completion
-            setTimeout(() => {
-                setLoading(false);
-                onOpenChange(false);
-            }, 1500);
+            // Create download link
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `audit-logs-${Date.now()}.${format}`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+
+            toast.success('Export completed');
+            setLoading(false);
+            onOpenChange(false);
         } catch (error) {
-            console.error('Export failed:', error);
+            toast.error('Failed to export logs');
             setLoading(false);
         }
     };

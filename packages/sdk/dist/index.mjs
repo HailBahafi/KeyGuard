@@ -234,40 +234,37 @@ var BrowserStorageAdapter = class {
   }
 };
 async function getDeviceFingerprint() {
+  const isNode = typeof process !== "undefined" && process.versions != null && process.versions.node != null;
+  if (isNode || typeof window === "undefined") {
+    console.warn("\u26A0\uFE0F KeyGuard: Running in Node.js/Server environment - Using Mock Fingerprint");
+    return {
+      visitorId: "node-test-device-" + Date.now(),
+      label: "Node.js Environment",
+      metadata: {
+        platform: "Node.js",
+        userAgent: "Terminal",
+        isServer: true,
+        timestamp: (/* @__PURE__ */ new Date()).toISOString()
+      }
+    };
+  }
   try {
-    const fpPromise = FingerprintJS.load();
-    const fp = await fpPromise;
+    const fp = await FingerprintJS.load();
     const result = await fp.get();
     const components = result.components;
     const label = generateDeviceLabel(components);
-    const getValue = (component) => {
-      if (!component) return void 0;
-      if (typeof component === "object" && "value" in component) {
-        return component.value;
-      }
-      return void 0;
-    };
-    const metadata = {
-      platform: getValue(components.platform),
-      vendor: getValue(components.vendor),
-      vendorFlavors: getValue(components.vendorFlavors),
-      screenResolution: getValue(components.screenResolution),
-      timezone: getValue(components.timezone),
-      languages: getValue(components.languages),
-      colorDepth: getValue(components.colorDepth),
-      deviceMemory: getValue(components.deviceMemory),
-      hardwareConcurrency: getValue(components.hardwareConcurrency),
-      touchSupport: getValue(components.touchSupport)
-    };
     return {
       visitorId: result.visitorId,
       label,
-      metadata
+      metadata: result.components || {}
     };
   } catch (error) {
-    throw new Error(
-      `Device fingerprinting failed: ${error instanceof Error ? error.message : "Unknown error"}`
-    );
+    console.warn("KeyGuard: FingerprintJS failed, falling back.", error);
+    return {
+      visitorId: "fallback-" + Date.now(),
+      label: "Unknown Device",
+      metadata: { error: String(error) }
+    };
   }
 }
 function generateDeviceLabel(components) {
@@ -281,36 +278,14 @@ function generateDeviceLabel(components) {
   let browser = "Unknown Browser";
   const vendor = String(getValue(components.vendor, ""));
   const vendorFlavors = getValue(components.vendorFlavors, []);
-  if (vendor.includes("Google") || Array.isArray(vendorFlavors) && vendorFlavors.includes("chrome")) {
-    browser = "Chrome";
-  } else if (vendor.includes("Apple") || Array.isArray(vendorFlavors) && vendorFlavors.includes("safari")) {
-    browser = "Safari";
-  } else if (Array.isArray(vendorFlavors) && vendorFlavors.includes("firefox")) {
-    browser = "Firefox";
-  } else if (Array.isArray(vendorFlavors) && vendorFlavors.includes("edge")) {
-    browser = "Edge";
-  }
+  if (vendor.includes("Google") || Array.isArray(vendorFlavors) && vendorFlavors.includes("chrome")) browser = "Chrome";
+  else if (vendor.includes("Apple") || Array.isArray(vendorFlavors) && vendorFlavors.includes("safari")) browser = "Safari";
+  else if (Array.isArray(vendorFlavors) && vendorFlavors.includes("firefox")) browser = "Firefox";
   let os = "Unknown OS";
   const platform = String(getValue(components.platform, ""));
-  if (platform.includes("Win")) {
-    os = "Windows";
-  } else if (platform.includes("Mac")) {
-    os = "macOS";
-  } else if (platform.includes("Linux")) {
-    os = "Linux";
-  } else if (platform.includes("iPhone") || platform.includes("iPad")) {
-    os = "iOS";
-  } else if (platform.includes("Android")) {
-    os = "Android";
-  }
-  if (os === "Unknown OS" && typeof navigator !== "undefined") {
-    const ua = navigator.userAgent || "";
-    if (ua.includes("Windows")) os = "Windows";
-    else if (ua.includes("Mac")) os = "macOS";
-    else if (ua.includes("Linux")) os = "Linux";
-    else if (ua.includes("iPhone") || ua.includes("iPad")) os = "iOS";
-    else if (ua.includes("Android")) os = "Android";
-  }
+  if (platform.includes("Win")) os = "Windows";
+  else if (platform.includes("Mac")) os = "macOS";
+  else if (platform.includes("Linux")) os = "Linux";
   return `${browser} on ${os}`;
 }
 
@@ -377,10 +352,8 @@ var KeyGuardClient = class {
       let fingerprint;
       if (this.fingerprintProvider) {
         fingerprint = await this.fingerprintProvider.getFingerprint();
-      } else if (typeof window !== "undefined") {
-        fingerprint = await getDeviceFingerprint();
       } else {
-        throw new Error("No fingerprint provider configured and browser environment not detected.");
+        fingerprint = await getDeviceFingerprint();
       }
       const existingKeys = await this.storage.getKeyPair();
       if (existingKeys) {

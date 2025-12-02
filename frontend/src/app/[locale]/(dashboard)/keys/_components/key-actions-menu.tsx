@@ -11,7 +11,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { ApiKey } from '@/lib/queries/keys-queries';
+import { ApiKey } from '@/hooks/use-keys';
 import { useToast } from '@/components/ui/use-toast';
 
 interface KeyActionsMenuProps {
@@ -28,7 +28,10 @@ export function KeyActionsMenu({ apiKey, onViewDetails, onRotate, onRevoke }: Ke
     const handleCopy = () => {
         // In a real app, we might need to fetch the full key first if not available
         // For now, we'll simulate copying the masked value or a placeholder
-        navigator.clipboard.writeText(apiKey.maskedValue);
+        const valueToCopy = apiKey.maskedValue || apiKey.id || '';
+        if (valueToCopy) {
+            navigator.clipboard.writeText(valueToCopy);
+        }
         toast({
             title: t('copied'),
             duration: 2000,

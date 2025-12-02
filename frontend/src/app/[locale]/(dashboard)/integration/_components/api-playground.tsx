@@ -15,7 +15,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Send, Loader2 } from 'lucide-react';
-import { mockApiResponses } from '@/lib/docs-content';
 
 interface ApiPlaygroundProps {
     open: boolean;
@@ -31,7 +30,7 @@ export function ApiPlayground({ open, onOpenChange }: ApiPlaygroundProps) {
             { role: 'user', content: 'Hello! How can you help me today?' }
         ]
     }, null, 2));
-    const [response, setResponse] = useState<any>(null);
+    const [response, setResponse] = useState<Record<string, unknown> | null>(null);
     const [loading, setLoading] = useState(false);
     const [responseTime, setResponseTime] = useState<number>(0);
 
@@ -43,11 +42,29 @@ export function ApiPlayground({ open, onOpenChange }: ApiPlaygroundProps) {
         // Simulate network delay
         await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 500));
 
-        // Determine which mock response to use based on URL
-        let mockResponse: any = mockApiResponses.openai.success;
-        if (url.includes('anthropic')) {
-            mockResponse = mockApiResponses.anthropic.success;
-        }
+        // Demo: Generate a simple mock response based on URL
+        // In production, this would use the actual KeyGuard SDK to sign and send the request
+        const mockResponse: Record<string, unknown> = {
+            id: `chatcmpl-${Math.random().toString(36).substring(7)}`,
+            object: 'chat.completion',
+            created: Math.floor(Date.now() / 1000),
+            model: url.includes('anthropic') ? 'claude-3-opus-20240229' : 'gpt-4-turbo-preview',
+            choices: [
+                {
+                    index: 0,
+                    message: {
+                        role: 'assistant',
+                        content: 'This is a demo response. In production, this would be the actual API response from the provider.',
+                    },
+                    finish_reason: 'stop',
+                },
+            ],
+            usage: {
+                prompt_tokens: 10,
+                completion_tokens: 15,
+                total_tokens: 25,
+            },
+        };
 
         const endTime = Date.now();
         setResponseTime(endTime - startTime);
@@ -61,7 +78,7 @@ export function ApiPlayground({ open, onOpenChange }: ApiPlaygroundProps) {
                 <DialogHeader>
                     <DialogTitle>API Playground</DialogTitle>
                     <DialogDescription>
-                        Test API requests with KeyGuard signing (simulated)
+                        Demo: Test API requests with KeyGuard signing (simulated responses for demonstration purposes only)
                     </DialogDescription>
                 </DialogHeader>
 

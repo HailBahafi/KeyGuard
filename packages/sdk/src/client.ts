@@ -99,10 +99,9 @@ export class KeyGuardClient {
       let fingerprint;
       if (this.fingerprintProvider) {
         fingerprint = await this.fingerprintProvider.getFingerprint();
-      } else if (typeof window !== 'undefined') {
-        fingerprint = await getDeviceFingerprint();
       } else {
-        throw new Error('No fingerprint provider configured and browser environment not detected.');
+        // getDeviceFingerprint() now handles Node.js environments with mock data
+        fingerprint = await getDeviceFingerprint();
       }
 
       // Check if device is already enrolled

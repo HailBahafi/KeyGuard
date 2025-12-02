@@ -5,7 +5,6 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 import {
     Dialog,
     DialogContent,
@@ -23,15 +22,15 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { useToast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 import { Plus, Copy, Trash2, Check } from 'lucide-react';
-import { generateApiKey, revokeApiKey } from '@/lib/mock-api/settings';
+import { apiClient } from '@/lib/api';
 import type { ApiKey } from '@/types/settings';
 import { formatDistanceToNow } from 'date-fns';
 
 interface ApiSectionProps {
     keys: ApiKey[];
-    onUpdate: () => void;
+    onUpdate?: () => void;
 }
 
 export function ApiSection({ keys, onUpdate }: ApiSectionProps) {
@@ -41,33 +40,25 @@ export function ApiSection({ keys, onUpdate }: ApiSectionProps) {
     const [generatedKey, setGeneratedKey] = useState<{ key: ApiKey; rawKey: string } | null>(null);
     const [loading, setLoading] = useState(false);
     const [copied, setCopied] = useState(false);
-    const { toast } = useToast();
 
     const handleGenerateKey = async () => {
         if (!newKeyName.trim()) {
-            toast({
-                title: 'Error',
-                description: 'Please enter a key name',
-                variant: 'destructive',
-            });
+            toast.error('Please enter a key name');
             return;
         }
 
         try {
             setLoading(true);
-            const result = await generateApiKey(newKeyName, ['read', 'write']);
-            setGeneratedKey(result);
+            // TODO: Replace with real endpoint when available: POST /settings/api-keys
+            const response = await apiClient.post<{ key: ApiKey; rawKey: string }>('/settings/api-keys', {
+                name: newKeyName,
+                scope: ['read', 'write'],
+            });
+            setGeneratedKey(response.data);
             setNewKeyName('');
-            toast({
-                title: 'Success',
-                description: 'API key generated successfully',
-            });
-        } catch (error) {
-            toast({
-                title: 'Error',
-                description: 'Failed to generate API key',
-                variant: 'destructive',
-            });
+            toast.success('API key generated successfully');
+        } catch {
+            toast.error('Failed to generate API key');
         } finally {
             setLoading(false);
         }
@@ -78,16 +69,9 @@ export function ApiSection({ keys, onUpdate }: ApiSectionProps) {
             await navigator.clipboard.writeText(key);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
-            toast({
-                title: 'Copied',
-                description: 'API key copied to clipboard',
-            });
-        } catch (error) {
-            toast({
-                title: 'Error',
-                description: 'Failed to copy to clipboard',
-                variant: 'destructive',
-            });
+            toast.success('API key copied to clipboard');
+        } catch {
+            toast.error('Failed to copy to clipboard');
         }
     };
 
@@ -96,19 +80,13 @@ export function ApiSection({ keys, onUpdate }: ApiSectionProps) {
 
         try {
             setLoading(true);
-            await revokeApiKey(keyToRevoke.id);
-            toast({
-                title: 'Success',
-                description: 'API key revoked successfully',
-            });
-            onUpdate();
+            // TODO: Replace with real endpoint when available: DELETE /settings/api-keys/:id
+            await apiClient.delete(`/settings/api-keys/${keyToRevoke.id}`);
+            toast.success('API key revoked successfully');
+            onUpdate?.();
             setKeyToRevoke(null);
-        } catch (error) {
-            toast({
-                title: 'Error',
-                description: 'Failed to revoke API key',
-                variant: 'destructive',
-            });
+        } catch {
+            toast.error('Failed to revoke API key');
         } finally {
             setLoading(false);
         }
@@ -117,7 +95,7 @@ export function ApiSection({ keys, onUpdate }: ApiSectionProps) {
     const handleCloseGenerated = () => {
         setGeneratedKey(null);
         setIsGenerateOpen(false);
-        onUpdate();
+        onUpdate?.();
     };
 
     return (
@@ -226,7 +204,7 @@ export function ApiSection({ keys, onUpdate }: ApiSectionProps) {
                         <div className="space-y-4">
                             <div className="p-4 rounded-lg bg-muted">
                                 <p className="text-sm text-muted-foreground mb-2">
-                                    ⚠️ Make sure to copy your API key now. You won't be able to see it again!
+                                    ⚠️ Make sure to copy your API key now. You won&apos;t be able to see it again!
                                 </p>
                                 <div className="flex items-center gap-2">
                                     <code className="flex-1 text-sm font-mono bg-background p-3 rounded border border-border break-all">
@@ -256,7 +234,7 @@ export function ApiSection({ keys, onUpdate }: ApiSectionProps) {
                     <AlertDialogHeader>
                         <AlertDialogTitle>Revoke API Key?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This will permanently revoke the API key "{keyToRevoke?.name}". Applications using this key will no longer have access.
+                            This will permanently revoke the API key `{keyToRevoke?.name}`. Applications using this key will no longer have access.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

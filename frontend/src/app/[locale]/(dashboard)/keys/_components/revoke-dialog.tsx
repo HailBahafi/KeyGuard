@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ApiKey } from '@/lib/queries/keys-queries';
+import { ApiKey } from '@/hooks/use-keys';
 import { useState } from 'react';
 
 interface RevokeKeyDialogProps {

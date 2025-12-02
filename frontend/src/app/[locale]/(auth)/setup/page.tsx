@@ -1,35 +1,39 @@
 'use client';
 
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useRouter } from 'next/navigation';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useAuthStore } from '@/stores/use-auth-store';
+import { useRegister } from '@/hooks/use-auth';
 
 export default function SetupPage() {
     const t = useTranslations('Auth.setup');
     const tErrors = useTranslations('Auth.errors');
-    const router = useRouter();
-    const locale = useLocale();
-    const register = useAuthStore((state) => state.register);
-    const [isLoading, setIsLoading] = useState(false);
+    const registerMutation = useRegister();
 
     // Zod validation schema with password confirmation
+    // Note: Backend requires username (3-30 chars, alphanumeric + underscore/hyphen)
+    // organizationName is used as username for now
     const formSchema = z.object({
         organizationName: z.string()
-            .min(3, { message: tErrors('minLength', { min: 3 }) }),
+            .min(3, { message: tErrors('minLength', { min: 3 }) })
+            .max(30, { message: tErrors('maxLength', { max: 30 }) })
+            .regex(/^[a-zA-Z0-9_-]+$/, {
+                message: 'Organization name must contain only letters, numbers, underscores, or hyphens',
+            }),
         email: z.string()
             .min(1, { message: tErrors('required') })
             .email({ message: tErrors('invalidEmail') }),
         password: z.string()
-            .min(8, { message: tErrors('passwordTooShort') }),
+            .min(8, { message: tErrors('passwordTooShort') })
+            .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
+                message: 'Password must contain at least one lowercase letter, one uppercase letter, and one number',
+            }),
         confirmPassword: z.string()
             .min(1, { message: tErrors('required') }),
     }).refine((data) => data.password === data.confirmPassword, {
@@ -49,16 +53,13 @@ export default function SetupPage() {
         },
     });
 
-    const onSubmit = async (data: FormValues) => {
-        setIsLoading(true);
-        try {
-            await register(data.organizationName, data.email, data.password);
-            // Redirect to dashboard on success
-            router.push(`/${locale}/dashboard`);
-        } catch (error) {
-            console.error('Setup failed:', error);
-            setIsLoading(false);
-        }
+    const onSubmit = (data: FormValues) => {
+        // useRegister hook handles success (redirect) and error (toast) automatically
+        registerMutation.mutate({
+            email: data.email,
+            username: data.organizationName, // Use organizationName as username
+            password: data.password,
+        });
     };
 
     return (
@@ -150,9 +151,9 @@ export default function SetupPage() {
                             <Button
                                 type="submit"
                                 className="w-full"
-                                disabled={isLoading}
+                                disabled={registerMutation.isPending}
                             >
-                                {isLoading ? t('loadingButton') : t('submitButton')}
+                                {registerMutation.isPending ? t('loadingButton') : t('submitButton')}
                             </Button>
                         </form>
                     </Form>
