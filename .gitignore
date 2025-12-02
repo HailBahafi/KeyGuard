@@ -15,6 +15,3 @@ out/
 .env
 .env.*
 
-# generated files
-**/generated/
-**/prisma/generated/

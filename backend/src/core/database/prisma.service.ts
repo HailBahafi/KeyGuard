@@ -7,7 +7,7 @@ import { PrismaClient } from 'src/generated/client';
 
 @Injectable()
 export class PrismaService implements OnModuleInit, OnModuleDestroy {
-  public readonly prisma: any;
+  public readonly prisma: PrismaClient;
 
   constructor() {
     this.prisma = PrismaService.createPrismaClient();
