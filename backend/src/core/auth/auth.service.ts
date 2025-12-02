@@ -1,3 +1,4 @@
+import { Prisma } from '@/src/generated/client';
 import {
   ConflictException,
   Injectable,
@@ -9,17 +10,14 @@ import { Hashing } from 'src/common/utils/hashing.util';
 import { PrismaService } from '../database/prisma.service';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { LoginDto } from './dto/login.dto';
-import { RegisterDto } from './dto/register.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
-import { Prisma } from '@/src/generated/client';
-
+import { RegisterDto } from './dto/register.dto';
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly prismaService: PrismaService,
   ) { }
-
   async login(loginDto: LoginDto): Promise<LoginResponseDto> {
     // Find user by email
     const user = await this.prismaService.prisma.user.findUnique({
@@ -33,35 +31,28 @@ export class AuthService {
         isActive: true,
       },
     });
-
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
-
     if (!user.isActive) {
       throw new UnauthorizedException('Account is inactive');
     }
-
     // Verify password
     const isPasswordValid = await Hashing.compare(
       loginDto.password,
       user.password,
     );
-
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
-
     // Generate tokens
     const accessToken = await this.generateAccessToken(user.id, user.email);
     const refreshToken = await this.generateRefreshToken(user.id);
-
     // Update last login
     await this.prismaService.prisma.user.update({
       where: { id: user.id },
       data: { lastLogin: dayjs().toDate() },
     });
-
     return {
       accessToken,
       refreshToken,
@@ -73,39 +64,31 @@ export class AuthService {
       },
     };
   }
-
   async refreshAccessToken(refreshToken: string): Promise<{ accessToken: string }> {
     try {
       const payload = await this.jwtService.verifyAsync(refreshToken);
-
       // Verify user still exists and is active
       const user = await this.prismaService.prisma.user.findUnique({
         where: { id: payload.id },
         select: { id: true, email: true, isActive: true },
       });
-
       if (!user?.isActive) {
         throw new UnauthorizedException('Invalid refresh token');
       }
-
       const accessToken = await this.generateAccessToken(user.id, user.email);
-
       return { accessToken };
     } catch (error) {
       throw new UnauthorizedException('Invalid refresh token');
     }
   }
-
   private async generateAccessToken(userId: string, email: string): Promise<string> {
     const payload = { id: userId, email };
     return this.jwtService.signAsync(payload, { expiresIn: '15m' });
   }
-
   private async generateRefreshToken(userId: string): Promise<string> {
     const payload = { id: userId };
     return this.jwtService.signAsync(payload, { expiresIn: '7d' });
   }
-
   async validateUser(userId: string) {
     const user = await this.prismaService.prisma.user.findUnique({
       where: { id: userId },
@@ -117,56 +100,45 @@ export class AuthService {
         isActive: true,
       },
     });
-
     if (!user?.isActive) {
       throw new UnauthorizedException('User not found or inactive');
     }
-
     return user;
   }
-
   async register(registerDto: RegisterDto): Promise<RegisterResponseDto> {
     // Check if user with this email already exists
     const existingUser = await this.prismaService.prisma.user.findUnique({
       where: { email: registerDto.email },
     });
-
     if (existingUser) {
       throw new ConflictException('An account with this email already exists');
     }
-
     // Create organization slug from name
     const slug = registerDto.organizationName
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
-
     // Check if organization slug already exists
     const existingOrg = await this.prismaService.prisma.organization.findUnique({
       where: { slug },
     });
-
     if (existingOrg) {
       // If slug exists, append random string
       const randomSuffix = Math.random().toString(36).substring(2, 6);
       const uniqueSlug = `${slug}-${randomSuffix}`;
-
-      return await this.createOrganizationAndUser(
+      return this.createOrganizationAndUser(
         registerDto,
         uniqueSlug,
       );
     }
-
     return await this.createOrganizationAndUser(registerDto, slug);
   }
-
   private async createOrganizationAndUser(
     registerDto: RegisterDto,
     slug: string,
   ): Promise<RegisterResponseDto> {
     // Hash password
     const hashedPassword = await Hashing.hash(registerDto.password);
-
     // Create organization and admin user in a transaction
     const result = await this.prismaService.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // Create organization
@@ -176,7 +148,6 @@ export class AuthService {
           slug,
         },
       });
-
       // Create admin user
       const user = await tx.user.create({
         data: {
@@ -187,16 +158,13 @@ export class AuthService {
           organizationId: organization.id,
         },
       });
-
       return { organization, user };
     });
-
     // Generate JWT token
     const token = await this.generateAccessToken(
       result.user.id,
       result.user.email,
     );
-
     // Return response
     return {
       success: true,
