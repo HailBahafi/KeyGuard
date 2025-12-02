@@ -1,9 +1,10 @@
 import { ReactNode } from 'react';
+import { ResponsiveHeader } from '@/components/common/responsive-header';
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
     return (
         <div className="min-h-screen bg-background">
-            {/* Dashboard Layout - Can add sidebar, navbar, etc. later */}
+            <ResponsiveHeader />
             <main className="container mx-auto p-6">
                 {children}
             </main>

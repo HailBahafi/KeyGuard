@@ -110,6 +110,15 @@
         "dark": "Dark",
         "system": "System"
     },
+    "Navigation": {
+        "home": "Home",
+        "dashboard": "Dashboard",
+        "keys": "API Keys",
+        "devices": "Devices",
+        "audit": "Audit Logs",
+        "integration": "Integration",
+        "settings": "Settings"
+    },
     "Auth": {
         "login": {
             "title": "Welcome Back",

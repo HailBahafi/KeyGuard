@@ -110,6 +110,15 @@
         "dark": "داكن",
         "system": "النظام"
     },
+    "Navigation": {
+        "home": "الرئيسية",
+        "dashboard": "لوحة التحكم",
+        "keys": "مفاتيح API",
+        "devices": "الأجهزة",
+        "audit": "سجلات التدقيق",
+        "integration": "التكامل",
+        "settings": "الإعدادات"
+    },
     "Auth": {
         "login": {
             "title": "مرحبًا بعودتك",
