@@ -122,15 +122,15 @@ export async function fetchKeys(
 }
 
 // Create key mock
-export async function createKey(data: any): Promise<ApiKey> {
+export async function createKey(data: { name: string; provider: string; environment?: string; expiresAt?: string; description?: string }): Promise<ApiKey> {
     await new Promise(resolve => setTimeout(resolve, 500));
 
     const newKey: ApiKey = {
         id: `key_${mockKeys.length + 1}`,
         name: data.name,
-        provider: data.provider,
+        provider: data.provider as 'openai' | 'anthropic' | 'google' | 'azure',
         status: 'active',
-        environment: data.environment || 'development',
+        environment: data.environment as 'production' | 'development' | 'staging' || 'development',
         created: new Date().toISOString(),
         lastUsed: null,
         expiresAt: data.expiresAt || null,

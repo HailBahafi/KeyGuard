@@ -12,8 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { securitySettingsSchema, type SecuritySettingsFormData } from '@/lib/validations/settings';
 import { useState } from 'react';
 import { Loader2, Plus, X } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
-import { updateSecuritySettings } from '@/lib/mock-api/settings';
+import { useUpdateSecuritySettings } from '@/hooks/use-settings';
 import type { SecuritySettings } from '@/types/settings';
 
 interface SecurityFormProps {
@@ -30,9 +29,8 @@ const sessionTimeouts = [
 ];
 
 export function SecurityForm({ initialData, onSuccess }: SecurityFormProps) {
-    const [loading, setLoading] = useState(false);
+    const updateMutation = useUpdateSecuritySettings();
     const [newIp, setNewIp] = useState('');
-    const { toast } = useToast();
 
     const {
         register,
@@ -47,24 +45,12 @@ export function SecurityForm({ initialData, onSuccess }: SecurityFormProps) {
 
     const ipWhitelist = watch('ipWhitelist') || [];
 
-    const onSubmit = async (data: SecuritySettingsFormData) => {
-        try {
-            setLoading(true);
-            await updateSecuritySettings(data);
-            toast({
-                title: 'Success',
-                description: 'Security settings saved successfully',
-            });
-            onSuccess?.();
-        } catch (error) {
-            toast({
-                title: 'Error',
-                description: 'Failed to save settings',
-                variant: 'destructive',
-            });
-        } finally {
-            setLoading(false);
-        }
+    const onSubmit = (data: SecuritySettingsFormData) => {
+        updateMutation.mutate(data, {
+            onSuccess: () => {
+                onSuccess?.();
+            },
+        });
     };
 
     const handleAddIp = () => {
@@ -194,8 +180,8 @@ export function SecurityForm({ initialData, onSuccess }: SecurityFormProps) {
                     </div>
                 </div>
 
-                <Button type="submit" disabled={!isDirty || loading}>
-                    {loading && <Loader2 className="h-4 w-4 me-2 animate-spin" />}
+                <Button type="submit" disabled={!isDirty || updateMutation.isPending}>
+                    {updateMutation.isPending && <Loader2 className="h-4 w-4 me-2 animate-spin" />}
                     Save Changes
                 </Button>
             </form>

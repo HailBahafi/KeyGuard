@@ -8,10 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { generalSettingsSchema, type GeneralSettingsFormData } from '@/lib/validations/settings';
-import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
-import { updateGeneralSettings } from '@/lib/mock-api/settings';
+import { useUpdateGeneralSettings } from '@/hooks/use-settings';
 import type { GeneralSettings } from '@/types/settings';
 
 interface GeneralFormProps {
@@ -30,8 +28,7 @@ const timezones = [
 ];
 
 export function GeneralForm({ initialData, onSuccess }: GeneralFormProps) {
-    const [loading, setLoading] = useState(false);
-    const { toast } = useToast();
+    const updateMutation = useUpdateGeneralSettings();
     const {
         register,
         handleSubmit,
@@ -43,23 +40,12 @@ export function GeneralForm({ initialData, onSuccess }: GeneralFormProps) {
         defaultValues: initialData,
     });
 
-    const onSubmit = async (data: GeneralSettingsFormData) => {
-        try {
-            setLoading(true);
-            await updateGeneralSettings(data);
-            toast({
-                title: 'Success',
-                description: 'General settings saved successfully',
-            });
-            onSuccess?.();
-        } catch (error) {
-            toast({
-                title: 'Error',
-                description: 'Failed to save settings',
-            });
-        } finally {
-            setLoading(false);
-        }
+    const onSubmit = (data: GeneralSettingsFormData) => {
+        updateMutation.mutate(data, {
+            onSuccess: () => {
+                onSuccess?.();
+            },
+        });
     };
 
     return (
@@ -134,8 +120,8 @@ export function GeneralForm({ initialData, onSuccess }: GeneralFormProps) {
                     </div>
                 </div>
 
-                <Button type="submit" disabled={!isDirty || loading}>
-                    {loading && <Loader2 className="h-4 w-4 me-2 animate-spin" />}
+                <Button type="submit" disabled={!isDirty || updateMutation.isPending}>
+                    {updateMutation.isPending && <Loader2 className="h-4 w-4 me-2 animate-spin" />}
                     Save Changes
                 </Button>
             </form>

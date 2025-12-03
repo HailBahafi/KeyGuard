@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Copy, RefreshCw, CheckCircle } from 'lucide-react';
-import { generateEnrollmentCode } from '@/lib/queries/device-queries';
+import { useEnrollmentCode } from '@/hooks/use-devices';
 import { EnrollmentCode } from '@/types/device';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatDistanceToNow } from 'date-fns';
@@ -18,25 +18,26 @@ import { formatDistanceToNow } from 'date-fns';
 interface EnrollmentDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    onGenerateCode?: (name: string) => void;
 }
 
-export function EnrollmentDialog({ open, onOpenChange }: EnrollmentDialogProps) {
+export function EnrollmentDialog({ open, onOpenChange, onGenerateCode }: EnrollmentDialogProps) {
+    const enrollmentMutation = useEnrollmentCode();
     const [enrollmentCode, setEnrollmentCode] = useState<EnrollmentCode | null>(null);
-    const [loading, setLoading] = useState(false);
     const [copied, setCopied] = useState(false);
     const [timeLeft, setTimeLeft] = useState<string>('');
 
-    const loadEnrollmentCode = async () => {
-        try {
-            setLoading(true);
-            const code = await generateEnrollmentCode();
-            setEnrollmentCode(code);
-            setCopied(false);
-        } catch (error) {
-            console.error('Failed to generate enrollment code:', error);
-        } finally {
-            setLoading(false);
-        }
+    const loadEnrollmentCode = () => {
+        // Generate code with default name, or use callback if provided
+        enrollmentMutation.mutate('New Device', {
+            onSuccess: (data) => {
+                setEnrollmentCode(data);
+                setCopied(false);
+                if (onGenerateCode) {
+                    onGenerateCode('New Device');
+                }
+            },
+        });
     };
 
     useEffect(() => {
@@ -94,7 +95,7 @@ export function EnrollmentDialog({ open, onOpenChange }: EnrollmentDialogProps) 
                     {/* Enrollment Code */}
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-foreground">Enrollment Code</label>
-                        {loading ? (
+                        {enrollmentMutation.isPending ? (
                             <Skeleton className="h-16 w-full" />
                         ) : enrollmentCode ? (
                             <div className="relative">
@@ -129,7 +130,7 @@ export function EnrollmentDialog({ open, onOpenChange }: EnrollmentDialogProps) 
                     {/* CLI Command */}
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-foreground">CLI Command</label>
-                        {loading ? (
+                        {enrollmentMutation.isPending ? (
                             <Skeleton className="h-12 w-full" />
                         ) : (
                             <div className="relative">
@@ -154,9 +155,9 @@ export function EnrollmentDialog({ open, onOpenChange }: EnrollmentDialogProps) 
                             variant="outline"
                             className="flex-1"
                             onClick={loadEnrollmentCode}
-                            disabled={loading}
+                            disabled={enrollmentMutation.isPending}
                         >
-                            <RefreshCw className={`h-4 w-4 me-2 ${loading ? 'animate-spin' : ''}`} />
+                            <RefreshCw className={`h-4 w-4 me-2 ${enrollmentMutation.isPending ? 'animate-spin' : ''}`} />
                             Generate New Code
                         </Button>
                         <Button onClick={() => onOpenChange(false)}>

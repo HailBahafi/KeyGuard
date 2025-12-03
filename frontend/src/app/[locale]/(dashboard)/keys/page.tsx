@@ -1,26 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Plus, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { fetchKeys, revokeKey, ApiKey } from '@/lib/queries/keys-queries';
+import { useApiKeys, useRevokeKey, useRotateKey, type ApiKey } from '@/hooks/use-keys';
 import { KeysTable } from './_components/keys-table';
 import { KeyFilters } from './_components/key-filters';
 import { CreateKeyDialog } from './_components/create-key-dialog';
 import { KeyDetailsSheet } from './_components/key-details-sheet';
 import { RevokeKeyDialog } from './_components/revoke-dialog';
 import { RotateKeyDialog } from './_components/rotate-dialog';
-import { useToast } from '@/components/ui/use-toast';
 
 export default function KeysPage() {
     const t = useTranslations('KeyVault');
-    const { toast } = useToast();
-
-    // Data State
-    const [keys, setKeys] = useState<ApiKey[]>([]);
-    const [loading, setLoading] = useState(true);
 
     // Filter State
     const [searchQuery, setSearchQuery] = useState('');
@@ -38,35 +32,20 @@ export default function KeysPage() {
     const [isRevokeOpen, setIsRevokeOpen] = useState(false);
     const [isRotateOpen, setIsRotateOpen] = useState(false);
 
-    // Load keys
-    const loadKeys = async () => {
-        try {
-            setLoading(true);
-            const data = await fetchKeys(1, 20, {
-                search: searchQuery,
-                status: filters.status,
-                provider: filters.provider,
-                environment: filters.environment
-            });
-            setKeys(data.keys);
-        } catch (error) {
-            console.error('Failed to load keys:', error);
-            toast({
-                title: "Error",
-                description: "Failed to load keys",
-                variant: "destructive"
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
+    // React Query hooks
+    const { data: keysData, isLoading: loading } = useApiKeys({
+        page: 1,
+        limit: 20,
+        search: searchQuery || undefined,
+        status: filters.status !== 'all' ? filters.status : undefined,
+        provider: filters.provider !== 'all' ? filters.provider : undefined,
+        environment: filters.environment !== 'all' ? filters.environment : undefined,
+    });
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            loadKeys();
-        }, 300);
-        return () => clearTimeout(timer);
-    }, [searchQuery, filters]);
+    const revokeMutation = useRevokeKey();
+    const rotateMutation = useRotateKey();
+
+    const keys = keysData?.keys || [];
 
     // Handlers
     const handleFilterChange = (key: string, value: string) => {
@@ -99,32 +78,22 @@ export default function KeysPage() {
     };
 
     const handleRevokeConfirm = async (keyId: string) => {
-        try {
-            await revokeKey(keyId);
-            toast({
-                title: "Key Revoked",
-                description: "The API key has been successfully revoked."
-            });
-            loadKeys();
-            if (selectedKey?.id === keyId) {
-                setSelectedKey(prev => prev ? { ...prev, status: 'revoked' } : null);
-            }
-        } catch (error) {
-            toast({
-                title: "Error",
-                description: "Failed to revoke key",
-                variant: "destructive"
-            });
-        }
+        revokeMutation.mutate(keyId, {
+            onSuccess: () => {
+                setIsRevokeOpen(false);
+                if (selectedKey?.id === keyId) {
+                    setSelectedKey(prev => prev ? { ...prev, status: 'revoked' } : null);
+                }
+            },
+        });
     };
 
     const handleRotateConfirm = async (keyId: string) => {
-        // Mock rotation
-        toast({
-            title: t('rotateDialog.success'),
-            description: "New key generated."
+        rotateMutation.mutate(keyId, {
+            onSuccess: () => {
+                setIsRotateOpen(false);
+            },
         });
-        loadKeys();
     };
 
     return (
@@ -172,7 +141,6 @@ export default function KeysPage() {
             <CreateKeyDialog
                 open={isCreateOpen}
                 onOpenChange={setIsCreateOpen}
-                onKeyCreated={loadKeys}
             />
 
             <KeyDetailsSheet

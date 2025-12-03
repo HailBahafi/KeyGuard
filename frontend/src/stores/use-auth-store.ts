@@ -2,20 +2,25 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
 export interface User {
-    email: string;
+    id: string;
+    email?: string;
+    username?: string;
     organizationName?: string;
-    isAuthenticated: boolean;
+    isActive?: boolean;
+    role?: string;
 }
 
 interface AuthState {
     user: User | null;
+    accessToken: string | null;
+    isAuthenticated: boolean;
     isLoading: boolean;
     error: string | null;
 
     // Actions
-    login: (email: string, password: string) => Promise<void>;
-    register: (organizationName: string, email: string, password: string) => Promise<void>;
     logout: () => void;
+    setUser: (user: User | null) => void;
+    setToken: (token: string | null) => void;
     clearError: () => void;
 }
 
@@ -24,67 +29,27 @@ export const useAuthStore = create<AuthState>()(
         persist(
             (set) => ({
                 user: null,
+                accessToken: null,
+                isAuthenticated: false,
                 isLoading: false,
                 error: null,
-
-                login: async (email: string, password: string) => {
-                    set({ isLoading: true, error: null });
-
-                    try {
-                        // Mock API call with setTimeout
-                        await new Promise((resolve) => setTimeout(resolve, 500));
-
-                        // Simulate successful login
-                        // In production, validate response from backend
-                        set({
-                            user: {
-                                email,
-                                isAuthenticated: true,
-                            },
-                            isLoading: false,
-                            error: null,
-                        });
-                    } catch (error) {
-                        set({
-                            isLoading: false,
-                            error: 'Login failed. Please try again.',
-                        });
-                        throw error;
-                    }
-                },
-
-                register: async (organizationName: string, email: string, password: string) => {
-                    set({ isLoading: true, error: null });
-
-                    try {
-                        // Mock API call with setTimeout
-                        await new Promise((resolve) => setTimeout(resolve, 500));
-
-                        // Simulate successful registration
-                        set({
-                            user: {
-                                email,
-                                organizationName,
-                                isAuthenticated: true,
-                            },
-                            isLoading: false,
-                            error: null,
-                        });
-                    } catch (error) {
-                        set({
-                            isLoading: false,
-                            error: 'Registration failed. Please try again.',
-                        });
-                        throw error;
-                    }
-                },
 
                 logout: () => {
                     set({
                         user: null,
+                        accessToken: null,
+                        isAuthenticated: false,
                         isLoading: false,
                         error: null,
                     });
+                },
+
+                setUser: (user: User | null) => {
+                    set({ user, isAuthenticated: !!user });
+                },
+
+                setToken: (token: string | null) => {
+                    set({ accessToken: token, isAuthenticated: !!token });
                 },
 
                 clearError: () => {
@@ -93,7 +58,11 @@ export const useAuthStore = create<AuthState>()(
             }),
             {
                 name: 'auth-storage',
-                partialize: (state) => ({ user: state.user }),
+                partialize: (state) => ({
+                    user: state.user,
+                    accessToken: state.accessToken,
+                    isAuthenticated: state.isAuthenticated,
+                }),
             }
         )
     )

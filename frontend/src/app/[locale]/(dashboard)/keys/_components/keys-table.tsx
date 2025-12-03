@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ApiKey } from '@/lib/queries/keys-queries';
+import { ApiKey } from '@/hooks/use-keys';
 import { KeyActionsMenu } from './key-actions-menu';
 
 interface KeysTableProps {

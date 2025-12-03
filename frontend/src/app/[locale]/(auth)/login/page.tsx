@@ -1,25 +1,20 @@
 'use client';
 
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useRouter } from 'next/navigation';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useAuthStore } from '@/stores/use-auth-store';
+import { useLogin } from '@/hooks/use-auth';
 
 export default function LoginPage() {
     const t = useTranslations('Auth.login');
     const tErrors = useTranslations('Auth.errors');
-    const router = useRouter();
-    const locale = useLocale();
-    const login = useAuthStore((state) => state.login);
-    const [isLoading, setIsLoading] = useState(false);
+    const loginMutation = useLogin();
 
     // Zod validation schema
     const formSchema = z.object({
@@ -40,16 +35,12 @@ export default function LoginPage() {
         },
     });
 
-    const onSubmit = async (data: FormValues) => {
-        setIsLoading(true);
-        try {
-            await login(data.email, data.password);
-            // Redirect to dashboard on success
-            router.push(`/${locale}/dashboard`);
-        } catch (error) {
-            console.error('Login failed:', error);
-            setIsLoading(false);
-        }
+    const onSubmit = (data: FormValues) => {
+        // useLogin hook handles success (redirect) and error (toast) automatically
+        loginMutation.mutate({
+            email: data.email,
+            password: data.password,
+        });
     };
 
     return (
@@ -107,9 +98,9 @@ export default function LoginPage() {
                             <Button
                                 type="submit"
                                 className="w-full"
-                                disabled={isLoading}
+                                disabled={loginMutation.isPending}
                             >
-                                {isLoading ? t('loadingButton') : t('submitButton')}
+                                {loginMutation.isPending ? t('loadingButton') : t('submitButton')}
                             </Button>
                         </form>
                     </Form>

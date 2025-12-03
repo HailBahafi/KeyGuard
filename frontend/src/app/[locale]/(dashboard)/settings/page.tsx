@@ -1,34 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { SettingsSidebar } from './_components/settings-sidebar';
 import { GeneralForm } from './_components/general-form';
 import { SecurityForm } from './_components/security-form';
 import { NotificationsForm } from './_components/notifications-form';
 import { ApiSection } from './_components/api-section';
 import { BackupCard } from './_components/backup-card';
-import { fetchSettings } from '@/lib/mock-api/settings';
-import type { SettingsState } from '@/types/settings';
+import { useSettings } from '@/hooks/use-settings';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function SettingsPage() {
-    const [settings, setSettings] = useState<SettingsState | null>(null);
-    const [loading, setLoading] = useState(true);
-
-    const loadSettings = async () => {
-        try {
-            const data = await fetchSettings();
-            setSettings(data);
-        } catch (error) {
-            console.error('Failed to load settings:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        loadSettings();
-    }, []);
+    const { data: settings, isLoading: loading } = useSettings();
 
     if (loading) {
         return (
@@ -78,19 +60,19 @@ export default function SettingsPage() {
                 <main className="space-y-8 min-w-0">
                     <GeneralForm
                         initialData={settings.general}
-                        onSuccess={loadSettings}
                     />
 
                     <SecurityForm
                         initialData={settings.security}
-                        onSuccess={loadSettings}
                     />
 
                     <NotificationsForm />
 
                     <ApiSection
                         keys={settings.api.keys}
-                        onUpdate={loadSettings}
+                        onUpdate={() => {
+                            // Settings will auto-refetch via React Query
+                        }}
                     />
 
                     <BackupCard lastBackupAt={settings.backup.lastBackupAt} />

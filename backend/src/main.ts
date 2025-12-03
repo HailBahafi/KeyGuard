@@ -143,13 +143,16 @@ function setupCors(app: NestFastifyApplication, isProd: boolean): void {
 
   app.enableCors({
     origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
       if (allowedOrigins.includes(origin)) return callback(null, true);
+      // In development, allow all localhost origins for testing
       if (!isProd && /localhost|127\.0\.0\.1/.test(origin)) return callback(null, true);
       return callback(new Error('Not allowed by CORS'), false);
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-keyguard-signature', 'x-keyguard-timestamp', 'x-keyguard-nonce', 'x-keyguard-body-sha256', 'x-keyguard-key-id', 'x-keyguard-api-key', 'x-keyguard-alg'],
   });
 }
 

@@ -1,8 +1,10 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { ThemeProvider } from '@/components/providers/theme-provider';
+import { QueryProvider } from '@/components/providers/query-provider';
 import { notFound } from 'next/navigation';
 import { routing } from '../../../i18n/routing';
+import { Toaster } from 'sonner';
 import '@/app/globals.css';
 
 export function generateStaticParams() {
@@ -38,9 +40,12 @@ export default async function LocaleLayout({
                     enableSystem
                     disableTransitionOnChange
                 >
-                    <NextIntlClientProvider messages={messages}>
-                        {children}
-                    </NextIntlClientProvider>
+                    <QueryProvider>
+                        <NextIntlClientProvider messages={messages}>
+                            {children}
+                            <Toaster position="top-right" richColors />
+                        </NextIntlClientProvider>
+                    </QueryProvider>
                 </ThemeProvider>
             </body>
         </html>

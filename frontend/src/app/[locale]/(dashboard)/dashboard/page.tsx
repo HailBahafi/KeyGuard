@@ -1,51 +1,99 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { Key, Monitor, Activity as ActivityIcon, AlertTriangle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useApiKeys } from '@/hooks/use-keys';
+import { useDevices } from '@/hooks/use-devices';
+import { useLogs } from '@/hooks/use-logs';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { MetricCard } from './_components/metric-card';
-import { UsageChart } from './_components/usage-chart';
 import { ActivityFeed } from './_components/activity-feed';
 import { DeviceOverview } from './_components/device-overview';
 import { SecurityAlerts } from './_components/security-alerts';
-import { fetchDashboardData, DashboardData } from '@/lib/queries/dashboard-queries';
 
 export default function DashboardPage() {
     const t = useTranslations('Dashboard');
-    const [data, setData] = useState<DashboardData | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [isRefreshing, setIsRefreshing] = useState(false);
+    const queryClient = useQueryClient();
 
-    const loadData = async () => {
-        try {
-            setIsRefreshing(true);
-            const dashboardData = await fetchDashboardData('7d');
-            setData(dashboardData);
-        } catch (error) {
-            console.error('Failed to load dashboard data:', error);
-        } finally {
-            setIsLoading(false);
-            setIsRefreshing(false);
-        }
+    // Fetch real data
+    const { data: keysData, isLoading: keysLoading } = useApiKeys({ page: 1, limit: 100 });
+    const { data: devicesData, isLoading: devicesLoading } = useDevices({ page: 1, limit: 100 });
+    const { data: logsData, isLoading: logsLoading } = useLogs({ page: 1, limit: 10 });
+
+    const isLoading = keysLoading || devicesLoading || logsLoading;
+
+    // Calculate metrics from real data
+    const activeKeys = keysData?.keys.filter(k => k.status === 'active').length || 0;
+    const totalKeys = keysData?.keys.length || 0;
+    const activeDevices = devicesData?.devices.filter(d => d.status === 'active').length || 0;
+    const totalDevices = devicesData?.devices.length || 0;
+
+    const handleRefresh = () => {
+        queryClient.invalidateQueries({ queryKey: ['keys'] });
+        queryClient.invalidateQueries({ queryKey: ['devices'] });
+        queryClient.invalidateQueries({ queryKey: ['logs'] });
     };
 
-    useEffect(() => {
-        loadData();
+    // Transform audit logs into activity feed format
+    const recentActivity = useMemo(() => {
+        if (!logsData?.logs) return [];
+        return logsData.logs.slice(0, 10).map(log => ({
+            id: log.id,
+            device: log.actor.name,
+            action: log.event,
+            keyName: log.target.type === 'key' ? log.target.name : undefined,
+            timestamp: log.timestamp,
+            status: log.status === 'success' ? 'success' as const : 'failed' as const,
+        }));
+    }, [logsData]);
 
-        // Auto-refresh every 30 seconds
-        const interval = setInterval(loadData, 30000);
-        return () => clearInterval(interval);
-    }, []);
+    // Derive security alerts from audit logs with critical/warning severity
+    const securityAlerts = useMemo(() => {
+        if (!logsData?.logs) return [];
+        return logsData.logs
+            .filter(log => (log.severity === 'critical' || log.severity === 'warning') && log.status === 'failure')
+            .slice(0, 5)
+            .map(log => ({
+                id: log.id,
+                type: log.event.includes('rate_limited') ? 'rate_limit' as const
+                    : log.event.includes('suspicious') ? 'suspicious_activity' as const
+                    : log.event.includes('auth') && log.status === 'failure' ? 'auth_failed' as const
+                    : 'suspicious_activity' as const,
+                severity: log.severity === 'critical' ? 'error' as const : 'warning' as const,
+                message: log.metadata.error || `${log.event} from ${log.actor.name}`,
+                timestamp: log.timestamp,
+            }));
+    }, [logsData]);
 
-    if (isLoading || !data) {
+    // Calculate offline devices
+    const offlineDevices = useMemo(() => {
+        if (!devicesData?.devices) return 0;
+        const baseTime = 1700000000000; // Fixed base time
+        return devicesData.devices.filter(d => {
+            const lastSeenTime = new Date(d.lastSeen).getTime();
+            const hoursSinceLastSeen = (baseTime - lastSeenTime) / (1000 * 60 * 60);
+            return d.status === 'active' && hoursSinceLastSeen > 24;
+        }).length;
+    }, [devicesData]);
+
+    if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center space-y-4">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto" />
-                    <p className="text-sm text-muted-foreground">Loading dashboard...</p>
+            <div className="space-y-6 pb-8">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                        <Skeleton className="h-8 w-48 mb-2" />
+                        <Skeleton className="h-4 w-96" />
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                        <Skeleton key={i} className="h-32" />
+                    ))}
                 </div>
             </div>
         );
@@ -70,10 +118,10 @@ export default function DashboardPage() {
                     <Button
                         variant="outline"
                         size="sm"
-                        onClick={loadData}
-                        disabled={isRefreshing}
+                        onClick={handleRefresh}
+                        disabled={isLoading}
                     >
-                        <RefreshCw className={`h-4 w-4 me-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                        <RefreshCw className={`h-4 w-4 me-2 ${isLoading ? 'animate-spin' : ''}`} />
                         {t('actions.refresh')}
                     </Button>
                     <Button size="sm">
@@ -87,45 +135,38 @@ export default function DashboardPage() {
                 <MetricCard
                     icon={Key}
                     label={t('metrics.activeKeys')}
-                    value={data.metrics.activeKeys.count}
-                    trend={{ direction: 'up', value: `${data.metrics.activeKeys.change} ${t('metrics.trend.from')}` }}
+                    value={activeKeys}
+                    trend={{ direction: 'neutral', value: `${totalKeys} total` }}
                     onClick={() => console.log('Navigate to keys')}
                 />
                 <MetricCard
                     icon={Monitor}
                     label={t('metrics.totalDevices')}
-                    value={data.metrics.totalDevices.count}
-                    trend={{ direction: 'up', value: `${data.metrics.totalDevices.change} ${t('metrics.trend.new')}` }}
+                    value={totalDevices}
+                    trend={{ direction: 'neutral', value: `${activeDevices} active` }}
                     onClick={() => console.log('Navigate to devices')}
                 />
                 <MetricCard
                     icon={ActivityIcon}
                     label={t('metrics.apiCallsToday')}
-                    value={data.metrics.apiCalls.count.toLocaleString()}
-                    trend={{ direction: 'up', value: `${data.metrics.apiCalls.change} ${t('metrics.trend.from')}` }}
+                    value="0"
+                    trend={{ direction: 'neutral', value: 'N/A' }}
                     onClick={() => console.log('Navigate to logs')}
                 />
                 <MetricCard
                     icon={AlertTriangle}
                     label={t('metrics.securityAlerts')}
-                    value={data.metrics.alerts.count}
+                    value={securityAlerts.length}
                     trend={{
-                        direction: data.metrics.alerts.count > 0 ? 'up' : 'neutral',
-                        value: `${data.metrics.alerts.change} ${t('metrics.trend.new')}`,
+                        direction: securityAlerts.length > 0 ? 'up' : 'neutral',
+                        value: securityAlerts.length > 0 ? `${securityAlerts.length} active` : 'All clear',
                     }}
-                    className={data.metrics.alerts.count > 0 ? 'border-destructive/50' : ''}
+                    className={securityAlerts.length > 0 ? 'border-destructive/50' : ''}
                     onClick={() => console.log('Scroll to alerts')}
                 />
             </div>
 
-            {/* Usage Chart */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.4 }}
-            >
-                <UsageChart data={data.usage} />
-            </motion.div>
+            {/* Usage Chart - Removed until usage analytics endpoint is available */}
 
             {/* Activity Feed & Device Overview */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -134,14 +175,21 @@ export default function DashboardPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3, delay: 0.5 }}
                 >
-                    <ActivityFeed activities={data.recentActivity} />
+                    <ActivityFeed activities={recentActivity} />
                 </motion.div>
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3, delay: 0.6 }}
                 >
-                    <DeviceOverview status={data.deviceStatus} topDevices={data.topDevices} />
+                    <DeviceOverview 
+                        status={{
+                            active: activeDevices,
+                            idle: devicesData?.devices.filter(d => d.status === 'pending').length || 0,
+                            offline: offlineDevices,
+                        }} 
+                        topDevices={[]} 
+                    />
                 </motion.div>
             </div>
 
@@ -152,14 +200,9 @@ export default function DashboardPage() {
                 transition={{ duration: 0.3, delay: 0.7 }}
             >
                 <SecurityAlerts
-                    alerts={data.alerts}
+                    alerts={securityAlerts}
                     onDismiss={(alertId) => {
                         console.log('Dismiss alert:', alertId);
-                        // In production, would call API to dismiss alert
-                        setData({
-                            ...data,
-                            alerts: data.alerts.filter((a) => a.id !== alertId),
-                        });
                     }}
                 />
             </motion.div>

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Check, ChevronRight, ChevronLeft, Copy, Eye, EyeOff, Shield, Key, AlertTriangle } from 'lucide-react';
+import { Check, ChevronRight, ChevronLeft, Eye, EyeOff, Shield, Key, AlertTriangle } from 'lucide-react';
 import {
     Dialog,
     DialogContent,
@@ -38,23 +38,20 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { keySchema, KeyFormData } from '@/lib/validations/key-schema';
-import { createKey } from '@/lib/queries/keys-queries';
-import { useToast } from '@/components/ui/use-toast';
+import { useCreateKey } from '@/hooks/use-keys';
 
 interface CreateKeyDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    onKeyCreated: () => void;
 }
 
 const STEPS = ['basic', 'apiKey', 'security', 'review'];
 
-export function CreateKeyDialog({ open, onOpenChange, onKeyCreated }: CreateKeyDialogProps) {
+export function CreateKeyDialog({ open, onOpenChange }: CreateKeyDialogProps) {
     const t = useTranslations('KeyVault.createDialog');
-    const { toast } = useToast();
+    const createKeyMutation = useCreateKey();
     const [step, setStep] = useState(0);
     const [showKey, setShowKey] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const form = useForm<KeyFormData>({
         resolver: zodResolver(keySchema),
@@ -74,7 +71,8 @@ export function CreateKeyDialog({ open, onOpenChange, onKeyCreated }: CreateKeyD
 
     const handleNext = async () => {
         const fields = getFieldsForStep(step);
-        const isValid = await form.trigger(fields as any);
+        // Type assertion needed because getFieldsForStep returns string[] but trigger expects field paths
+        const isValid = await form.trigger(fields as Parameters<typeof form.trigger>[0]);
 
         if (isValid) {
             setStep((prev) => Math.min(prev + 1, STEPS.length - 1));
@@ -86,26 +84,21 @@ export function CreateKeyDialog({ open, onOpenChange, onKeyCreated }: CreateKeyD
     };
 
     const onSubmit = async (data: KeyFormData) => {
-        try {
-            setIsSubmitting(true);
-            await createKey(data);
-            toast({
-                title: t('success.title'),
-                description: t('success.warning'),
-            });
-            onKeyCreated();
-            onOpenChange(false);
-            form.reset();
-            setStep(0);
-        } catch (error) {
-            toast({
-                title: "Error",
-                description: "Failed to create key",
-                variant: "destructive"
-            });
-        } finally {
-            setIsSubmitting(false);
-        }
+        createKeyMutation.mutate(
+            {
+                name: data.name,
+                provider: data.provider,
+                environment: data.environment || 'development', // Default to development if not provided
+                description: data.description,
+            },
+            {
+                onSuccess: () => {
+                    onOpenChange(false);
+                    form.reset();
+                    setStep(0);
+                },
+            }
+        );
     };
 
     const getFieldsForStep = (stepIndex: number) => {
@@ -389,7 +382,7 @@ export function CreateKeyDialog({ open, onOpenChange, onKeyCreated }: CreateKeyD
                                 type="button"
                                 variant="outline"
                                 onClick={handleBack}
-                                disabled={step === 0 || isSubmitting}
+                                disabled={step === 0 || createKeyMutation.isPending}
                             >
                                 <ChevronLeft className="w-4 h-4 me-2" />
                                 {t('buttons.back')}
@@ -401,8 +394,8 @@ export function CreateKeyDialog({ open, onOpenChange, onKeyCreated }: CreateKeyD
                                     <ChevronRight className="w-4 h-4 ms-2" />
                                 </Button>
                             ) : (
-                                <Button type="submit" disabled={isSubmitting}>
-                                    {isSubmitting ? (
+                                    <Button type="submit" disabled={createKeyMutation.isPending}>
+                                        {createKeyMutation.isPending ? (
                                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white me-2" />
                                     ) : (
                                         <Check className="w-4 h-4 me-2" />

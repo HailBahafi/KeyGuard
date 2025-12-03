@@ -1,16 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { Search, Download, Settings } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-    fetchLogs,
-    subscribeToLogs
-} from '@/lib/mock-api/audit-logs';
-import { AuditLog, LogFilters } from '@/types/audit';
+import { toast } from 'sonner';
+import { useLogs } from '@/hooks/use-logs';
+import type { AuditLog, LogFilters } from '@/types/audit';
 import { LiveIndicator } from './_components/live-indicator';
 import { AuditFilters } from './_components/audit-filters';
 import { LogRow } from './_components/log-row';
@@ -18,19 +15,7 @@ import { LogDetailsSheet } from './_components/log-details';
 import { ExportDialog } from './_components/export-dialog';
 
 export default function AuditLogsPage() {
-    const { toast } = useToast();
     const logsContainerRef = useRef<HTMLDivElement>(null);
-    const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
-
-    // Data State
-    const [logs, setLogs] = useState<AuditLog[]>([]);
-    const [newLogs, setNewLogs] = useState<AuditLog[]>([]);
-    const [totalRecords, setTotalRecords] = useState(0);
-    const [loading, setLoading] = useState(true);
-
-    // Live Stream State
-    const [isLive, setIsLive] = useState(true);
-    const [newLogsCount, setNewLogsCount] = useState(0);
 
     // Filter State
     const [searchQuery, setSearchQuery] = useState('');
@@ -48,82 +33,21 @@ export default function AuditLogsPage() {
 
     // Pagination State
     const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
 
-    // Load logs
-    const loadLogs = async () => {
-        try {
-            setLoading(true);
-            const data = await fetchLogs(page, 50, {
-                search: searchQuery,
-                ...filters
-            });
-            setLogs(data.logs);
-            setTotalRecords(data.pagination.total);
-            setTotalPages(data.pagination.pages);
-        } catch (error) {
-            console.error('Failed to load logs:', error);
-            toast({
-                title: 'Error',
-                description: 'Failed to load audit logs',
-                variant: 'destructive'
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
+    // React Query hook - auto-refetches every 30s for live updates
+    const { data: logsData, isLoading: loading } = useLogs({
+        page,
+        limit: 50,
+        search: searchQuery || undefined,
+        dateRange: filters.dateRange !== 'all' ? filters.dateRange : undefined,
+        eventType: filters.eventType !== 'all' ? filters.eventType : undefined,
+        status: filters.status !== 'all' ? filters.status : undefined,
+        severity: filters.severity !== 'all' ? filters.severity : undefined,
+    });
 
-    // Subscribe to live updates
-    useEffect(() => {
-        if (!isLive) return;
-
-        const unsubscribe = subscribeToLogs((newLog) => {
-            if (isLive) {
-                // Add new log to the beginning
-                setLogs(prev => [newLog, ...prev].slice(0, 50)); // Keep only 50 in view
-                setNewLogs(prev => [...prev, newLog]);
-
-                // Auto scroll to top if enabled
-                if (shouldAutoScroll && logsContainerRef.current) {
-                    logsContainerRef.current.scrollTop = 0;
-                }
-
-                // Show toast for critical events
-                if (newLog.severity === 'critical') {
-                    toast({
-                        title: '🚨 Critical Event',
-                        description: `${newLog.event} - ${newLog.actor.name}`,
-                        variant: 'destructive'
-                    });
-                }
-            } else {
-                // If paused, increment counter
-                setNewLogsCount(prev => prev + 1);
-            }
-        });
-
-        return unsubscribe;
-    }, [isLive, shouldAutoScroll, toast]);
-
-    // Clear new logs animation after a delay
-    useEffect(() => {
-        if (newLogs.length > 0) {
-            const timer = setTimeout(() => {
-                setNewLogs([]);
-            }, 2000); // Clear animation after 2 seconds
-
-            return () => clearTimeout(timer);
-        }
-    }, [newLogs]);
-
-    // Load logs on filter/search/page change
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            loadLogs();
-        }, 300); // Debounce search
-
-        return () => clearTimeout(timer);
-    }, [searchQuery, filters, page]);
+    const logs = logsData?.logs || [];
+    const totalRecords = logsData?.pagination.total || 0;
+    const totalPages = logsData?.pagination.pages || 1;
 
     // Handlers
     const handleFilterChange = (key: keyof LogFilters, value: string) => {
@@ -143,12 +67,9 @@ export default function AuditLogsPage() {
     };
 
     const handleToggleLive = () => {
-        setIsLive(prev => !prev);
-        if (!isLive) {
-            // Resuming, clear new logs counter
-            setNewLogsCount(0);
-            loadLogs(); // Refresh to get latest logs
-        }
+        // Live updates are handled by React Query's refetchInterval
+        // This is just for UI state
+        toast.info('Live updates are always active');
     };
 
     const handleViewDetails = (log: AuditLog) => {
@@ -168,9 +89,9 @@ export default function AuditLogsPage() {
                 </div>
                 <div className="flex items-center gap-2">
                     <LiveIndicator
-                        isLive={isLive}
+                        isLive={true}
                         onToggle={handleToggleLive}
-                        newLogsCount={newLogsCount}
+                        newLogsCount={0}
                     />
                     <Button
                         variant="outline"
@@ -213,11 +134,9 @@ export default function AuditLogsPage() {
                     <span>
                         Showing {logs.length} of {totalRecords.toLocaleString()} logs
                     </span>
-                    {isLive && (
-                        <span className="text-green-600 dark:text-green-500 font-medium">
-                            Live streaming active
-                        </span>
-                    )}
+                    <span className="text-green-600 dark:text-green-500 font-medium">
+                        Auto-refreshing every 30s
+                    </span>
                 </div>
             )}
 
@@ -250,7 +169,7 @@ export default function AuditLogsPage() {
                             key={log.id}
                             log={log}
                             onClick={handleViewDetails}
-                            isNew={newLogs.some(newLog => newLog.id === log.id)}
+                            isNew={false}
                         />
                     ))
                 )}

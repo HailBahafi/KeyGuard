@@ -1,6 +1,7 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
 import { Public } from './common/decorators/public.decorator';
+import { SignatureGuard } from './common/guards/signature.guard';
 
 @Controller()
 @Public()
@@ -12,5 +13,12 @@ export class AppController {
     return this.appService.getHello();
   }
 
-
+  @Post('verify-test')
+  @UseGuards(SignatureGuard)
+  verifyTest(): { status: string; message: string } {
+    return {
+      status: 'success',
+      message: 'Signature Verified!',
+    };
+  }
 }
