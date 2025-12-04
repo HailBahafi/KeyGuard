@@ -45,9 +45,17 @@ apiClient.interceptors.request.use(
         }
       }
     }
+    // Debug logging
+    // console.log('API Request:', {
+    //   url: config.url,
+    //   baseURL: config.baseURL,
+    //   fullUrl: `${config.baseURL}${config.url}`,
+    //   headers: config.headers
+    // });
     return config;
   },
   (error) => {
+    // console.error('API Request Error:', error);
     return Promise.reject(error);
   }
 );
@@ -62,6 +70,7 @@ apiClient.interceptors.response.use(
   async (error: AxiosError<{ message?: string; error?: string; errors?: any }>) => {
     // Handle network errors
     if (!error.response) {
+      // console.error('API Network Error:', error);
       toast.error('Network error', {
         description: 'Unable to connect to the server. Please check your connection.',
       });
@@ -69,6 +78,7 @@ apiClient.interceptors.response.use(
     }
 
     const { status, data } = error.response;
+    // console.error('API Response Error:', { status, data, url: error.config?.url });
 
     // Extract error message
     const errorMessage =
@@ -79,11 +89,16 @@ apiClient.interceptors.response.use(
 
     // Handle 401 Unauthorized - Auto logout
     if (status === 401) {
+      // console.error('API 401 Unauthorized:', { url: error.config?.url });
       // Clear auth storage
       if (typeof window !== 'undefined') {
         localStorage.removeItem('auth-storage');
-        // Redirect to login
-        window.location.href = '/login';
+        // Get current locale from path
+        const pathParts = window.location.pathname.split('/');
+        const locale = pathParts[1] || 'en';
+
+        // Redirect to login with locale
+        window.location.href = `/${locale}/login`;
       }
       toast.error('Session expired', {
         description: 'Please log in again.',

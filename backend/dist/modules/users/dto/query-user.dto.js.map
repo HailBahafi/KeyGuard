@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../../src/modules/users/dto/query-user.dto.ts"],"sourcesContent":["import { PaginationDto } from 'src/common/base/pagination.dto';\n\nexport class QueryUserDto extends PaginationDto {}\n"],"names":["QueryUserDto","PaginationDto"],"mappings":";;;;+BAEaA;;;eAAAA;;;+BAFiB;AAEvB,IAAA,AAAMA,eAAN,MAAMA,qBAAqBC,4BAAa;AAAE"}

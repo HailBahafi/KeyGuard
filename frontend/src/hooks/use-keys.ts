@@ -42,6 +42,10 @@ export interface CreateKeyDto {
   expiresAt?: string;
 }
 
+export interface CreateKeyResponse extends ApiKey {
+  rawKey?: string; // ⚠️ Shown only once! Must be copied immediately
+}
+
 interface KeysParams {
   page?: number;
   limit?: number;
@@ -82,16 +86,14 @@ export function useCreateKey() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: CreateKeyDto): Promise<ApiKey> => {
-      const response = await apiClient.post<ApiKey>('/keys', data);
+    mutationFn: async (data: CreateKeyDto): Promise<CreateKeyResponse> => {
+      const response = await apiClient.post<CreateKeyResponse>('/keys', data);
       return response.data;
     },
     onSuccess: () => {
       // Invalidate and refetch keys list
       queryClient.invalidateQueries({ queryKey: ['keys'] });
-      toast.success('API key created', {
-        description: 'Your new API key has been generated successfully.',
-      });
+      // NOTE: Success toast will be shown by the component after user copies rawKey
     },
   });
 }

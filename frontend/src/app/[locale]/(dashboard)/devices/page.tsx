@@ -76,7 +76,17 @@ export default function DevicesPage() {
     };
 
     const handleApprove = (device: Device) => {
-        approveMutation.mutate(device.id, {
+        // TODO: Prompt user for additional device details in a dialog
+        // For now, using device data as placeholder with required fields
+        approveMutation.mutate({
+            deviceId: device.id,
+            data: {
+                name: device.name,
+                ownerName: 'Device Owner', // TODO: Get from dialog
+                ownerEmail: 'owner@example.com', // TODO: Get from dialog
+                location: device.location,
+            }
+        }, {
             onSuccess: () => {
                 if (selectedDevice?.id === device.id) {
                     setSelectedDevice({ ...device, status: 'active' });
@@ -159,7 +169,12 @@ export default function DevicesPage() {
                 open={isEnrollmentOpen}
                 onOpenChange={setIsEnrollmentOpen}
                 onGenerateCode={(name) => {
-                    enrollmentMutation.mutate(name);
+                    // Using default expiry time of 60 minutes
+                    enrollmentMutation.mutate({
+                        name,
+                        expiresInMinutes: 60,
+                        description: 'Generated from devices page'
+                    });
                 }}
             />
 

@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
+import { Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -57,7 +58,7 @@ export default function SetupPage() {
         // useRegister hook handles success (redirect) and error (toast) automatically
         registerMutation.mutate({
             email: data.email,
-            username: data.organizationName, // Use organizationName as username
+            organizationName: data.organizationName,
             password: data.password,
         });
     };
@@ -153,6 +154,9 @@ export default function SetupPage() {
                                 className="w-full"
                                 disabled={registerMutation.isPending}
                             >
+                                {registerMutation.isPending && (
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                )}
                                 {registerMutation.isPending ? t('loadingButton') : t('submitButton')}
                             </Button>
                         </form>

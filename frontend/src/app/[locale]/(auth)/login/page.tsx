@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
+import { Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -100,6 +101,9 @@ export default function LoginPage() {
                                 className="w-full"
                                 disabled={loginMutation.isPending}
                             >
+                                {loginMutation.isPending && (
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                )}
                                 {loginMutation.isPending ? t('loadingButton') : t('submitButton')}
                             </Button>
                         </form>

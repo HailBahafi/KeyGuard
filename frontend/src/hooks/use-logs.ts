@@ -38,6 +38,7 @@ export function useLogs(params: LogsParams = {}) {
     },
     staleTime: 10000, // 10 seconds (logs change frequently)
     refetchInterval: 30000, // Refetch every 30 seconds for live updates
+    placeholderData: (previousData) => previousData, // Keep previous data while fetching for smooth pagination
   });
 }
 
@@ -52,6 +53,23 @@ export function useLog(logId: string) {
       return response.data;
     },
     enabled: !!logId,
+  });
+}
+
+/**
+ * Export audit logs
+ */
+import { useMutation } from '@tanstack/react-query';
+import type { ExportLogsPayload } from '@/types/audit';
+
+export function useExportLogs() {
+  return useMutation({
+    mutationFn: async (payload: ExportLogsPayload) => {
+      const response = await apiClient.post('/audit/logs/export', payload, {
+        responseType: 'blob', // Important for file download
+      });
+      return response.data;
+    },
   });
 }
 
