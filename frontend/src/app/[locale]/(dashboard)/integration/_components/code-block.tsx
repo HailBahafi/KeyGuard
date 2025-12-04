@@ -55,19 +55,19 @@ export function CodeBlock({
         <Card className="overflow-hidden border-border bg-card">
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/30">
-                <div className="flex items-center gap-2">
-                    <Badge className={cn('border-0 text-xs', languageColors[displayLanguage] || languageColors.bash)}>
+                <div className="flex items-center gap-2 min-w-0">
+                    <Badge className={cn('border-0 text-xs flex-shrink-0', languageColors[displayLanguage] || languageColors.bash)}>
                         {languageLabels[displayLanguage] || displayLanguage}
                     </Badge>
                     {filename && (
-                        <span className="text-xs text-muted-foreground font-mono">{filename}</span>
+                        <span className="text-xs text-muted-foreground font-mono truncate">{filename}</span>
                     )}
                 </div>
                 <Button
                     variant="ghost"
                     size="sm"
                     onClick={copyToClipboard}
-                    className="h-7 text-xs"
+                    className="h-7 text-xs flex-shrink-0"
                 >
                     {copied ? (
                         <>
@@ -84,20 +84,20 @@ export function CodeBlock({
             </div>
 
             {/* Code Content */}
-            <div className="relative overflow-x-auto">
-                <pre className="p-4 text-sm font-mono leading-relaxed">
-                    <code className="text-foreground">
+            <div className="relative overflow-x-auto max-w-full">
+                <pre className="p-4 text-sm font-mono leading-relaxed overflow-x-auto">
+                    <code className="text-foreground block">
                         {showLineNumbers ? (
                             lines.map((line, index) => (
                                 <div key={index} className="flex">
-                                    <span className="inline-block w-8 text-end me-4 text-muted-foreground select-none">
+                                    <span className="inline-block w-8 text-end me-4 text-muted-foreground select-none flex-shrink-0">
                                         {index + 1}
                                     </span>
-                                    <span>{line}</span>
+                                    <span className="break-all">{line}</span>
                                 </div>
                             ))
                         ) : (
-                            code
+                            <span className="whitespace-pre-wrap break-words">{code}</span>
                         )}
                     </code>
                 </pre>
