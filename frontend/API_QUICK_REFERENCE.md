@@ -691,7 +691,7 @@ DELETE /devices/:id
 
 ### List Logs
 ```bash
-GET /logs?page=1&limit=50&dateRange=day&eventType=all
+GET page=1&limit=50&dateRange=day&eventType=all
 → 200 OK
 {
   "logs": [...],

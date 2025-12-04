@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Code2, Play } from 'lucide-react';
 import { Sidebar } from './_components/sidebar';
 import { QuickStart } from './_components/quick-start';
+import { ConnectionTest } from './_components/connection-test';
 import { SdkReference } from './_components/sdk-reference';
 import { ApiPlayground } from './_components/api-playground';
 import { useLanguageStore } from '@/stores/use-language-store';
@@ -51,16 +52,16 @@ export default function IntegrationPage() {
     const [isPlaygroundOpen, setIsPlaygroundOpen] = useState(false);
 
     return (
-        <div className="animate-in fade-in duration-500">
+        <div className="animate-in fade-in duration-500 max-w-full overflow-hidden">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-                <div>
+                <div className="min-w-0">
                     <h1 className="text-3xl font-bold tracking-tight">Integration Guide</h1>
                     <p className="text-muted-foreground mt-1">
                         Developer documentation and SDK reference
                     </p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-wrap">
                     {/* Language Selector */}
                     <Select value={language} onValueChange={(value: any) => setLanguage(value)}>
                         <SelectTrigger className="w-[160px]">
@@ -85,15 +86,16 @@ export default function IntegrationPage() {
             </div>
 
             {/* Two-Column Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-8 overflow-hidden">
                 {/* Sidebar Navigation */}
                 <aside className="hidden lg:block">
                     <Sidebar sections={sections} />
                 </aside>
 
                 {/* Main Content */}
-                <main className="space-y-16 min-w-0">
+                <main className="space-y-16 min-w-0 max-w-full overflow-hidden">
                     <QuickStart />
+                    <ConnectionTest />
                     <SdkReference />
                 </main>
             </div>
