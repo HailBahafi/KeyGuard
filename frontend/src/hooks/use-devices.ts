@@ -19,6 +19,19 @@ interface DevicesParams {
   sort?: string;
 }
 
+export interface ApproveDeviceDto {
+  name: string;
+  ownerName: string;
+  ownerEmail: string;
+  location?: string;
+}
+
+export interface EnrollmentCodeDto {
+  name: string;
+  expiresInMinutes?: number;
+  description?: string;
+}
+
 /**
  * Fetch devices with pagination and filters
  */
@@ -65,8 +78,8 @@ export function useApproveDevice() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (deviceId: string): Promise<Device> => {
-      const response = await apiClient.post<Device>(`/devices/${deviceId}/approve`);
+    mutationFn: async ({ deviceId, data }: { deviceId: string; data: ApproveDeviceDto }): Promise<Device> => {
+      const response = await apiClient.post<Device>(`/devices/${deviceId}/approve`, data);
       return response.data;
     },
     onSuccess: () => {
@@ -98,12 +111,31 @@ export function useRevokeDevice() {
 }
 
 /**
+ * Suspend a device
+ */
+export function useSuspendDevice() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (deviceId: string): Promise<void> => {
+      await apiClient.post(`/devices/${deviceId}/suspend`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['devices'] });
+      toast.success('Device suspended', {
+        description: 'The device has been suspended successfully.',
+      });
+    },
+  });
+}
+
+/**
  * Generate enrollment code
  */
 export function useEnrollmentCode() {
   return useMutation({
-    mutationFn: async (name: string): Promise<EnrollmentCode> => {
-      const response = await apiClient.post<EnrollmentCode>('/devices/enroll', { name });
+    mutationFn: async (data: EnrollmentCodeDto): Promise<EnrollmentCode> => {
+      const response = await apiClient.post<EnrollmentCode>('/devices/enroll', data);
       return response.data;
     },
     onSuccess: () => {

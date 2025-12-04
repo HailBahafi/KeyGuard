@@ -57,3 +57,12 @@ export interface LogFilters {
     startDate?: string;
     endDate?: string;
 }
+
+export interface ExportLogsPayload {
+    format: 'csv' | 'json';
+    filters: {
+        severity?: string;
+        status?: string;
+        dateRange?: string;
+    };
+}

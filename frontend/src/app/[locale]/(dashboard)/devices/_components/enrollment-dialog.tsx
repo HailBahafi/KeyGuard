@@ -28,8 +28,12 @@ export function EnrollmentDialog({ open, onOpenChange, onGenerateCode }: Enrollm
     const [timeLeft, setTimeLeft] = useState<string>('');
 
     const loadEnrollmentCode = () => {
-        // Generate code with default name, or use callback if provided
-        enrollmentMutation.mutate('New Device', {
+        // Generate code with default name and 60 minute expiry
+        enrollmentMutation.mutate({
+            name: 'New Device',
+            expiresInMinutes: 60,
+            description: 'Generated from dashboard'
+        }, {
             onSuccess: (data) => {
                 setEnrollmentCode(data);
                 setCopied(false);
