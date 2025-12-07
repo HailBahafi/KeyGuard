@@ -1,7 +1,7 @@
 import { HeroSection } from './_components/landing/hero-section';
 import { FeaturesGrid } from './_components/landing/features-grid';
 import { HowItWorks } from './_components/landing/how-it-works';
-import { SocialProof } from './_components/landing/social-proof';
+import { StatsSection } from './_components/landing/stats-section';
 import { PricingSection } from './_components/landing/pricing-section';
 import { Footer } from './_components/landing/footer';
 import { LandingHeader } from './_components/landing/landing-header';
@@ -16,14 +16,14 @@ export default async function HomePage({
     const t = await getTranslations({ locale, namespace: 'LandingPage' });
 
     return (
-        <div className="relative min-h-screen">
+        <div className="relative min-h-screen bg-background">
             {/* Responsive Header */}
             <LandingHeader />
 
             {/* Main Content */}
             <main className="pt-16">
                 <HeroSection />
-                <SocialProof />
+                <StatsSection />
                 <FeaturesGrid />
                 <HowItWorks />
                 <PricingSection />
@@ -34,3 +34,4 @@ export default async function HomePage({
         </div>
     );
 }
+

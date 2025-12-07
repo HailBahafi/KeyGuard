@@ -46,7 +46,7 @@ export function AnimatedTerminal() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="relative w-full max-w-2xl"
+            className="relative w-full max-w-[667px]"
         >
             {/* Terminal Window */}
             <div className="bg-card border border-border rounded-lg overflow-hidden shadow-2xl">
@@ -54,15 +54,15 @@ export function AnimatedTerminal() {
                 <div className="bg-muted px-4 py-2 flex items-center gap-2 border-b border-border">
                     <div className="flex gap-1.5">
                         <div className="w-3 h-3 rounded-full bg-destructive" />
-                        <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                        <div className="w-3 h-3 rounded-full bg-green-500" />
+                        <div className="w-3 h-3 rounded-full bg-chart-4" />
+                        <div className="w-3 h-3 rounded-full bg-chart-2" />
                     </div>
                     <span className="text-sm text-muted-foreground ms-2">keyguard-enroll.ts</span>
                 </div>
 
                 {/* Terminal Body */}
                 <div className="p-6 font-mono text-sm h-[300px] overflow-y-auto bg-card">
-                    <div className="w-[500px]">
+                    <div className="w-full">
                         {displayedLines.map((line, index) => (
                             <div key={index} className="leading-relaxed">
                                 {line.startsWith('//') ? (
@@ -70,7 +70,7 @@ export function AnimatedTerminal() {
                                 ) : line.includes('import') || line.includes('const') || line.includes('await') ? (
                                     <span className="text-primary">{line}</span>
                                 ) : line.includes('✓') ? (
-                                    <span className="text-green-500">{line}</span>
+                                    <span className="text-chart-2">{line}</span>
                                 ) : (
                                     <span className="text-foreground">{line}</span>
                                 )}

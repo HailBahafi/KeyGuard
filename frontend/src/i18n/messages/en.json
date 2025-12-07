@@ -49,9 +49,12 @@
         "socialProof": {
             "title": "Engineered for Compliance",
             "metrics": {
-                "requests": "10,000+ Requests Secured",
-                "latency": "0ms Latency Added",
-                "uptime": "99.99% Uptime"
+                "requests": "Requests Secured",
+                "requestsDesc": "10,000+ last month",
+                "latency": "Latency Added",
+                "latencyDesc": "Zero noticeable delay",
+                "uptime": "Uptime",
+                "uptimeDesc": "99.99% last month"
             },
             "badges": {
                 "nca": "NCA Compliant",
