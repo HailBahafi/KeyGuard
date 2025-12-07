@@ -33,10 +33,19 @@ export default async function LocaleLayout({
 
     return (
         <html lang={locale} dir={direction} suppressHydrationWarning>
-            <body>
+            <head>
+                {/* Google Fonts - Cairo and Tajawal for Arabic */}
+                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                <link 
+                    href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Tajawal:wght@400;500;700&display=swap" 
+                    rel="stylesheet" 
+                />
+            </head>
+            <body className={locale === 'ar' ? 'font-[Cairo,Tajawal,sans-serif]' : ''}>
                 <ThemeProvider
                     attribute="class"
-                    defaultTheme="system"
+                    defaultTheme="dark"
                     enableSystem
                     disableTransitionOnChange
                 >
@@ -51,3 +60,6 @@ export default async function LocaleLayout({
         </html>
     );
 }
+
+
+

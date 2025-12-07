@@ -3,35 +3,28 @@
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { Check } from 'lucide-react';
+import { Check, Star } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export function PricingSection() {
     const t = useTranslations('LandingPage.pricing');
 
     const plans = [
-        {
-            key: 'community',
-            featured: false,
-        },
-        {
-            key: 'enterprise',
-            featured: true,
-        },
+        { key: 'community', featured: false },
+        { key: 'enterprise', featured: true },
     ];
 
     return (
-        <section className="py-24 px-4" id="pricing">
+        <section className="py-24 px-4 bg-background" id="pricing">
             <div className="container mx-auto">
-                {/* Section Header */}
+                {/* Header - follows typography rules */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
                     className="text-center mb-16 space-y-4"
                 >
-                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight">
+                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground">
                         {t('title')}
                     </h2>
                     <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -51,49 +44,94 @@ export function PricingSection() {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.6, delay: index * 0.2 }}
+                                className="relative"
                             >
-                                <Card className={`h-full ${plan.featured ? 'border-primary shadow-lg shadow-primary/10' : 'border-border'}`}>
+                                {/* SHINE BORDER - Enterprise Only - uses CSS variables */}
+                                {plan.featured && (
+                                    <div className="absolute inset-0 rounded-2xl p-[3px] overflow-hidden">
+                                        <motion.div
+                                            className="absolute inset-0 rounded-2xl"
+                                            style={{
+                                                background: 'conic-gradient(from 0deg, var(--chart-4), var(--primary), var(--chart-3), var(--chart-4))',
+                                            }}
+                                            animate={{ rotate: 360 }}
+                                            transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+                                        />
+                                        <div className="absolute inset-[3px] rounded-2xl bg-muted" />
+                                    </div>
+                                )}
+
+                                <div 
+                                    className={cn(
+                                        'relative h-full rounded-2xl p-8 flex flex-col',
+                                        plan.featured 
+                                            ? 'bg-muted border-transparent' 
+                                            : 'bg-card border border-border'
+                                    )}
+                                >
+                                    {/* RECOMMENDED Badge */}
                                     {plan.featured && (
-                                        <div className="bg-primary text-primary-foreground text-center text-sm font-semibold py-2">
-                                            RECOMMENDED
+                                        <div className="absolute -top-4 start-1/2 -translate-x-1/2 rtl:translate-x-1/2 flex items-center gap-1.5 bg-chart-4 text-primary-foreground text-sm font-bold px-4 py-1.5 rounded-full shadow-lg shadow-chart-4/30">
+                                            <Star className="size-4 fill-primary-foreground" />
+                                            موصى به
                                         </div>
                                     )}
 
-                                    <CardHeader className="space-y-4">
-                                        <CardTitle className="text-2xl">{t(`${plan.key}.title`)}</CardTitle>
-                                        <div>
-                                            <span className="text-4xl font-bold">{t(`${plan.key}.price`)}</span>
-                                            {plan.key === 'community' && <span className="text-muted-foreground ms-2">/forever</span>}
+                                    {/* Plan Header */}
+                                    <div className="mb-8 pt-4">
+                                        <h3 className="text-2xl font-semibold text-foreground mb-3">
+                                            {t(`${plan.key}.title`)}
+                                        </h3>
+                                        <div className="flex items-baseline gap-2 mb-3">
+                                            <span className={cn(
+                                                'text-5xl font-bold',
+                                                plan.featured ? 'text-chart-4' : 'text-foreground'
+                                            )}>
+                                                {t(`${plan.key}.price`)}
+                                            </span>
                                         </div>
-                                        <CardDescription className="text-base">
+                                        <p className="text-muted-foreground">
                                             {t(`${plan.key}.description`)}
-                                        </CardDescription>
-                                    </CardHeader>
+                                        </p>
+                                    </div>
 
-                                    <CardContent className="space-y-4">
-                                        <ul className="space-y-3">
-                                            {features.map((feature, featureIndex) => (
-                                                <li key={featureIndex} className="flex items-start gap-3">
-                                                    <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                                                    <span className="text-sm">{feature}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </CardContent>
+                                    {/* Features */}
+                                    <ul className="space-y-4 mb-8 flex-grow">
+                                        {features.map((feature, i) => (
+                                            <motion.li 
+                                                key={i} 
+                                                className="flex items-start gap-3"
+                                                initial={{ opacity: 0, x: -10 }}
+                                                whileInView={{ opacity: 1, x: 0 }}
+                                                viewport={{ once: true }}
+                                                transition={{ delay: index * 0.2 + i * 0.05 }}
+                                            >
+                                                <div className={cn(
+                                                    'rounded-full p-0.5 mt-0.5',
+                                                    plan.featured ? 'bg-chart-4' : 'bg-chart-2'
+                                                )}>
+                                                    <Check className="size-4 text-primary-foreground" />
+                                                </div>
+                                                <span className="text-muted-foreground">{feature}</span>
+                                            </motion.li>
+                                        ))}
+                                    </ul>
 
-                                    <CardFooter>
-                                        <Button
-                                            className="w-full"
-                                            variant={plan.featured ? 'default' : 'outline'}
-                                            size="lg"
-                                            asChild
-                                        >
-                                            <a href={plan.key === 'community' ? '#' : '#contact'}>
-                                                {t(`${plan.key}.cta`)}
-                                            </a>
-                                        </Button>
-                                    </CardFooter>
-                                </Card>
+                                    {/* CTA - uses semantic button styles */}
+                                    <Button
+                                        className={cn(
+                                            'w-full h-12 text-base font-semibold',
+                                            plan.featured 
+                                                ? 'bg-chart-4 hover:bg-chart-4/90 text-primary-foreground shadow-lg shadow-chart-4/30'
+                                                : 'bg-secondary hover:bg-accent text-foreground border border-border'
+                                        )}
+                                        asChild
+                                    >
+                                        <a href={plan.key === 'community' ? '#' : '#contact'}>
+                                            {t(`${plan.key}.cta`)}
+                                        </a>
+                                    </Button>
+                                </div>
                             </motion.div>
                         );
                     })}

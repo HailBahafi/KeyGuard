@@ -1,38 +1,49 @@
 {
   "name": "@keyguard/sdk",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Secure TypeScript SDK for Device Binding to protect LLM API keys",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
     }
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prebuild": "rimraf dist"
   },
   "keywords": [
     "security",
     "device-binding",
     "cryptography",
     "ecdsa",
-    "typescript"
+    "typescript",
+    "keyguard"
   ],
-  "author": "",
+  "author": "KeyGuard Team",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "@types/node": "^20.10.0",
+    "rimraf": "^6.1.2",
     "tsup": "^8.0.1",
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@fingerprintjs/fingerprintjs": "^5.0.1",
+    "@fingerprintjs/fingerprintjs": "^4.2.1",
     "idb-keyval": "^6.2.1"
   }
 }
