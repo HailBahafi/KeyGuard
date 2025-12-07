@@ -61,40 +61,42 @@ export function AnimatedTerminal() {
                 </div>
 
                 {/* Terminal Body */}
-                <div className="p-6 font-mono text-sm min-h-[300px] bg-card">
-                    {displayedLines.map((line, index) => (
-                        <div key={index} className="leading-relaxed">
-                            {line.startsWith('//') ? (
-                                <span className="text-muted-foreground">{line}</span>
-                            ) : line.includes('import') || line.includes('const') || line.includes('await') ? (
-                                <span className="text-primary">{line}</span>
-                            ) : line.includes('✓') ? (
-                                <span className="text-green-500">{line}</span>
-                            ) : (
-                                <span className="text-foreground">{line}</span>
-                            )}
-                        </div>
-                    ))}
-                    {currentLineIndex < codeLines.length && (
-                        <div className="leading-relaxed">
-                            {codeLines[currentLineIndex].substring(0, currentChar).startsWith('//') ? (
-                                <span className="text-muted-foreground">
-                                    {codeLines[currentLineIndex].substring(0, currentChar)}
-                                </span>
-                            ) : codeLines[currentLineIndex].substring(0, currentChar).includes('import') ||
-                                codeLines[currentLineIndex].substring(0, currentChar).includes('const') ||
-                                codeLines[currentLineIndex].substring(0, currentChar).includes('await') ? (
-                                <span className="text-primary">
-                                    {codeLines[currentLineIndex].substring(0, currentChar)}
-                                </span>
-                            ) : (
-                                <span className="text-foreground">
-                                    {codeLines[currentLineIndex].substring(0, currentChar)}
-                                </span>
-                            )}
-                            <span className="inline-block w-2 h-4 bg-primary animate-pulse ms-0.5" />
-                        </div>
-                    )}
+                <div className="p-6 font-mono text-sm h-[300px] overflow-y-auto bg-card">
+                    <div className="w-[500px]">
+                        {displayedLines.map((line, index) => (
+                            <div key={index} className="leading-relaxed">
+                                {line.startsWith('//') ? (
+                                    <span className="text-muted-foreground">{line}</span>
+                                ) : line.includes('import') || line.includes('const') || line.includes('await') ? (
+                                    <span className="text-primary">{line}</span>
+                                ) : line.includes('✓') ? (
+                                    <span className="text-green-500">{line}</span>
+                                ) : (
+                                    <span className="text-foreground">{line}</span>
+                                )}
+                            </div>
+                        ))}
+                        {currentLineIndex < codeLines.length && (
+                            <div className="leading-relaxed">
+                                {codeLines[currentLineIndex].substring(0, currentChar).startsWith('//') ? (
+                                    <span className="text-muted-foreground">
+                                        {codeLines[currentLineIndex].substring(0, currentChar)}
+                                    </span>
+                                ) : codeLines[currentLineIndex].substring(0, currentChar).includes('import') ||
+                                    codeLines[currentLineIndex].substring(0, currentChar).includes('const') ||
+                                    codeLines[currentLineIndex].substring(0, currentChar).includes('await') ? (
+                                    <span className="text-primary">
+                                        {codeLines[currentLineIndex].substring(0, currentChar)}
+                                    </span>
+                                ) : (
+                                    <span className="text-foreground">
+                                        {codeLines[currentLineIndex].substring(0, currentChar)}
+                                    </span>
+                                )}
+                                <span className="inline-block w-2 h-4 bg-primary animate-pulse ms-0.5" />
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </motion.div>

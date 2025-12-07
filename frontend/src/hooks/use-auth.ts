@@ -5,8 +5,7 @@
  */
 
 import { useMutation } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
-import { useLocale } from 'next-intl';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/stores/use-auth-store';
 import { apiClient } from '@/lib/api';
 import { toast } from 'sonner';
@@ -40,7 +39,9 @@ interface AuthResponse {
  */
 export function useLogin() {
   const router = useRouter();
-  const locale = useLocale();
+  const pathname = usePathname();
+  // Extract locale from current pathname (e.g., /ar/login -> ar)
+  const locale = pathname.split('/')[1] || 'en';
   const { setUser, setToken } = useAuthStore();
 
   return useMutation({
@@ -65,7 +66,7 @@ export function useLogin() {
         description: 'Welcome back!',
       });
 
-      // Redirect to dashboard
+      // Redirect to dashboard with current locale
       router.push(`/${locale}/dashboard`);
     },
     onError: (error) => {
@@ -81,7 +82,9 @@ export function useLogin() {
  */
 export function useRegister() {
   const router = useRouter();
-  const locale = useLocale();
+  const pathname = usePathname();
+  // Extract locale from current pathname
+  const locale = pathname.split('/')[1] || 'en';
   const { setUser, setToken } = useAuthStore();
 
   return useMutation({

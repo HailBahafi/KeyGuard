@@ -72,7 +72,7 @@ export function HowItWorks() {
                             className="relative"
                         >
                             {/* Step Card */}
-                            <div className="relative bg-card border border-border rounded-lg p-6 space-y-4 hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
+                            <div className="relative bg-card border border-border rounded-lg p-6 space-y-4 hover:border-primary/50 transition-all duration-300 hover:shadow-lg h-full min-h-[220px] flex flex-col">
                                 {/* Number Badge */}
                                 <div className="absolute -top-4 start-6">
                                     <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center border-4 border-background">
@@ -88,7 +88,7 @@ export function HowItWorks() {
                                 </div>
 
                                 {/* Content */}
-                                <div className="space-y-2">
+                                <div className="space-y-2 flex-grow">
                                     <h3 className="text-xl font-semibold">{t(step.titleKey)}</h3>
                                     <p className="text-muted-foreground leading-relaxed">
                                         {t(step.descKey)}
