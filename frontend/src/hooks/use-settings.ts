@@ -36,7 +36,7 @@ export function useUpdateGeneralSettings() {
 
   return useMutation({
     mutationFn: async (data: GeneralSettings): Promise<{ success: boolean }> => {
-      const response = await apiClient.put<{ success: boolean }>('/settings/general', data);
+      const response = await apiClient.patch<{ success: boolean }>('/settings/general', data);
       return response.data;
     },
     onSuccess: () => {
@@ -56,7 +56,7 @@ export function useUpdateSecuritySettings() {
 
   return useMutation({
     mutationFn: async (data: SecuritySettings): Promise<{ success: boolean }> => {
-      const response = await apiClient.put<{ success: boolean }>('/settings/security', data);
+      const response = await apiClient.patch<{ success: boolean }>('/settings/security', data);
       return response.data;
     },
     onSuccess: () => {
@@ -76,7 +76,7 @@ export function useUpdateNotificationSettings() {
 
   return useMutation({
     mutationFn: async (data: NotificationSettings): Promise<{ success: boolean }> => {
-      const response = await apiClient.put<{ success: boolean }>('/settings/notifications', data);
+      const response = await apiClient.patch<{ success: boolean }>('/settings/notifications', data);
       return response.data;
     },
     onSuccess: () => {

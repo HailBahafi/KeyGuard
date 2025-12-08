@@ -114,7 +114,7 @@ export class SignatureGuard implements CanActivate {
         await this.prisma.prisma.device.update({
             where: { id: device.id },
             data: { lastSeen: new Date() },
-        }).catch(err => {
+        }).catch((err: Error) => {
             this.logger.error(`Failed to update lastSeen for device ${device.id}: ${err.message}`);
         });
 

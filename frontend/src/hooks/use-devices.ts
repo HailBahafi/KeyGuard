@@ -26,10 +26,11 @@ export interface ApproveDeviceDto {
   location?: string;
 }
 
-export interface EnrollmentCodeDto {
-  name: string;
-  expiresInMinutes?: number;
-  description?: string;
+// Postman response for device actions: { success, message, device }
+export interface DeviceActionResponse {
+  success: boolean;
+  message: string;
+  device: Device;
 }
 
 /**
@@ -73,13 +74,14 @@ export function useDevice(deviceId: string) {
 
 /**
  * Approve a pending device
+ * Note: Per Postman spec, approve takes no body - just device ID
  */
 export function useApproveDevice() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ deviceId, data }: { deviceId: string; data: ApproveDeviceDto }): Promise<Device> => {
-      const response = await apiClient.patch<Device>(`/devices/${deviceId}/approve`, data);
+    mutationFn: async (deviceId: string): Promise<DeviceActionResponse> => {
+      const response = await apiClient.patch<DeviceActionResponse>(`/devices/${deviceId}/approve`);
       return response.data;
     },
     onSuccess: () => {
@@ -98,8 +100,9 @@ export function useRevokeDevice() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (deviceId: string): Promise<void> => {
-      await apiClient.delete(`/devices/${deviceId}`);
+    mutationFn: async (deviceId: string): Promise<DeviceActionResponse> => {
+      const response = await apiClient.delete<DeviceActionResponse>(`/devices/${deviceId}`);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['devices'] });
@@ -117,8 +120,9 @@ export function useSuspendDevice() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (deviceId: string): Promise<void> => {
-      await apiClient.patch(`/devices/${deviceId}/suspend`);
+    mutationFn: async (deviceId: string): Promise<DeviceActionResponse> => {
+      const response = await apiClient.patch<DeviceActionResponse>(`/devices/${deviceId}/suspend`);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['devices'] });
@@ -131,11 +135,12 @@ export function useSuspendDevice() {
 
 /**
  * Generate enrollment code
+ * Note: Per Postman spec, this takes no body
  */
 export function useEnrollmentCode() {
   return useMutation({
-    mutationFn: async (data: EnrollmentCodeDto): Promise<EnrollmentCode> => {
-      const response = await apiClient.post<EnrollmentCode>('/devices/enrollment-code', data);
+    mutationFn: async (): Promise<EnrollmentCode> => {
+      const response = await apiClient.post<EnrollmentCode>('/devices/enrollment-code');
       return response.data;
     },
     onSuccess: () => {

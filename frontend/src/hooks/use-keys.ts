@@ -15,7 +15,7 @@ export interface ApiKey {
   provider: 'openai' | 'anthropic' | 'google' | 'azure';
   status: 'active' | 'idle' | 'expired' | 'revoked';
   environment: 'production' | 'development' | 'staging';
-  created: string;
+  createdAt: string;
   lastUsed: string | null;
   expiresAt: string | null;
   deviceCount: number;
@@ -87,8 +87,12 @@ export function useCreateKey() {
 
   return useMutation({
     mutationFn: async (data: CreateKeyDto): Promise<CreateKeyResponse> => {
-      const response = await apiClient.post<CreateKeyResponse>('/keys', data);
-      return response.data;
+      const response = await apiClient.post<{ key: CreateKeyResponse; rawKey: string }>('/keys', data);
+      // Return the key with rawKey attached
+      return {
+        ...response.data.key,
+        rawKey: response.data.rawKey,
+      };
     },
     onSuccess: () => {
       // Invalidate and refetch keys list

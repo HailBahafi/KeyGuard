@@ -76,17 +76,8 @@ export default function DevicesPage() {
     };
 
     const handleApprove = (device: Device) => {
-        // TODO: Prompt user for additional device details in a dialog
-        // For now, using device data as placeholder with required fields
-        approveMutation.mutate({
-            deviceId: device.id,
-            data: {
-                name: device.name,
-                ownerName: 'Device Owner', // TODO: Get from dialog
-                ownerEmail: 'owner@example.com', // TODO: Get from dialog
-                location: device.location,
-            }
-        }, {
+        // Per Postman spec, approve endpoint takes no body - just device ID
+        approveMutation.mutate(device.id, {
             onSuccess: () => {
                 if (selectedDevice?.id === device.id) {
                     setSelectedDevice({ ...device, status: 'active' });
@@ -168,13 +159,9 @@ export default function DevicesPage() {
             <EnrollmentDialog
                 open={isEnrollmentOpen}
                 onOpenChange={setIsEnrollmentOpen}
-                onGenerateCode={(name) => {
-                    // Using default expiry time of 60 minutes
-                    enrollmentMutation.mutate({
-                        name,
-                        expiresInMinutes: 60,
-                        description: 'Generated from devices page'
-                    });
+                onGenerateCode={() => {
+                    // Per Postman spec, enrollment code takes no body
+                    enrollmentMutation.mutate();
                 }}
             />
 

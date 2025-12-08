@@ -18,7 +18,7 @@ import { formatDistanceToNow } from 'date-fns';
 interface EnrollmentDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    onGenerateCode?: (name: string) => void;
+    onGenerateCode?: () => void; // No args per Postman spec
 }
 
 export function EnrollmentDialog({ open, onOpenChange, onGenerateCode }: EnrollmentDialogProps) {
@@ -28,17 +28,13 @@ export function EnrollmentDialog({ open, onOpenChange, onGenerateCode }: Enrollm
     const [timeLeft, setTimeLeft] = useState<string>('');
 
     const loadEnrollmentCode = () => {
-        // Generate code with default name and 60 minute expiry
-        enrollmentMutation.mutate({
-            name: 'New Device',
-            expiresInMinutes: 60,
-            description: 'Generated from dashboard'
-        }, {
+        // Per Postman spec, enrollment code takes no body
+        enrollmentMutation.mutate(undefined, {
             onSuccess: (data) => {
                 setEnrollmentCode(data);
                 setCopied(false);
                 if (onGenerateCode) {
-                    onGenerateCode('New Device');
+                    onGenerateCode();
                 }
             },
         });

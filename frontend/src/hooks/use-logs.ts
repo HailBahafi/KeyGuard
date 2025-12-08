@@ -44,6 +44,9 @@ export function useLogs(params: LogsParams = {}) {
 
 /**
  * Get a single audit log by ID
+ * 
+ * ⚠️ WARNING: This endpoint (GET /audit/logs/:id) is NOT currently implemented
+ * on the backend. The hook is provided for future use but will return 404.
  */
 export function useLog(logId: string) {
   return useQuery({
@@ -62,12 +65,15 @@ export function useLog(logId: string) {
 import { useMutation } from '@tanstack/react-query';
 import type { ExportLogsPayload } from '@/types/audit';
 
+export interface ExportLogsResponse {
+  url: string;
+  filename: string;
+}
+
 export function useExportLogs() {
   return useMutation({
-    mutationFn: async (payload: ExportLogsPayload) => {
-      const response = await apiClient.post('/audit/logs/export', payload, {
-        responseType: 'blob', // Important for file download
-      });
+    mutationFn: async (payload: ExportLogsPayload): Promise<ExportLogsResponse> => {
+      const response = await apiClient.post<ExportLogsResponse>('/audit/logs/export', payload);
       return response.data;
     },
   });

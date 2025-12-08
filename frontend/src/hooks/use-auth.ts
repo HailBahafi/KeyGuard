@@ -22,16 +22,27 @@ interface RegisterCredentials {
   password: string;
 }
 
-interface AuthResponse {
-  id: string;
+// Postman Login Response: { accessToken, refreshToken, user: { id, email, name, role } }
+interface LoginResponse {
   accessToken: string;
-  refreshToken?: string;
-  user?: {
+  refreshToken: string;
+  user: {
     id: string;
-    email?: string;
-    username?: string;
-    organizationName?: string;
+    email: string;
+    name: string;
+    role: string;
   };
+}
+
+// Postman Register Response: { success, user: { email, organizationName, isAuthenticated }, token }
+interface RegisterResponse {
+  success: boolean;
+  user: {
+    email: string;
+    organizationName: string;
+    isAuthenticated: boolean;
+  };
+  token: string;
 }
 
 /**
@@ -45,21 +56,17 @@ export function useLogin() {
   const { setUser, setToken } = useAuthStore();
 
   return useMutation({
-    mutationFn: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-      const response = await apiClient.post<AuthResponse>('/auth/login', credentials);
+    mutationFn: async (credentials: LoginCredentials): Promise<LoginResponse> => {
+      const response = await apiClient.post<LoginResponse>('/auth/login', credentials);
       return response.data;
     },
-    onSuccess: (data, variables) => {
-      // Update Zustand store with token and user info
-      const emailOrUsername = variables.email || variables.username || '';
-      const isEmail = emailOrUsername.includes('@');
-
+    onSuccess: (data) => {
+      // Update Zustand store with token and user info from Postman response
       setToken(data.accessToken);
       setUser({
-        id: data.id,
-        email: isEmail ? emailOrUsername : undefined,
-        username: !isEmail ? emailOrUsername : undefined,
-        ...(data.user || {}),
+        id: data.user.id,
+        email: data.user.email,
+        role: data.user.role,
       });
 
       toast.success('Login successful', {
@@ -88,18 +95,18 @@ export function useRegister() {
   const { setUser, setToken } = useAuthStore();
 
   return useMutation({
-    mutationFn: async (credentials: RegisterCredentials): Promise<AuthResponse> => {
-      const response = await apiClient.post<AuthResponse>('/auth/register', credentials);
+    mutationFn: async (credentials: RegisterCredentials): Promise<RegisterResponse> => {
+      const response = await apiClient.post<RegisterResponse>('/auth/register', credentials);
       return response.data;
     },
-    onSuccess: (data, variables) => {
-      // Update Zustand store with token and user info
-      setToken(data.accessToken);
+    onSuccess: (data) => {
+      // Update Zustand store with token and user info from Postman response
+      // Note: Register returns 'token' not 'accessToken'
+      setToken(data.token);
       setUser({
-        id: data.id,
-        email: variables.email,
-        organizationName: variables.organizationName,
-        ...(data.user || {}),
+        id: '', // Register response doesn't include ID
+        email: data.user.email,
+        organizationName: data.user.organizationName,
       });
 
       toast.success('Instance configured successfully', {

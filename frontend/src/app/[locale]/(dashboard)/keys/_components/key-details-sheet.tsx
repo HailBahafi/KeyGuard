@@ -54,7 +54,7 @@ export function KeyDetailsSheet({ apiKey, open, onOpenChange, onRotate, onRevoke
                                         {t('information.created')}
                                     </span>
                                     <p className="font-medium">
-                                        {new Date(apiKey.created).toLocaleDateString()}
+                                        {new Date(apiKey.createdAt).toLocaleDateString()}
                                     </p>
                                 </div>
                                 <div className="space-y-1">
