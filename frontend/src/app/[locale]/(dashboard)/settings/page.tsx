@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { SettingsSidebar } from './_components/settings-sidebar';
 import { GeneralForm } from './_components/general-form';
 import { SecurityForm } from './_components/security-form';
@@ -10,6 +11,7 @@ import { useSettings } from '@/hooks/use-settings';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function SettingsPage() {
+    const t = useTranslations('Settings');
     const { data: settings, isLoading: loading } = useSettings();
 
     if (loading) {
@@ -34,7 +36,7 @@ export default function SettingsPage() {
     if (!settings) {
         return (
             <div className="text-center p-12">
-                <p className="text-muted-foreground">Failed to load settings</p>
+                <p className="text-muted-foreground">{t('failedToLoad')}</p>
             </div>
         );
     }
@@ -43,9 +45,9 @@ export default function SettingsPage() {
         <div className="animate-in fade-in duration-500">
             {/* Header */}
             <div className="mb-8">
-                <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+                <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
                 <p className="text-muted-foreground mt-1">
-                    Manage your KeyGuard instance configuration and preferences
+                    {t('subtitle')}
                 </p>
             </div>
 

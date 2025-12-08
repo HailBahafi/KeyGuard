@@ -44,6 +44,12 @@
             "step3": {
                 "title": "التحقق",
                 "description": "البوابة تتحقق من صحة التوقيع وتعيد توجيه الطلبات المصادق عليها فقط إلى OpenAI"
+            },
+            "labels": {
+                "clientApp": "تطبيق العميل",
+                "llmProvider": "مزود LLM",
+                "protectedRequest": "طلب محمي ✓",
+                "unsecuredRequest": "طلب غير آمن"
             }
         },
         "socialProof": {
@@ -132,7 +138,9 @@
             "passwordPlaceholder": "أدخل كلمة المرور",
             "submitButton": "تسجيل الدخول",
             "forgotPassword": "نسيت كلمة المرور؟",
-            "loadingButton": "جارٍ تسجيل الدخول..."
+            "loadingButton": "جارٍ تسجيل الدخول...",
+            "noAccount": "ليس لديك حساب؟",
+            "signUp": "إنشاء حساب"
         },
         "setup": {
             "title": "مرحبًا بك في KeyGuard",
@@ -146,7 +154,9 @@
             "confirmPasswordLabel": "تأكيد كلمة المرور",
             "confirmPasswordPlaceholder": "أعد إدخال كلمة المرور",
             "submitButton": "إكمال الإعداد",
-            "loadingButton": "جارٍ الإعداد..."
+            "loadingButton": "جارٍ الإعداد...",
+            "hasAccount": "لديك حساب بالفعل؟",
+            "signIn": "تسجيل الدخول"
         },
         "errors": {
             "required": "هذا الحقل مطلوب",
@@ -470,6 +480,199 @@
             "next": "التالي",
             "page": "صفحة {current} من {total}",
             "showing": "عرض {from}-{to} من {total}"
+        }
+    },
+    "Devices": {
+        "title": "إدارة الأجهزة",
+        "subtitle": "إدارة الأجهزة المسجلة والموافقة على طلبات الوصول المعلقة",
+        "enrollDevice": "تسجيل جهاز",
+        "search": {
+            "placeholder": "البحث عن الأجهزة بالاسم أو المالك أو الموقع..."
+        },
+        "filters": {
+            "status": {
+                "label": "الحالة",
+                "all": "جميع الحالات",
+                "allShort": "الكل",
+                "active": "نشط",
+                "pending": "قيد الانتظار",
+                "suspended": "معلق",
+                "revoked": "ملغى",
+                "offline": "غير متصل"
+            },
+            "platform": {
+                "label": "المنصة",
+                "all": "جميع المنصات"
+            },
+            "lastSeen": {
+                "label": "آخر ظهور",
+                "all": "كل الوقت",
+                "hour": "آخر ساعة",
+                "day": "آخر 24 ساعة",
+                "week": "آخر أسبوع"
+            },
+            "sort": {
+                "label": "الترتيب حسب",
+                "recent": "الأحدث",
+                "name": "الاسم (أ-ي)",
+                "platform": "المنصة"
+            },
+            "clearAll": "مسح الفلاتر"
+        },
+        "stats": {
+            "total": "إجمالي الأجهزة",
+            "active": "نشط",
+            "pending": "قيد الانتظار",
+            "suspended": "معلق",
+            "offline": "غير متصل"
+        },
+        "viewMode": {
+            "grid": "شبكة",
+            "table": "جدول"
+        },
+        "table": {
+            "deviceName": "اسم الجهاز",
+            "owner": "المالك",
+            "platform": "المنصة",
+            "status": "الحالة",
+            "lastSeen": "آخر ظهور",
+            "location": "الموقع",
+            "actions": "الإجراءات"
+        },
+        "card": {
+            "lastSeen": "آخر ظهور {time}",
+            "calls": "المكالمات",
+            "keys": "المفاتيح",
+            "details": "التفاصيل"
+        },
+        "actions": {
+            "viewDetails": "عرض التفاصيل",
+            "approve": "موافقة",
+            "suspend": "تعليق",
+            "revoke": "إلغاء"
+        },
+        "empty": {
+            "noDevices": "لم يتم العثور على أجهزة تطابق الفلاتر.",
+            "noDevicesSubtext": "سجل جهازك الأول للبدء"
+        }
+    },
+    "AuditLogs": {
+        "title": "سجلات التدقيق",
+        "subtitle": "مراقبة أحداث الأمان ونشاط النظام في الوقت الفعلي",
+        "export": "تصدير",
+        "search": {
+            "placeholder": "البحث في السجلات بالحدث أو الفاعل أو الهدف أو الخطأ..."
+        },
+        "filters": {
+            "dateRange": {
+                "label": "النطاق الزمني",
+                "all": "كل الوقت",
+                "hour": "آخر ساعة",
+                "day": "آخر 24 ساعة",
+                "week": "آخر أسبوع",
+                "month": "آخر شهر"
+            },
+            "eventType": {
+                "label": "نوع الحدث",
+                "all": "جميع الأحداث"
+            },
+            "status": {
+                "label": "الحالة",
+                "all": "جميع الحالات",
+                "success": "نجاح",
+                "failure": "فشل"
+            },
+            "severity": {
+                "label": "الخطورة",
+                "all": "جميع الخطورات",
+                "info": "معلومات",
+                "warning": "تحذير",
+                "error": "خطأ",
+                "critical": "حرج"
+            },
+            "activeFilters": "الفلاتر النشطة",
+            "clearAll": "مسح الكل"
+        },
+        "summary": {
+            "showing": "عرض {count} من {total} سجل",
+            "autoRefresh": "التحديث التلقائي كل 30 ثانية"
+        },
+        "pagination": {
+            "previous": "السابق",
+            "next": "التالي",
+            "page": "صفحة {current} من {total}"
+        },
+        "empty": {
+            "noLogs": "لم يتم العثور على سجلات تدقيق تطابق الفلاتر.",
+            "clearFilters": "مسح جميع الفلاتر"
+        },
+        "liveIndicator": {
+            "live": "مباشر",
+            "paused": "متوقف"
+        }
+    },
+    "Integration": {
+        "title": "دليل التكامل",
+        "subtitle": "وثائق المطورين ومرجع SDK",
+        "tryApi": "تجربة API",
+        "onThisPage": "في هذه الصفحة",
+        "sections": {
+            "quickStart": "البداية السريعة",
+            "install": "التثبيت",
+            "enroll": "التهيئة والتسجيل",
+            "sign": "توقيع الطلبات",
+            "codeGenerator": "مولد الأكواد",
+            "troubleshooting": "استكشاف الأخطاء",
+            "sdkReference": "مرجع SDK",
+            "clientInit": "تهيئة العميل",
+            "enrollDevice": "enroll()",
+            "signRequest": "signRequest()",
+            "examples": "أمثلة"
+        },
+        "quickStart": {
+            "badge": "البداية السريعة",
+            "title": "ابدأ في 3 خطوات",
+            "description": "أمّن أول طلب API الخاص بك في أقل من 3 دقائق",
+            "step": "الخطوة {number}"
+        },
+        "codeGenerator": {
+            "badge": "تفاعلي",
+            "title": "مولد الأكواد",
+            "description": "أنشئ مقتطفات كود جاهزة للاستخدام مع مفتاح API الخاص بك",
+            "sdkIntegration": "تكامل SDK",
+            "selectLanguage": "اختر لغتك ومفتاح API لإنشاء الكود",
+            "selectApiKey": "اختر مفتاح API",
+            "usePlaceholder": "استخدم عنصر نائب",
+            "loadingKeys": "جاري تحميل المفاتيح...",
+            "noActiveKeys": "لم يتم العثور على مفاتيح نشطة"
+        },
+        "troubleshooting": {
+            "badge": "تحقق",
+            "title": "استكشاف الأخطاء",
+            "description": "اختبر اتصالك بـ KeyGuard API",
+            "healthCheck": "فحص الصحة",
+            "healthCheckDesc": "اختبر الاتصال للتحقق من أن KeyGuard API الخاص بك قابل للوصول وجاهز للعمل.",
+            "pingButton": "فحص الاتصال",
+            "status": {
+                "checking": "جاري الفحص...",
+                "operational": "النظام يعمل",
+                "notConnected": "غير متصل"
+            },
+            "successMessage": "مثيل KeyGuard الخاص بك متصل ويقبل الطلبات.",
+            "failureTitle": "فشل الاتصال",
+            "failureMessage": "تأكد من أن KeyGuard API يعمل ويمكن الوصول إليه. تحقق من عنوان URL الخاص بـ API في الإعدادات."
+        }
+    },
+    "Settings": {
+        "title": "الإعدادات",
+        "subtitle": "إدارة تكوين وتفضيلات مثيل KeyGuard الخاص بك",
+        "failedToLoad": "فشل تحميل الإعدادات",
+        "sections": {
+            "general": "عام",
+            "security": "الأمان",
+            "notifications": "الإشعارات",
+            "api": "مفاتيح API",
+            "backup": "النسخ الاحتياطي والاستعادة"
         }
     }
 }

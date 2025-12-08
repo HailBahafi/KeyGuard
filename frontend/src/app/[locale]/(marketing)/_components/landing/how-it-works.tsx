@@ -18,14 +18,14 @@ const CircleNode = forwardRef<
     }
 >(({ icon, label, borderColor, isCenter, showLock }, ref) => {
     return (
-        <div className="flex flex-col items-center gap-4 z-10">
+        <div className="flex flex-col items-center gap-2 sm:gap-4 z-10">
             <div
                 ref={ref}
                 className={cn(
                     'relative flex items-center justify-center rounded-full transition-all duration-300',
                     isCenter 
-                        ? 'size-28 md:size-32 bg-gradient-to-br from-primary via-chart-3 to-primary shadow-2xl shadow-primary/40' 
-                        : 'size-20 md:size-24 bg-card border-2',
+                        ? 'size-16 sm:size-24 md:size-32 bg-gradient-to-br from-primary via-chart-3 to-primary shadow-2xl shadow-primary/40' 
+                        : 'size-12 sm:size-16 md:size-24 bg-card border-2',
                     !isCenter && borderColor
                 )}
             >
@@ -42,14 +42,14 @@ const CircleNode = forwardRef<
                 {showLock && (
                     <motion.div
                         initial={{ scale: 0, y: 0 }}
-                        animate={{ scale: 1, y: -50 }}
-                        className="absolute -top-4 bg-chart-2 rounded-full p-2.5 shadow-lg shadow-chart-2/50 z-20"
+                        animate={{ scale: 1, y: -40 }}
+                        className="absolute -top-2 sm:-top-4 bg-chart-2 rounded-full p-1.5 sm:p-2.5 shadow-lg shadow-chart-2/50 z-20"
                     >
-                        <Lock className="size-5 text-primary-foreground" />
+                        <Lock className="size-3 sm:size-5 text-primary-foreground" />
                     </motion.div>
                 )}
             </div>
-            <span className="text-sm md:text-base font-semibold text-foreground">{label}</span>
+            <span className="text-xs sm:text-sm md:text-base font-semibold text-foreground text-center">{label}</span>
         </div>
     );
 });
@@ -139,6 +139,30 @@ export function HowItWorks() {
     const isInView = useInView(containerRef, { once: false, margin: '-50px' });
     
     const [phase, setPhase] = useState<'idle' | 'beam1' | 'lock' | 'beam2'>('idle');
+    const [containerWidth, setContainerWidth] = useState(0);
+
+    // Track container width for responsive beams
+    useEffect(() => {
+        const updateWidth = () => {
+            if (containerRef.current) {
+                setContainerWidth(containerRef.current.clientWidth);
+            }
+        };
+
+        updateWidth();
+        window.addEventListener('resize', updateWidth);
+        
+        // Use ResizeObserver for more accurate tracking
+        const resizeObserver = new ResizeObserver(updateWidth);
+        if (containerRef.current) {
+            resizeObserver.observe(containerRef.current);
+        }
+
+        return () => {
+            window.removeEventListener('resize', updateWidth);
+            resizeObserver.disconnect();
+        };
+    }, []);
 
     // Animation cycle
     useEffect(() => {
@@ -164,12 +188,11 @@ export function HowItWorks() {
         };
     }, [isInView]);
 
-    // Node positions (relative percentages)
-    const nodes = {
-        client: { x: 85, y: 50 },   // Right (RTL)
-        keyguard: { x: 50, y: 50 }, // Center
-        llm: { x: 15, y: 50 },      // Left (RTL)
-    };
+    // Calculate beam positions based on actual container width
+    const beamY = 120;
+    const rightX = containerWidth * 0.85;
+    const centerX = containerWidth * 0.50;
+    const leftX = containerWidth * 0.15;
 
     return (
         <section className="py-24 px-4 bg-background" id="how-it-works">
@@ -197,35 +220,39 @@ export function HowItWorks() {
                     viewport={{ once: true }}
                     className="relative h-[300px] max-w-4xl mx-auto mb-12"
                 >
-                    {/* SVG Beams - uses CSS variable colors via chart tokens */}
-                    <AnimatedBeamLine
-                        start={{ x: containerRef.current ? containerRef.current.clientWidth * 0.85 : 680, y: 120 }}
-                        end={{ x: containerRef.current ? containerRef.current.clientWidth * 0.50 : 400, y: 120 }}
-                        isActive={phase === 'beam1' || phase === 'lock'}
-                        colors={{ from: 'var(--destructive)', to: 'var(--chart-4)' }}
-                    />
-                    <AnimatedBeamLine
-                        start={{ x: containerRef.current ? containerRef.current.clientWidth * 0.50 : 400, y: 120 }}
-                        end={{ x: containerRef.current ? containerRef.current.clientWidth * 0.15 : 120, y: 120 }}
-                        isActive={phase === 'beam2'}
-                        colors={{ from: 'var(--primary)', to: 'var(--chart-2)' }}
-                    />
+                    {/* SVG Beams - only render when we have valid width */}
+                    {containerWidth > 0 && (
+                        <>
+                            <AnimatedBeamLine
+                                start={{ x: rightX, y: beamY }}
+                                end={{ x: centerX, y: beamY }}
+                                isActive={phase === 'beam1' || phase === 'lock'}
+                                colors={{ from: 'var(--destructive)', to: 'var(--chart-4)' }}
+                            />
+                            <AnimatedBeamLine
+                                start={{ x: centerX, y: beamY }}
+                                end={{ x: leftX, y: beamY }}
+                                isActive={phase === 'beam2'}
+                                colors={{ from: 'var(--primary)', to: 'var(--chart-2)' }}
+                            />
+                        </>
+                    )}
 
                     {/* Nodes Container */}
-                    <div className="absolute inset-0 flex items-center justify-between px-8 md:px-16">
+                    <div className="absolute inset-0 flex items-center justify-between px-4 sm:px-8 md:px-16">
                         {/* Client Node (Right in RTL) */}
-                        <div className="order-3">
+                        <div className="order-3 rtl:order-1">
                             <CircleNode
-                                icon={<Smartphone className="size-10 text-destructive" />}
-                                label="تطبيق العميل"
+                                icon={<Smartphone className="size-6 sm:size-8 md:size-10 text-destructive" />}
+                                label={t('labels.clientApp')}
                                 borderColor="border-destructive"
                             />
                         </div>
 
                         {/* KeyGuard Node (Center) */}
-                        <div className="order-2">
+                        <div className={`order-2`}>
                             <CircleNode
-                                icon={<Shield className="size-12 text-primary-foreground" />}
+                                icon={<Shield className="size-8 sm:size-10 md:size-12 text-primary-foreground" />}
                                 label="KeyGuard"
                                 borderColor="border-primary"
                                 isCenter
@@ -234,19 +261,19 @@ export function HowItWorks() {
                         </div>
 
                         {/* LLM Node (Left in RTL) */}
-                        <div className="order-1">
+                        <div className="order-1 rtl:order-3">
                             <CircleNode
-                                icon={<Brain className="size-10 text-chart-2" />}
-                                label="مزود LLM"
+                                icon={<Brain className="size-6 sm:size-8 md:size-10 text-chart-2" />}
+                                label={t('labels.llmProvider')}
                                 borderColor="border-chart-2"
                             />
                         </div>
                     </div>
 
                     {/* Beam Labels */}
-                    <div className="absolute bottom-0 left-0 right-0 flex justify-around text-sm">
-                        <span className="text-chart-2 font-medium">طلب محمي ✓</span>
-                        <span className="text-destructive font-medium">طلب غير آمن</span>
+                    <div className="absolute bottom-6 left-0 right-0 flex justify-around text-xs sm:text-xs">
+                        <span className="order-1 rtl:order-2 text-chart-2 font-medium">{t('labels.protectedRequest')}</span>
+                        <span className="order-2 rtl:order-1 text-destructive font-medium">{t('labels.unsecuredRequest')}</span>
                     </div>
                 </motion.div>
 

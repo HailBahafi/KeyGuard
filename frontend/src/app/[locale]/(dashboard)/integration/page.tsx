@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Code2, Play } from 'lucide-react';
@@ -59,6 +60,7 @@ const languageOptions = [
 ];
 
 export default function IntegrationPage() {
+    const t = useTranslations('Integration');
     const { language, setLanguage } = useLanguageStore();
     const [isPlaygroundOpen, setIsPlaygroundOpen] = useState(false);
 
@@ -67,9 +69,9 @@ export default function IntegrationPage() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                 <div className="min-w-0">
-                    <h1 className="text-3xl font-bold tracking-tight">Integration Guide</h1>
+                    <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
                     <p className="text-muted-foreground mt-1">
-                        Developer documentation and SDK reference
+                        {t('subtitle')}
                     </p>
                 </div>
                 <div className="flex items-center gap-3 flex-wrap">
@@ -91,7 +93,7 @@ export default function IntegrationPage() {
                     {/* Try API Button */}
                     <Button onClick={() => setIsPlaygroundOpen(true)}>
                         <Play className="h-4 w-4 me-2" />
-                        Try API
+                        {t('tryApi')}
                     </Button>
                 </div>
             </div>
@@ -103,8 +105,8 @@ export default function IntegrationPage() {
                     <Sidebar sections={sections} />
                 </aside>
 
-                {/* Main Content */}
-                <main className="space-y-16 min-w-0 max-w-full overflow-hidden">
+                {/* Main Content - Code sections remain in English with LTR direction */}
+                <main className="space-y-16 min-w-0 max-w-full overflow-hidden" dir="ltr">
                     <QuickStart />
                     <CodeGenerator />
                     <ConnectionTest />

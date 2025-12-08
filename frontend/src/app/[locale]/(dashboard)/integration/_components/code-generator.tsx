@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -92,6 +93,7 @@ const languageLabels: Record<Language, string> = {
 };
 
 export function CodeGenerator() {
+    const t = useTranslations('Integration.codeGenerator');
     const [language, setLanguage] = useState<Language>('typescript');
     const [selectedKeyId, setSelectedKeyId] = useState<string>('placeholder');
 
@@ -116,10 +118,10 @@ export function CodeGenerator() {
     return (
         <section id="code-generator" className="scroll-mt-20">
             <div className="space-y-4 mb-8">
-                <Badge className="bg-primary/10 text-primary border-0">Interactive</Badge>
-                <h2 className="text-3xl font-bold tracking-tight">Code Generator</h2>
+                <Badge className="bg-primary/10 text-primary border-0">{t('badge')}</Badge>
+                <h2 className="text-3xl font-bold tracking-tight">{t('title')}</h2>
                 <p className="text-lg text-muted-foreground">
-                    Generate ready-to-use code snippets with your API key
+                    {t('description')}
                 </p>
             </div>
 
@@ -129,10 +131,10 @@ export function CodeGenerator() {
                         <div className="flex-1 min-w-0">
                             <CardTitle className="flex items-center gap-2">
                                 <Code2 className="h-5 w-5 text-primary" />
-                                SDK Integration
+                                {t('sdkIntegration')}
                             </CardTitle>
                             <CardDescription className="mt-1">
-                                Select your language and API key to generate code
+                                {t('selectLanguage')}
                             </CardDescription>
                         </div>
 
@@ -140,15 +142,15 @@ export function CodeGenerator() {
                         <Select value={selectedKeyId} onValueChange={setSelectedKeyId}>
                             <SelectTrigger className="w-[200px]">
                                 <Key className="h-4 w-4 me-2 text-muted-foreground" />
-                                <SelectValue placeholder="Select API Key" />
+                                <SelectValue placeholder={t('selectApiKey')} />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="placeholder">
-                                    Use placeholder
+                                    {t('usePlaceholder')}
                                 </SelectItem>
                                 {keysLoading ? (
                                     <SelectItem value="loading" disabled>
-                                        Loading keys...
+                                        {t('loadingKeys')}
                                     </SelectItem>
                                 ) : keysData?.keys && keysData.keys.length > 0 ? (
                                     keysData.keys.map((key) => (
@@ -158,7 +160,7 @@ export function CodeGenerator() {
                                     ))
                                 ) : (
                                     <SelectItem value="no-keys" disabled>
-                                        No active keys found
+                                        {t('noActiveKeys')}
                                     </SelectItem>
                                 )}
                             </SelectContent>
@@ -178,12 +180,14 @@ export function CodeGenerator() {
 
                         {Object.entries(codeSnippets).map(([lang, code]) => (
                             <TabsContent key={lang} value={lang} className="mt-0">
-                                <CodeBlock
-                                    code={code}
-                                    language={lang}
-                                    filename={lang === 'typescript' ? 'example.ts' : lang === 'python' ? 'example.py' : undefined}
-                                    showLineNumbers
-                                />
+                                <div dir="ltr">
+                                    <CodeBlock
+                                        code={code}
+                                        language={lang}
+                                        filename={lang === 'typescript' ? 'example.ts' : lang === 'python' ? 'example.py' : undefined}
+                                        showLineNumbers
+                                    />
+                                </div>
                             </TabsContent>
                         ))}
                     </Tabs>

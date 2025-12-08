@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { DeviceStats } from '@/types/device';
 import { Monitor, Clock, XCircle, Wifi, WifiOff } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -11,37 +12,39 @@ interface DeviceStatsProps {
 }
 
 export function DeviceStatsBar({ stats, onFilterByStatus }: DeviceStatsProps) {
+    const t = useTranslations('Devices.stats');
+
     const statCards = [
         {
-            label: 'Total Devices',
+            labelKey: 'total',
             value: stats.total,
             icon: Monitor,
             status: 'all',
             colorClass: 'text-foreground'
         },
         {
-            label: 'Active',
+            labelKey: 'active',
             value: stats.active,
             icon: Wifi,
             status: 'active',
             colorClass: 'text-green-600 dark:text-green-500'
         },
         {
-            label: 'Pending',
+            labelKey: 'pending',
             value: stats.pending,
             icon: Clock,
             status: 'pending',
             colorClass: 'text-yellow-600 dark:text-yellow-500'
         },
         {
-            label: 'Suspended',
+            labelKey: 'suspended',
             value: stats.suspended,
             icon: XCircle,
             status: 'suspended',
             colorClass: 'text-red-600 dark:text-red-500'
         },
         {
-            label: 'Offline',
+            labelKey: 'offline',
             value: stats.offline,
             icon: WifiOff,
             status: 'offline',
@@ -65,7 +68,7 @@ export function DeviceStatsBar({ stats, onFilterByStatus }: DeviceStatsProps) {
                     >
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-muted-foreground">{stat.label}</p>
+                                <p className="text-sm text-muted-foreground">{t(stat.labelKey)}</p>
                                 <p className={cn("text-2xl font-bold mt-1", stat.colorClass)}>
                                     {stat.value}
                                 </p>

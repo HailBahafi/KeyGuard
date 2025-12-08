@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Plus, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,8 @@ import { EnrollmentDialog } from './_components/enrollment-dialog';
 import { DeviceDetailsSheet } from './_components/device-details-sheet';
 
 export default function DevicesPage() {
+    const t = useTranslations('Devices');
+
     // Filter State
     const [searchQuery, setSearchQuery] = useState('');
     const [filters, setFilters] = useState({
@@ -113,14 +116,14 @@ export default function DevicesPage() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Device Inventory</h1>
+                    <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
                     <p className="text-muted-foreground mt-1">
-                        Manage enrolled devices and approve pending access requests
+                        {t('subtitle')}
                     </p>
                 </div>
                 <Button onClick={() => setIsEnrollmentOpen(true)}>
                     <Plus className="h-4 w-4 me-2" />
-                    Enroll Device
+                    {t('enrollDevice')}
                 </Button>
             </div>
 
@@ -132,7 +135,7 @@ export default function DevicesPage() {
                 <div className="relative">
                     <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
-                        placeholder="Search devices by name, owner, or location..."
+                        placeholder={t('search.placeholder')}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="ps-10 max-w-md"

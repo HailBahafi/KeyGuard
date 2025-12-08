@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
@@ -16,6 +17,8 @@ interface DeviceFiltersProps {
 }
 
 export function DeviceFilters({ filters, onFilterChange, onClearFilters }: DeviceFiltersProps) {
+    const t = useTranslations('Devices.filters');
+
     const hasActiveFilters =
         filters.status !== 'all' ||
         filters.platform !== 'all' ||
@@ -29,15 +32,15 @@ export function DeviceFilters({ filters, onFilterChange, onClearFilters }: Devic
                 onValueChange={(value) => onFilterChange('status', value)}
             >
                 <SelectTrigger className="w-[160px]">
-                    <SelectValue placeholder="Status" />
+                    <SelectValue placeholder={t('status.label')} />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="suspended">Suspended</SelectItem>
-                    <SelectItem value="revoked">Revoked</SelectItem>
-                    <SelectItem value="offline">Offline</SelectItem>
+                    <SelectItem value="all">{t('status.all')}</SelectItem>
+                    <SelectItem value="active">{t('status.active')}</SelectItem>
+                    <SelectItem value="pending">{t('status.pending')}</SelectItem>
+                    <SelectItem value="suspended">{t('status.suspended')}</SelectItem>
+                    <SelectItem value="revoked">{t('status.revoked')}</SelectItem>
+                    <SelectItem value="offline">{t('status.offline')}</SelectItem>
                 </SelectContent>
             </Select>
 
@@ -47,10 +50,10 @@ export function DeviceFilters({ filters, onFilterChange, onClearFilters }: Devic
                 onValueChange={(value) => onFilterChange('platform', value)}
             >
                 <SelectTrigger className="w-[160px]">
-                    <SelectValue placeholder="Platform" />
+                    <SelectValue placeholder={t('platform.label')} />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="all">All Platforms</SelectItem>
+                    <SelectItem value="all">{t('platform.all')}</SelectItem>
                     <SelectItem value="macOS">macOS</SelectItem>
                     <SelectItem value="Windows">Windows</SelectItem>
                     <SelectItem value="Linux">Linux</SelectItem>
@@ -65,13 +68,13 @@ export function DeviceFilters({ filters, onFilterChange, onClearFilters }: Devic
                 onValueChange={(value) => onFilterChange('lastSeen', value)}
             >
                 <SelectTrigger className="w-[160px]">
-                    <SelectValue placeholder="Last Seen" />
+                    <SelectValue placeholder={t('lastSeen.label')} />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="all">All Time</SelectItem>
-                    <SelectItem value="hour">Last Hour</SelectItem>
-                    <SelectItem value="day">Last 24 Hours</SelectItem>
-                    <SelectItem value="week">Last Week</SelectItem>
+                    <SelectItem value="all">{t('lastSeen.all')}</SelectItem>
+                    <SelectItem value="hour">{t('lastSeen.hour')}</SelectItem>
+                    <SelectItem value="day">{t('lastSeen.day')}</SelectItem>
+                    <SelectItem value="week">{t('lastSeen.week')}</SelectItem>
                 </SelectContent>
             </Select>
 
@@ -81,12 +84,12 @@ export function DeviceFilters({ filters, onFilterChange, onClearFilters }: Devic
                 onValueChange={(value) => onFilterChange('sort', value)}
             >
                 <SelectTrigger className="w-[160px]">
-                    <SelectValue placeholder="Sort by" />
+                    <SelectValue placeholder={t('sort.label')} />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="recent">Most Recent</SelectItem>
-                    <SelectItem value="name">Name (A-Z)</SelectItem>
-                    <SelectItem value="platform">Platform</SelectItem>
+                    <SelectItem value="recent">{t('sort.recent')}</SelectItem>
+                    <SelectItem value="name">{t('sort.name')}</SelectItem>
+                    <SelectItem value="platform">{t('sort.platform')}</SelectItem>
                 </SelectContent>
             </Select>
 
@@ -99,7 +102,7 @@ export function DeviceFilters({ filters, onFilterChange, onClearFilters }: Devic
                     className="text-muted-foreground"
                 >
                     <X className="h-4 w-4 me-1" />
-                    Clear Filters
+                    {t('clearAll')}
                 </Button>
             )}
         </div>

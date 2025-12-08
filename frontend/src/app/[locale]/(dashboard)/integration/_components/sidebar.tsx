@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
 
@@ -13,6 +14,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ sections }: SidebarProps) {
+    const t = useTranslations('Integration');
     const [activeSection, setActiveSection] = useState<string>('');
 
     useEffect(() => {
@@ -53,7 +55,7 @@ export function Sidebar({ sections }: SidebarProps) {
 
     return (
         <nav className="sticky top-6 space-y-1">
-            <h2 className="text-sm font-semibold text-foreground mb-3">On This Page</h2>
+            <h2 className="text-sm font-semibold text-foreground mb-3">{t('onThisPage')}</h2>
             {sections.map((section) => (
                 <div key={section.id}>
                     <button

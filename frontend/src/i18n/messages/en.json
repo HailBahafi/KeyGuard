@@ -44,6 +44,12 @@
             "step3": {
                 "title": "Verify",
                 "description": "Gateway validates the signature and forwards only authenticated requests to OpenAI"
+            },
+            "labels": {
+                "clientApp": "Client App",
+                "llmProvider": "LLM Provider",
+                "protectedRequest": "Protected Request ✓",
+                "unsecuredRequest": "Unsecured Request"
             }
         },
         "socialProof": {
@@ -133,7 +139,9 @@
             "passwordPlaceholder": "Enter your password",
             "submitButton": "Sign In",
             "forgotPassword": "Forgot password?",
-            "loadingButton": "Signing in..."
+            "loadingButton": "Signing in...",
+            "noAccount": "Don't have an account?",
+            "signUp": "Sign up"
         },
         "setup": {
             "title": "Welcome to KeyGuard",
@@ -147,7 +155,9 @@
             "confirmPasswordLabel": "Confirm Password",
             "confirmPasswordPlaceholder": "Re-enter your password",
             "submitButton": "Complete Setup",
-            "loadingButton": "Setting up..."
+            "loadingButton": "Setting up...",
+            "hasAccount": "Already have an account?",
+            "signIn": "Sign in"
         },
         "errors": {
             "required": "This field is required",
@@ -471,6 +481,199 @@
             "next": "Next",
             "page": "Page {current} of {total}",
             "showing": "Showing {from}-{to} of {total} keys"
+        }
+    },
+    "Devices": {
+        "title": "Device Inventory",
+        "subtitle": "Manage enrolled devices and approve pending access requests",
+        "enrollDevice": "Enroll Device",
+        "search": {
+            "placeholder": "Search devices by name, owner, or location..."
+        },
+        "filters": {
+            "status": {
+                "label": "Status",
+                "all": "All Statuses",
+                "allShort": "All",
+                "active": "Active",
+                "pending": "Pending",
+                "suspended": "Suspended",
+                "revoked": "Revoked",
+                "offline": "Offline"
+            },
+            "platform": {
+                "label": "Platform",
+                "all": "All Platforms"
+            },
+            "lastSeen": {
+                "label": "Last Seen",
+                "all": "All Time",
+                "hour": "Last Hour",
+                "day": "Last 24 Hours",
+                "week": "Last Week"
+            },
+            "sort": {
+                "label": "Sort by",
+                "recent": "Most Recent",
+                "name": "Name (A-Z)",
+                "platform": "Platform"
+            },
+            "clearAll": "Clear Filters"
+        },
+        "stats": {
+            "total": "Total Devices",
+            "active": "Active",
+            "pending": "Pending",
+            "suspended": "Suspended",
+            "offline": "Offline"
+        },
+        "viewMode": {
+            "grid": "Grid",
+            "table": "Table"
+        },
+        "table": {
+            "deviceName": "Device Name",
+            "owner": "Owner",
+            "platform": "Platform",
+            "status": "Status",
+            "lastSeen": "Last Seen",
+            "location": "Location",
+            "actions": "Actions"
+        },
+        "card": {
+            "lastSeen": "Last seen {time}",
+            "calls": "Calls",
+            "keys": "Keys",
+            "details": "Details"
+        },
+        "actions": {
+            "viewDetails": "View Details",
+            "approve": "Approve",
+            "suspend": "Suspend",
+            "revoke": "Revoke"
+        },
+        "empty": {
+            "noDevices": "No devices found matching your filters.",
+            "noDevicesSubtext": "Enroll your first device to get started"
+        }
+    },
+    "AuditLogs": {
+        "title": "Audit Logs",
+        "subtitle": "Monitor security events and system activity in real-time",
+        "export": "Export",
+        "search": {
+            "placeholder": "Search logs by event, actor, target, or error..."
+        },
+        "filters": {
+            "dateRange": {
+                "label": "Date Range",
+                "all": "All Time",
+                "hour": "Last Hour",
+                "day": "Last 24 Hours",
+                "week": "Last Week",
+                "month": "Last Month"
+            },
+            "eventType": {
+                "label": "Event Type",
+                "all": "All Events"
+            },
+            "status": {
+                "label": "Status",
+                "all": "All Status",
+                "success": "Success",
+                "failure": "Failed"
+            },
+            "severity": {
+                "label": "Severity",
+                "all": "All Severity",
+                "info": "Info",
+                "warning": "Warning",
+                "error": "Error",
+                "critical": "Critical"
+            },
+            "activeFilters": "Active filters",
+            "clearAll": "Clear All"
+        },
+        "summary": {
+            "showing": "Showing {count} of {total} logs",
+            "autoRefresh": "Auto-refreshing every 30s"
+        },
+        "pagination": {
+            "previous": "Previous",
+            "next": "Next",
+            "page": "Page {current} of {total}"
+        },
+        "empty": {
+            "noLogs": "No audit logs found matching your filters.",
+            "clearFilters": "Clear all filters"
+        },
+        "liveIndicator": {
+            "live": "Live",
+            "paused": "Paused"
+        }
+    },
+    "Integration": {
+        "title": "Integration Guide",
+        "subtitle": "Developer documentation and SDK reference",
+        "tryApi": "Try API",
+        "onThisPage": "On This Page",
+        "sections": {
+            "quickStart": "Quick Start",
+            "install": "Install",
+            "enroll": "Initialize & Enroll",
+            "sign": "Sign Requests",
+            "codeGenerator": "Code Generator",
+            "troubleshooting": "Troubleshooting",
+            "sdkReference": "SDK Reference",
+            "clientInit": "Client Initialization",
+            "enrollDevice": "enroll()",
+            "signRequest": "signRequest()",
+            "examples": "Examples"
+        },
+        "quickStart": {
+            "badge": "Quick Start",
+            "title": "Get Started in 3 Steps",
+            "description": "Secure your first API request in under 3 minutes",
+            "step": "Step {number}"
+        },
+        "codeGenerator": {
+            "badge": "Interactive",
+            "title": "Code Generator",
+            "description": "Generate ready-to-use code snippets with your API key",
+            "sdkIntegration": "SDK Integration",
+            "selectLanguage": "Select your language and API key to generate code",
+            "selectApiKey": "Select API Key",
+            "usePlaceholder": "Use placeholder",
+            "loadingKeys": "Loading keys...",
+            "noActiveKeys": "No active keys found"
+        },
+        "troubleshooting": {
+            "badge": "Verify",
+            "title": "Troubleshooting",
+            "description": "Test your connection to the KeyGuard API",
+            "healthCheck": "Health Check",
+            "healthCheckDesc": "Test the connection to verify your KeyGuard API is reachable and operational.",
+            "pingButton": "Ping Health Check",
+            "status": {
+                "checking": "Checking...",
+                "operational": "System Operational",
+                "notConnected": "Not Connected"
+            },
+            "successMessage": "Your KeyGuard instance is online and accepting requests.",
+            "failureTitle": "Connection Failed",
+            "failureMessage": "Make sure the KeyGuard API is running and accessible. Check your API URL in settings."
+        }
+    },
+    "Settings": {
+        "title": "Settings",
+        "subtitle": "Manage your KeyGuard instance configuration and preferences",
+        "failedToLoad": "Failed to load settings",
+        "sections": {
+            "general": "General",
+            "security": "Security",
+            "notifications": "Notifications",
+            "api": "API Keys",
+            "backup": "Backup & Restore"
         }
     }
 }

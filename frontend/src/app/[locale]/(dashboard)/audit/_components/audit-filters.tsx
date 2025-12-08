@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -13,6 +14,8 @@ interface AuditFiltersProps {
 }
 
 export function AuditFilters({ filters, onFilterChange, onClearFilters }: AuditFiltersProps) {
+    const t = useTranslations('AuditLogs.filters');
+
     const hasActiveFilters =
         (filters.dateRange && filters.dateRange !== 'all') ||
         (filters.eventType && filters.eventType !== 'all') ||
@@ -23,14 +26,14 @@ export function AuditFilters({ filters, onFilterChange, onClearFilters }: AuditF
 
     if (filters.dateRange && filters.dateRange !== 'all') {
         const labels: Record<string, string> = {
-            hour: 'Last Hour',
-            day: 'Last 24 Hours',
-            week: 'Last Week',
-            month: 'Last Month'
+            hour: t('dateRange.hour'),
+            day: t('dateRange.day'),
+            week: t('dateRange.week'),
+            month: t('dateRange.month')
         };
         activeFilterTags.push({
             key: 'dateRange',
-            label: 'Date',
+            label: t('dateRange.label'),
             value: labels[filters.dateRange] || filters.dateRange
         });
     }
@@ -38,24 +41,34 @@ export function AuditFilters({ filters, onFilterChange, onClearFilters }: AuditF
     if (filters.eventType && filters.eventType !== 'all') {
         activeFilterTags.push({
             key: 'eventType',
-            label: 'Event',
+            label: t('eventType.label'),
             value: filters.eventType.charAt(0).toUpperCase() + filters.eventType.slice(1)
         });
     }
 
     if (filters.status && filters.status !== 'all') {
+        const statusLabels: Record<string, string> = {
+            success: t('status.success'),
+            failure: t('status.failure')
+        };
         activeFilterTags.push({
             key: 'status',
-            label: 'Status',
-            value: filters.status.charAt(0).toUpperCase() + filters.status.slice(1)
+            label: t('status.label'),
+            value: statusLabels[filters.status] || filters.status
         });
     }
 
     if (filters.severity && filters.severity !== 'all') {
+        const severityLabels: Record<string, string> = {
+            info: t('severity.info'),
+            warning: t('severity.warning'),
+            error: t('severity.error'),
+            critical: t('severity.critical')
+        };
         activeFilterTags.push({
             key: 'severity',
-            label: 'Severity',
-            value: filters.severity.charAt(0).toUpperCase() + filters.severity.slice(1)
+            label: t('severity.label'),
+            value: severityLabels[filters.severity] || filters.severity
         });
     }
 
@@ -69,14 +82,14 @@ export function AuditFilters({ filters, onFilterChange, onClearFilters }: AuditF
                     onValueChange={(value) => onFilterChange('dateRange', value)}
                 >
                     <SelectTrigger className="w-[160px]">
-                        <SelectValue placeholder="Date Range" />
+                        <SelectValue placeholder={t('dateRange.label')} />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">All Time</SelectItem>
-                        <SelectItem value="hour">Last Hour</SelectItem>
-                        <SelectItem value="day">Last 24 Hours</SelectItem>
-                        <SelectItem value="week">Last Week</SelectItem>
-                        <SelectItem value="month">Last Month</SelectItem>
+                        <SelectItem value="all">{t('dateRange.all')}</SelectItem>
+                        <SelectItem value="hour">{t('dateRange.hour')}</SelectItem>
+                        <SelectItem value="day">{t('dateRange.day')}</SelectItem>
+                        <SelectItem value="week">{t('dateRange.week')}</SelectItem>
+                        <SelectItem value="month">{t('dateRange.month')}</SelectItem>
                     </SelectContent>
                 </Select>
 
@@ -86,10 +99,10 @@ export function AuditFilters({ filters, onFilterChange, onClearFilters }: AuditF
                     onValueChange={(value) => onFilterChange('eventType', value)}
                 >
                     <SelectTrigger className="w-[160px]">
-                        <SelectValue placeholder="Event Type" />
+                        <SelectValue placeholder={t('eventType.label')} />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">All Events</SelectItem>
+                        <SelectItem value="all">{t('eventType.all')}</SelectItem>
                         <SelectItem value="auth">Authentication</SelectItem>
                         <SelectItem value="key">Key Operations</SelectItem>
                         <SelectItem value="device">Device Management</SelectItem>
@@ -105,12 +118,12 @@ export function AuditFilters({ filters, onFilterChange, onClearFilters }: AuditF
                     onValueChange={(value) => onFilterChange('status', value)}
                 >
                     <SelectTrigger className="w-[140px]">
-                        <SelectValue placeholder="Status" />
+                        <SelectValue placeholder={t('status.label')} />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">All Status</SelectItem>
-                        <SelectItem value="success">Success</SelectItem>
-                        <SelectItem value="failure">Failed</SelectItem>
+                        <SelectItem value="all">{t('status.all')}</SelectItem>
+                        <SelectItem value="success">{t('status.success')}</SelectItem>
+                        <SelectItem value="failure">{t('status.failure')}</SelectItem>
                     </SelectContent>
                 </Select>
 
@@ -120,13 +133,13 @@ export function AuditFilters({ filters, onFilterChange, onClearFilters }: AuditF
                     onValueChange={(value) => onFilterChange('severity', value)}
                 >
                     <SelectTrigger className="w-[140px]">
-                        <SelectValue placeholder="Severity" />
+                        <SelectValue placeholder={t('severity.label')} />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">All Severity</SelectItem>
-                        <SelectItem value="info">Info</SelectItem>
-                        <SelectItem value="warning">Warning</SelectItem>
-                        <SelectItem value="critical">Critical</SelectItem>
+                        <SelectItem value="all">{t('severity.all')}</SelectItem>
+                        <SelectItem value="info">{t('severity.info')}</SelectItem>
+                        <SelectItem value="warning">{t('severity.warning')}</SelectItem>
+                        <SelectItem value="critical">{t('severity.critical')}</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
@@ -134,7 +147,7 @@ export function AuditFilters({ filters, onFilterChange, onClearFilters }: AuditF
             {/* Active Filter Tags */}
             {hasActiveFilters && (
                 <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-sm text-muted-foreground">Active filters:</span>
+                    <span className="text-sm text-muted-foreground">{t('activeFilters')}:</span>
                     {activeFilterTags.map((tag) => (
                         <Badge
                             key={tag.key}
@@ -160,7 +173,7 @@ export function AuditFilters({ filters, onFilterChange, onClearFilters }: AuditF
                         onClick={onClearFilters}
                         className="h-6 text-xs"
                     >
-                        Clear All
+                        {t('clearAll')}
                     </Button>
                 </div>
             )}

@@ -42,7 +42,7 @@ export function LandingHeader() {
                 </a>
 
                 {/* Desktop Navigation */}
-                <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+                <nav className="hidden md:flex items-center gap-4 lg:gap-6 text-sm md:text-sm lg:text-base font-medium">
                     {navLinks.map((link) => (
                         <a
                             key={link.href}

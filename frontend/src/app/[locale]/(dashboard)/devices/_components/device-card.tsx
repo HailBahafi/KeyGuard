@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Device } from '@/types/device';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -33,6 +34,8 @@ export function DeviceCard({
     onSuspend,
     onRevoke
 }: DeviceCardProps) {
+    const t = useTranslations('Devices');
+
     // Select icon based on platform
     const getDeviceIcon = () => {
         const { os } = device.platform;
@@ -49,22 +52,22 @@ export function DeviceCard({
         switch (device.status) {
             case 'active':
                 return {
-                    label: 'Active',
+                    label: t('filters.status.active'),
                     className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                 };
             case 'pending':
                 return {
-                    label: 'Pending',
+                    label: t('filters.status.pending'),
                     className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
                 };
             case 'suspended':
                 return {
-                    label: 'Suspended',
+                    label: t('filters.status.suspended'),
                     className: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
                 };
             case 'revoked':
                 return {
-                    label: 'Revoked',
+                    label: t('filters.status.revoked'),
                     className: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
                 };
             default:
@@ -111,17 +114,17 @@ export function DeviceCard({
                 {/* Last Seen */}
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Clock className="h-3 w-3" />
-                    <span>Last seen {lastSeenText}</span>
+                    <span>{t('card.lastSeen', { time: lastSeenText })}</span>
                 </div>
 
                 {/* Stats */}
                 <div className="flex items-center gap-4 text-sm">
                     <div>
-                        <span className="text-muted-foreground">Calls: </span>
+                        <span className="text-muted-foreground">{t('card.calls')}: </span>
                         <span className="font-medium text-foreground">{device.stats.totalCalls.toLocaleString()}</span>
                     </div>
                     <div>
-                        <span className="text-muted-foreground">Keys: </span>
+                        <span className="text-muted-foreground">{t('card.keys')}: </span>
                         <span className="font-medium text-foreground">{device.stats.keysAccessed}</span>
                     </div>
                 </div>
@@ -135,7 +138,7 @@ export function DeviceCard({
                         className="flex-1"
                     >
                         <Eye className="h-4 w-4 me-1" />
-                        Details
+                        {t('card.details')}
                     </Button>
 
                     {device.status === 'pending' && (
@@ -145,7 +148,7 @@ export function DeviceCard({
                             onClick={() => onApprove(device)}
                         >
                             <CheckCircle className="h-4 w-4 me-1" />
-                            Approve
+                            {t('actions.approve')}
                         </Button>
                     )}
 
@@ -156,7 +159,7 @@ export function DeviceCard({
                             onClick={() => onSuspend(device)}
                         >
                             <Ban className="h-4 w-4 me-1" />
-                            Suspend
+                            {t('actions.suspend')}
                         </Button>
                     )}
 

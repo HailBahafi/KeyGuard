@@ -13,10 +13,10 @@ export const BackgroundBeams = React.memo(
     // Theme-aware colors
     const beamColors = isDark 
       ? {
-          start: "#18CCFC",    // Cyan for dark mode
-          middle: "#6344F5",   // Purple
-          end: "#AE48FF",      // Magenta
-          baseStroke: "#d4d4d4"
+          start: "#38d9ff",    // Brighter Cyan for dark mode
+          middle: "#8b6bff",   // Brighter Purple
+          end: "#d06fff",      // Brighter Magenta
+          baseStroke: "#e5e5e5"
         }
       : {
           start: "#3b82f6",    // Blue for light mode
@@ -25,8 +25,8 @@ export const BackgroundBeams = React.memo(
           baseStroke: "#737373"
         };
     
-    const strokeOpacity = isDark ? "0.6" : "0.4";
-    const baseStrokeOpacity = isDark ? "0.05" : "0.08";
+    const strokeOpacity = isDark ? "0.8" : "0.4";
+    const baseStrokeOpacity = isDark ? "0.08" : "0.08";
     
     const paths = [
       "M-380 -189C-380 -189 -312 216 152 343C616 470 684 875 684 875",

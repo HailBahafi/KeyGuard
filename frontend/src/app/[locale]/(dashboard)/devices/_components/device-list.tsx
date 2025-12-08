@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Device } from '@/types/device';
 import { DeviceCard } from './device-card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -35,6 +36,7 @@ export function DeviceList({
     onSuspend,
     onRevoke
 }: DeviceListProps) {
+    const t = useTranslations('Devices');
     const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
 
     if (loading) {
@@ -50,7 +52,7 @@ export function DeviceList({
     if (devices.length === 0) {
         return (
             <div className="text-center py-12 border border-dashed border-border rounded-lg bg-muted/20">
-                <p className="text-muted-foreground">No devices found matching your filters.</p>
+                <p className="text-muted-foreground">{t('empty.noDevices')}</p>
             </div>
         );
     }
@@ -63,9 +65,16 @@ export function DeviceList({
             revoked: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
         };
 
+        const statusLabels = {
+            active: t('filters.status.active'),
+            pending: t('filters.status.pending'),
+            suspended: t('filters.status.suspended'),
+            revoked: t('filters.status.revoked')
+        };
+
         return (
-            <Badge className={cn(configs[status], 'border-0 capitalize')}>
-                {status}
+            <Badge className={cn(configs[status], 'border-0')}>
+                {statusLabels[status]}
             </Badge>
         );
     };
@@ -80,7 +89,7 @@ export function DeviceList({
                     onClick={() => setViewMode('grid')}
                 >
                     <LayoutGrid className="h-4 w-4 me-1" />
-                    Grid
+                    {t('viewMode.grid')}
                 </Button>
                 <Button
                     variant={viewMode === 'table' ? 'default' : 'outline'}
@@ -88,7 +97,7 @@ export function DeviceList({
                     onClick={() => setViewMode('table')}
                 >
                     <TableIcon className="h-4 w-4 me-1" />
-                    Table
+                    {t('viewMode.table')}
                 </Button>
             </div>
 
@@ -114,13 +123,13 @@ export function DeviceList({
                     <Table>
                         <TableHeader>
                             <TableRow className="bg-muted/50">
-                                <TableHead>Device Name</TableHead>
-                                <TableHead>Owner</TableHead>
-                                <TableHead>Platform</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Last Seen</TableHead>
-                                <TableHead>Location</TableHead>
-                                <TableHead className="text-end">Actions</TableHead>
+                                <TableHead>{t('table.deviceName')}</TableHead>
+                                <TableHead>{t('table.owner')}</TableHead>
+                                <TableHead>{t('table.platform')}</TableHead>
+                                <TableHead>{t('table.status')}</TableHead>
+                                <TableHead>{t('table.lastSeen')}</TableHead>
+                                <TableHead>{t('table.location')}</TableHead>
+                                <TableHead className="text-end">{t('table.actions')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -158,7 +167,7 @@ export function DeviceList({
                                                     size="sm"
                                                     onClick={() => onApprove(device)}
                                                 >
-                                                    Approve
+                                                    {t('actions.approve')}
                                                 </Button>
                                             )}
                                             {device.status === 'active' && (
@@ -167,7 +176,7 @@ export function DeviceList({
                                                     size="sm"
                                                     onClick={() => onSuspend(device)}
                                                 >
-                                                    Suspend
+                                                    {t('actions.suspend')}
                                                 </Button>
                                             )}
                                         </div>

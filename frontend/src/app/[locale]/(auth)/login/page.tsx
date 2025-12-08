@@ -3,9 +3,10 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
+import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +16,7 @@ import { useLogin } from '@/hooks/use-auth';
 export default function LoginPage() {
     const t = useTranslations('Auth.login');
     const tErrors = useTranslations('Auth.errors');
+    const locale = useLocale();
     const loginMutation = useLogin();
 
     // Zod validation schema
@@ -109,13 +111,22 @@ export default function LoginPage() {
                         </form>
                     </Form>
                 </CardContent>
-                <CardFooter className="flex justify-center">
+                <CardFooter className="flex flex-col gap-4">
                     <button
                         type="button"
                         className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
                         {t('forgotPassword')}
                     </button>
+                    <div className="text-sm text-muted-foreground">
+                        {t('noAccount')}{' '}
+                        <Link 
+                            href={`/${locale}/setup`}
+                            className="text-primary hover:underline font-medium"
+                        >
+                            {t('signUp')}
+                        </Link>
+                    </div>
                 </CardFooter>
             </Card>
         </motion.div>

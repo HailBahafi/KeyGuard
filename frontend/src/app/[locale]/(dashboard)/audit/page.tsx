@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { Search, Download, Settings } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -15,6 +16,7 @@ import { LogDetailsSheet } from './_components/log-details';
 import { ExportDialog } from './_components/export-dialog';
 
 export default function AuditLogsPage() {
+    const t = useTranslations('AuditLogs');
     const logsContainerRef = useRef<HTMLDivElement>(null);
 
     // Filter State
@@ -82,9 +84,9 @@ export default function AuditLogsPage() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Audit Logs</h1>
+                    <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
                     <p className="text-muted-foreground mt-1">
-                        Monitor security events and system activity in real-time
+                        {t('subtitle')}
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -99,7 +101,7 @@ export default function AuditLogsPage() {
                         onClick={() => setIsExportOpen(true)}
                     >
                         <Download className="h-4 w-4 me-1" />
-                        Export
+                        {t('export')}
                     </Button>
                     <Button
                         variant="ghost"
@@ -115,7 +117,7 @@ export default function AuditLogsPage() {
                 <div className="relative">
                     <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
-                        placeholder="Search logs by event, actor, target, or error..."
+                        placeholder={t('search.placeholder')}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="ps-10 max-w-md"
@@ -132,10 +134,10 @@ export default function AuditLogsPage() {
             {!loading && (
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
                     <span>
-                        Showing {logs.length} of {totalRecords.toLocaleString()} logs
+                        {t('summary.showing', { count: logs.length, total: totalRecords.toLocaleString() })}
                     </span>
                     <span className="text-green-600 dark:text-green-500 font-medium">
-                        Auto-refreshing every 30s
+                        {t('summary.autoRefresh')}
                     </span>
                 </div>
             )}
@@ -153,13 +155,13 @@ export default function AuditLogsPage() {
                 ) : logs.length === 0 ? (
                     // Empty State
                     <div className="text-center py-12 border border-dashed border-border rounded-lg bg-muted/20">
-                        <p className="text-muted-foreground">No audit logs found matching your filters.</p>
+                        <p className="text-muted-foreground">{t('empty.noLogs')}</p>
                         <Button
                             variant="link"
                             onClick={handleClearFilters}
                             className="mt-2"
                         >
-                            Clear all filters
+                            {t('empty.clearFilters')}
                         </Button>
                     </div>
                 ) : (
@@ -184,10 +186,10 @@ export default function AuditLogsPage() {
                         onClick={() => setPage(prev => Math.max(1, prev - 1))}
                         disabled={page === 1}
                     >
-                        ← Previous
+                        ← {t('pagination.previous')}
                     </Button>
                     <span className="text-sm text-muted-foreground">
-                        Page {page} of {totalPages}
+                        {t('pagination.page', { current: page, total: totalPages })}
                     </span>
                     <Button
                         variant="outline"
@@ -195,7 +197,7 @@ export default function AuditLogsPage() {
                         onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}
                         disabled={page === totalPages}
                     >
-                        Next →
+                        {t('pagination.next')} →
                     </Button>
                 </div>
             )}
