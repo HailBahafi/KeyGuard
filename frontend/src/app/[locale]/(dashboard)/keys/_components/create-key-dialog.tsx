@@ -54,6 +54,7 @@ export function CreateKeyDialog({ open, onOpenChange }: CreateKeyDialogProps) {
     const [step, setStep] = useState(0);
     const [showKey, setShowKey] = useState(false);
     const [rawKey, setRawKey] = useState<string | null>(null);
+    const [showRawKeyDialog, setShowRawKeyDialog] = useState(false);
 
     const form = useForm<KeyFormData>({
         resolver: zodResolver(keySchema),
@@ -108,31 +109,15 @@ export function CreateKeyDialog({ open, onOpenChange }: CreateKeyDialogProps) {
                     // Capture rawKey if present (only shown once!)
                     if (response.rawKey) {
                         setRawKey(response.rawKey);
-                        // Move to success step (step 3) - DON'T close the dialog!
-                        setStep(3);
-                    } else {
-                        // No rawKey (shouldn't happen in production)
-                        onOpenChange(false);
-                        form.reset();
-                        setStep(0);
-                        toast.success('API key created', {
-                            description: 'Your new API key has been generated successfully.',
-                        });
+                        setShowRawKeyDialog(true);
                     }
+                    // Close create dialog and reset
+                    onOpenChange(false);
+                    form.reset();
+                    setStep(0);
                 },
             }
         );
-    };
-
-    const handleDone = () => {
-        // User clicked "I've Copied the Key" - now we can close and reset
-        onOpenChange(false);
-        setRawKey(null);
-        form.reset();
-        setStep(0);
-        toast.success('API key created', {
-            description: 'Your new API key has been generated successfully.',
-        });
     };
 
     const getFieldsForStep = (stepIndex: number) => {
@@ -397,85 +382,108 @@ export function CreateKeyDialog({ open, onOpenChange }: CreateKeyDialogProps) {
                                 </div>
                             )}
 
-                            {/* Step 3: Success - Show Raw Key */}
-                            {step === 3 && rawKey && (
-                                <div className="space-y-4">
-                                    <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-900/50">
-                                        <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-500" />
-                                        <AlertTitle className="text-amber-800 dark:text-amber-500">Important - Copy Your API Key Now!</AlertTitle>
-                                        <AlertDescription className="text-amber-700 dark:text-amber-400">
-                                            For security reasons, we can't show this key again. Store it somewhere safe!
-                                        </AlertDescription>
-                                    </Alert>
-
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-foreground">Your API Key</label>
-                                        <div className="relative">
-                                            <div className="flex items-center p-4 rounded-lg bg-muted border border-border font-mono text-sm break-all min-h-[60px]">
-                                                {rawKey}
-                                            </div>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="absolute top-2 end-2"
-                                                onClick={async () => {
-                                                    if (rawKey) {
-                                                        await navigator.clipboard.writeText(rawKey);
-                                                        toast.success('Copied!', {
-                                                            description: 'API key copied to clipboard.',
-                                                        });
-                                                    }
-                                                }}
-                                            >
-                                                <Copy className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
                             <DialogFooter className="flex justify-between sm:justify-between">
-                                {step < 3 ? (
-                                    <>
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            onClick={handleBack}
-                                            disabled={step === 0 || createKeyMutation.isPending}
-                                        >
-                                            <ChevronLeft className="w-4 h-4 me-2" />
-                                            {t('buttons.back')}
-                                        </Button>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={handleBack}
+                                    disabled={step === 0 || createKeyMutation.isPending}
+                                >
+                                    <ChevronLeft className="w-4 h-4 me-2" />
+                                    {t('buttons.back')}
+                                </Button>
 
-                                        {step < STEPS.length - 1 ? (
-                                            <Button type="button" onClick={handleNext}>
-                                                {t('buttons.next')}
-                                                <ChevronRight className="w-4 h-4 ms-2" />
-                                            </Button>
-                                        ) : (
-                                            <Button
-                                                type="button"
-                                                onClick={form.handleSubmit(onSubmit)}
-                                                disabled={createKeyMutation.isPending}
-                                            >
-                                                {createKeyMutation.isPending ? (
-                                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white me-2" />
-                                                ) : (
-                                                    <Check className="w-4 h-4 me-2" />
-                                                )}
-                                                {t('buttons.create')}
-                                            </Button>
-                                        )}
-                                    </>
+                                {step < STEPS.length - 1 ? (
+                                    <Button type="button" onClick={handleNext}>
+                                        {t('buttons.next')}
+                                        <ChevronRight className="w-4 h-4 ms-2" />
+                                    </Button>
                                 ) : (
-                                    <Button onClick={handleDone} className="w-full">
-                                        <Check className="w-4 h-4 me-2" />
-                                        I've Copied the Key
+                                    <Button
+                                        type="button"
+                                        onClick={form.handleSubmit(onSubmit)}
+                                        disabled={createKeyMutation.isPending}
+                                    >
+                                        {createKeyMutation.isPending ? (
+                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white me-2" />
+                                        ) : (
+                                            <Check className="w-4 h-4 me-2" />
+                                        )}
+                                        {t('buttons.create')}
                                     </Button>
                                 )}
                             </DialogFooter>
                         </form>
                     </Form>
+                </DialogContent>
+            </Dialog>
+
+            {/* Raw Key Dialog - Shown only once after creation */}
+            <Dialog open={showRawKeyDialog} onOpenChange={(open) => {
+                if (!open) {
+                    setShowRawKeyDialog(false);
+                    setRawKey(null);
+                    toast.success('API key created', {
+                        description: 'Your new API key has been generated successfully.',
+                    });
+                }
+            }}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Key className="h-5 w-5 text-primary" />
+                            Copy Your API Key
+                        </DialogTitle>
+                        <DialogDescription>
+                            ⚠️ This is the only time you'll see this key. Make sure to copy it now!
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="space-y-4">
+                        <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-900/50">
+                            <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-500" />
+                            <AlertTitle className="text-amber-800 dark:text-amber-500">Important</AlertTitle>
+                            <AlertDescription className="text-amber-700 dark:text-amber-400">
+                                For security reasons, we can't show this key again. Store it somewhere safe!
+                            </AlertDescription>
+                        </Alert>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-foreground">Your API Key</label>
+                            <div className="relative">
+                                <div className="flex items-center p-3 rounded-lg bg-muted border border-border font-mono text-sm break-all">
+                                    {rawKey}
+                                </div>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="absolute top-1 end-1"
+                                    onClick={async () => {
+                                        if (rawKey) {
+                                            await navigator.clipboard.writeText(rawKey);
+                                            toast.success('Copied!', {
+                                                description: 'API key copied to clipboard.',
+                                            });
+                                        }
+                                    }}
+                                >
+                                    <Copy className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <DialogFooter>
+                        <Button onClick={() => {
+                            setShowRawKeyDialog(false);
+                            setRawKey(null);
+                            toast.success('API key created', {
+                                description: 'Your new API key has been generated successfully.',
+                            });
+                        }}>
+                            I've Copied the Key
+                        </Button>
+                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         </>

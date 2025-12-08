@@ -87,12 +87,8 @@ export function useCreateKey() {
 
   return useMutation({
     mutationFn: async (data: CreateKeyDto): Promise<CreateKeyResponse> => {
-      const response = await apiClient.post<{ key: CreateKeyResponse; rawKey: string }>('/keys', data);
-      // Return the key with rawKey attached
-      return {
-        ...response.data.key,
-        rawKey: response.data.rawKey,
-      };
+      const response = await apiClient.post<{ key: CreateKeyResponse }>('/keys', data);
+      return response.data.key;
     },
     onSuccess: () => {
       // Invalidate and refetch keys list

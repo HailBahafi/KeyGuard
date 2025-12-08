@@ -1,8 +1,8 @@
 import { KeyGuardClient, MemoryStorageAdapter } from '@keyguard/sdk';
 
 // 1. الإعدادات (ضع المفتاح الذي نسخته من الداشبورد هنا)
-const API_KEY = 'test';
-const BACKEND_URL = 'test';
+const API_KEY = 'sk-generated-9z67k';
+const BACKEND_URL = 'https://keyguard-arhi.onrender.com/api/v1';
 
 // إعداد بصمة وهمية للتيرمينال
 const nodeFingerprint = {

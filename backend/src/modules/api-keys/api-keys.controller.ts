@@ -49,7 +49,8 @@ export class ApiKeysController {
   })
   @ApiResponse({ status: 409, description: 'API key with this name already exists' })
   async createKey(@Body() createKeyDto: CreateKeyDto): Promise<CreateKeyResponseDto> {
-    return this.apiKeysService.createKey(createKeyDto);
+    const key = await this.apiKeysService.createKey(createKeyDto);
+    return { key };
   }
 
   @Delete(':id')

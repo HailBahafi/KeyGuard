@@ -96,7 +96,7 @@ export class ApiKeysService {
     };
   }
 
-  async createKey(createKeyDto: CreateKeyDto): Promise<{ key: ApiKeyDto; rawKey: string }> {
+  async createKey(createKeyDto: CreateKeyDto): Promise<ApiKeyDto> {
     // Check if key with same name already exists
     const existingKey = await this.prisma.prisma.apiKey.findFirst({
       where: { name: createKeyDto.name },
@@ -165,21 +165,18 @@ export class ApiKeysService {
     }
 
     return {
-      key: {
-        id: key.id,
-        name: key.name,
-        provider: key.provider.toLowerCase() as 'openai' | 'anthropic' | 'google' | 'azure',
-        status: this.computeKeyStatus(key),
-        environment: key.environment.toLowerCase() as 'production' | 'development' | 'staging',
-        createdAt: key.createdAt.toISOString(),
-        lastUsed: null,
-        expiresAt: key.expiresAt ? key.expiresAt.toISOString() : null,
-        deviceCount: 0,
-        usageCount: 0,
-        description: key.description ?? '',
-        maskedValue: key.maskedValue,
-      },
-      rawKey: fullValue,
+      id: key.id,
+      name: key.name,
+      provider: key.provider.toLowerCase() as 'openai' | 'anthropic' | 'google' | 'azure',
+      status: this.computeKeyStatus(key),
+      environment: key.environment.toLowerCase() as 'production' | 'development' | 'staging',
+      createdAt: key.createdAt.toISOString(),
+      lastUsed: null,
+      expiresAt: key.expiresAt ? key.expiresAt.toISOString() : null,
+      deviceCount: 0,
+      usageCount: 0,
+      description: key.description ?? '',
+      maskedValue: key.maskedValue,
     };
   }
 

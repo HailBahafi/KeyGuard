@@ -63,12 +63,6 @@ export class KeysPaginationResponseDto {
 export class CreateKeyResponseDto {
   @ApiProperty({ type: ApiKeyDto })
   key: ApiKeyDto;
-
-  @ApiProperty({
-    description: 'The full unmasked API key. This is shown ONLY ONCE at creation time. Store it securely!',
-    example: 'kg_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6'
-  })
-  rawKey: string;
 }
 
 export class RevokeKeyResponseDto {
