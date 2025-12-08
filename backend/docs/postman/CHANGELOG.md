@@ -1,42 +1,69 @@
 # Postman Collection Changelog
 
-All notable changes to the KeyGuard API Postman collection will be documented in this file.
-
----
-
-## [1.1.0] - 2025-12-02
+## Version 1.1 - December 8, 2025
 
 ### Added
-- **Organization Registration Endpoint** (`POST /auth/register`)
-  - Complete request/response examples
-  - 4 sample responses (201 Success, 409 Conflict, 400 Validation, 500 Error)
-  - Automated test scripts for response validation
-  - Token auto-save functionality
-  - Comprehensive field validation documentation
+- **NEW**: OpenAI Proxy endpoints section
+  - Chat Completion (Non-streaming)
+  - Chat Completion (Streaming)
+  - List Models
+  - Embeddings
+  - Universal proxy support for all OpenAI endpoints
 
-### Updated
-- Collection description with organization setup information
-- Authentication section now includes 3 endpoints (Register, Login, Refresh)
-- Environment variables documentation
+- **NEW**: Simplified Logs endpoint (GET /logs)
+  - Easy frontend integration
+  - Real data from database
+  - Comprehensive filtering options
 
-### Notes
-- Registration endpoint supports first-time organization setup
-- Admin user automatically created with ADMIN role
-- JWT token returned immediately upon successful registration
-- Email uniqueness enforced
-- Organization slug auto-generated from name
+### Changed
+- **ENHANCED**: Audit Logs event type filter now includes "proxy"
+- **UPDATED**: Documentation to reflect new audit logging events
+
+### Event Types
+Added 9 new event types to audit logs:
+- `proxy.request` - OpenAI proxy requests
+- `device.enrolled` - Device enrollment
+- `device.revoked` - Device revocation
+- `key.created` - API key creation
+- `key.revoked` - API key revocation
+- `auth.login` - User login
+- `auth.register` - User registration
+- `settings.updated` - General settings update
+- `settings.security.updated` - Security settings update
 
 ---
 
-## [1.0.0] - 2025-12-01
+## Version 1.0 - December 2, 2025
 
 ### Initial Release
-- Complete API collection with 22 endpoints
-- Authentication (Login, Refresh Token)
-- API Keys Management (List, Create, Revoke)
-- Devices Management (List, Enroll, Approve, Suspend, Revoke)
-- Audit Logs (List, Export)
-- Settings (General, Security, Notifications, API Keys, Backup)
-- Comprehensive response examples for all endpoints
-- Automated test scripts
-- Environment variables setup
+- Authentication endpoints
+- API Keys Management
+- Devices Management
+- Audit Logs
+- Settings
+- Legacy KeyGuard endpoints
+
+---
+
+## How to Update
+
+### Option 1: Import New Documentation
+1. Read `NEW_ENDPOINTS_v1.1.md` for detailed documentation
+2. Manually add new sections to your Postman collection
+
+### Option 2: Download Updated Collection (Coming Soon)
+- Full Postman collection with v1.1 endpoints will be available soon
+
+---
+
+## Notes
+
+- All v1.0 endpoints remain unchanged (backward compatible)
+- New endpoints require KeyGuard signature verification
+- OpenAI API key configuration required for proxy endpoints
+- JWT authentication required for GET /logs endpoint
+
+---
+
+**Maintained by**: KeyGuard Development Team
+**Contact**: See repository README for support options

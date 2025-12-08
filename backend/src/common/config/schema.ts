@@ -20,4 +20,11 @@ export const configurationSchema = z.object({
     .url({ message: 'FRONTEND_URL must be a valid URL' })
     .optional()
     .default('http://localhost:3000'),
+
+  OPENAI_API_KEY: z.string().optional(),
+
+  OPENAI_BASE_URL: z
+    .url({ message: 'OPENAI_BASE_URL must be a valid URL' })
+    .optional()
+    .default('https://api.openai.com'),
 } satisfies { [K in keyof typeof environmentVariables]: z.ZodType });

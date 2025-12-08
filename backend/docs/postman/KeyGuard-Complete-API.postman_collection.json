@@ -1014,7 +1014,7 @@
                 {
                   "key": "eventType",
                   "value": "all",
-                  "description": "key, device, auth, system, api, security, all"
+                  "description": "key, device, auth, system, api, security, proxy, all"
                 },
                 {
                   "key": "status",

@@ -2,11 +2,13 @@ import { Prisma } from '@/src/generated/client';
 import {
   ConflictException,
   Injectable,
+  Logger,
   UnauthorizedException
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import dayjs from 'dayjs';
 import { Hashing } from 'src/common/utils/hashing.util';
+import { AuditLogsService } from '../../modules/audit-logs/audit-logs.service';
 import { PrismaService } from '../database/prisma.service';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { LoginDto } from './dto/login.dto';
@@ -14,9 +16,12 @@ import { RegisterResponseDto } from './dto/register-response.dto';
 import { RegisterDto } from './dto/register.dto';
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly jwtService: JwtService,
     private readonly prismaService: PrismaService,
+    private readonly auditLogsService: AuditLogsService,
   ) { }
   async login(loginDto: LoginDto): Promise<LoginResponseDto> {
     // Find user by email
@@ -53,6 +58,29 @@ export class AuthService {
       where: { id: user.id },
       data: { lastLogin: dayjs().toDate() },
     });
+
+    // Log successful login
+    try {
+      await this.auditLogsService.createLog({
+        event: 'auth.login',
+        severity: 'info',
+        status: 'success',
+        actorId: user.id,
+        actorName: user.name,
+        actorType: 'user',
+        actorIp: '0.0.0.0', // Will be updated by interceptor if available
+        targetId: user.id,
+        targetName: user.email,
+        targetType: 'user',
+        metadata: {
+          role: user.role,
+        },
+        userId: user.id,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to create audit log for login: ${error}`);
+    }
+
     return {
       accessToken,
       refreshToken,
@@ -165,6 +193,30 @@ export class AuthService {
       result.user.id,
       result.user.email,
     );
+
+    // Log successful registration
+    try {
+      await this.auditLogsService.createLog({
+        event: 'auth.register',
+        severity: 'info',
+        status: 'success',
+        actorId: result.user.id,
+        actorName: result.user.name,
+        actorType: 'user',
+        actorIp: '0.0.0.0', // Will be updated by interceptor if available
+        targetId: result.organization.id,
+        targetName: result.organization.name,
+        targetType: 'organization',
+        metadata: {
+          email: result.user.email,
+          organizationSlug: result.organization.slug,
+        },
+        userId: result.user.id,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to create audit log for registration: ${error}`);
+    }
+
     // Return response
     return {
       success: true,

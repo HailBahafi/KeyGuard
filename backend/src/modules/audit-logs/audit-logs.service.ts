@@ -126,12 +126,12 @@ export class AuditLogsService {
       metadata: (log.metadata as SecurityContextDto | null) ?? {},
     }));
 
-    const pages = Math.ceil((total as number) / limit);
+    const pages = Math.ceil(total / limit);
 
     return {
       logs: mappedLogs,
       pagination: {
-        total: total as number,
+        total,
         page,
         limit,
         pages,

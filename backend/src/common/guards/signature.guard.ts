@@ -1,22 +1,27 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { FastifyRequest } from 'fastify';
+import { RedisService } from '../../core/cache/redis.service';
+import { PrismaService } from '../../core/database/prisma.service';
 import { CryptoService } from '../../modules/keyguard/services/crypto.service';
 
 /**
  * SignatureGuard - Validates KeyGuard cryptographic signatures
- * 
- * Protects endpoints by verifying device-bound request signatures
+ *
+ * Protects endpoints by verifying device-bound request signatures with:
+ * - Database lookup for device public key (no hardcoded keys)
+ * - Redis-based nonce replay protection
+ * - Timestamp validation
  */
 @Injectable()
 export class SignatureGuard implements CanActivate {
-    // TODO: Replace with database lookup once device enrollment is implemented
-    // For now, using hardcoded public key for testing
-    // You can generate a test key pair by running: node test.js
-    private readonly HARDCODED_PUBLIC_KEY = 'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEyw2fLJBv+YxDdd8ZTK795LX11MTcvhC0YZ2pTO84lsR+IllKguWHJ8ZxCF3a9VA3iw4LE1cGtElypNhWF2bFmA==';
+    private readonly logger = new Logger(SignatureGuard.name);
+    private readonly TIME_WINDOW_SECONDS = 120; // Match with verify-test window
 
-    private readonly TIME_WINDOW_SECONDS = 10;
-
-    constructor(private readonly cryptoService: CryptoService) { }
+    constructor(
+        private readonly cryptoService: CryptoService,
+        private readonly prisma: PrismaService,
+        private readonly redis: RedisService,
+    ) { }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest<FastifyRequest>();
@@ -34,14 +39,53 @@ export class SignatureGuard implements CanActivate {
             throw new UnauthorizedException('Missing required KeyGuard headers');
         }
 
-        // Validate timestamp is within acceptable time window
+        // 1. Validate API key and get project
+        const project = await this.prisma.prisma.apiKey.findFirst({
+            where: { fullValue: apiKey },
+        });
+
+        if (!project || project.status !== 'ACTIVE') {
+            throw new UnauthorizedException('Invalid or inactive API key');
+        }
+
+        // 2. Get device from database using keyId
+        const device = await this.prisma.prisma.device.findFirst({
+            where: {
+                apiKeyId: project.id,
+                keyId: keyId,
+            },
+        });
+
+        if (!device) {
+            this.logger.warn(`Device with keyId ${keyId} not found`);
+            throw new UnauthorizedException('Device not found');
+        }
+
+        if (device.status !== 'ACTIVE') {
+            this.logger.warn(`Device ${device.id} is ${device.status}`);
+            throw new UnauthorizedException(`Device is ${device.status}`);
+        }
+
+        if (!device.publicKeySpkiBase64) {
+            this.logger.error(`Device ${device.id} has no public key`);
+            throw new UnauthorizedException('Device has no public key');
+        }
+
+        // 3. Check nonce for replay protection using Redis SET NX
+        const nonceKey = `nonce:${project.id}:${keyId}:${nonce}`;
+        const isNewNonce = await this.redis.storeNonceIfNotExists(nonceKey, this.TIME_WINDOW_SECONDS);
+
+        if (!isNewNonce) {
+            this.logger.warn(`Replay attack detected: nonce ${nonce} already used`);
+            throw new UnauthorizedException('Nonce has already been used (replay attack detected)');
+        }
+
+        // 4. Validate timestamp is within acceptable time window
         this.validateTimestamp(timestamp);
 
-        // Reconstruct the canonical payload
+        // 5. Reconstruct the canonical payload
         const method = request.method;
         const url = request.url;
-
-        // Extract path and query from URL
         const pathAndQuery = this.extractPathAndQuery(url);
 
         const payload = this.cryptoService.reconstructPayload({
@@ -54,17 +98,27 @@ export class SignatureGuard implements CanActivate {
             keyId,
         });
 
-        // Verify the signature
+        // 6. Verify the signature using device's public key from DB
         const isValid = await this.cryptoService.verifySignature(
-            this.HARDCODED_PUBLIC_KEY,
+            device.publicKeySpkiBase64,
             signature,
             payload,
         );
 
         if (!isValid) {
+            this.logger.warn(`Invalid signature for device ${device.id}`);
             throw new UnauthorizedException('Invalid signature');
         }
 
+        // 7. Update last seen timestamp
+        await this.prisma.prisma.device.update({
+            where: { id: device.id },
+            data: { lastSeen: new Date() },
+        }).catch(err => {
+            this.logger.error(`Failed to update lastSeen for device ${device.id}: ${err.message}`);
+        });
+
+        this.logger.log(`Request verified successfully for device ${device.id}`);
         return true;
     }
 

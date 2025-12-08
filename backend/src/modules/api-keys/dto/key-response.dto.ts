@@ -17,7 +17,7 @@ export class ApiKeyDto {
   environment: 'production' | 'development' | 'staging';
 
   @ApiProperty()
-  created: string;
+  createdAt: string;
 
   @ApiProperty({ nullable: true })
   lastUsed: string | null;

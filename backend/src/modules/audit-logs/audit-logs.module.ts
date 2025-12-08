@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
+import { PrismaModule } from 'src/core/database/prisma.module';
 import { AuditLogsController } from './audit-logs.controller';
 import { AuditLogsService } from './audit-logs.service';
-import { PrismaModule } from 'src/core/database/prisma.module';
 
 @Module({
   imports: [PrismaModule],
@@ -9,4 +9,4 @@ import { PrismaModule } from 'src/core/database/prisma.module';
   providers: [AuditLogsService],
   exports: [AuditLogsService],
 })
-export class AuditLogsModule {}
+export class AuditLogsModule { }
