@@ -1,270 +1,128 @@
-Backend README  — Start Backend Phase 1 Testing
+Part 1: Backend Implementation Specification
+File Name: BACKEND_SPECS.md Status: High Priority Tech Stack: NestJS, Prisma (Postgres), Redis
 
-Create a file (for backend team) like: `BACKEND_PHASE1_README.md`
+1. Database Schema (Prisma)
+We need to model the relationship between API Keys (Projects) and Devices (Developers).
 
-````md
-# KeyGuard Backend Phase 1 — Enrollment + Signature Verification (SDK Test)
+Code snippet
 
-This README describes the minimal backend required to test the KeyGuard SDK end-to-end.
+// schema.prisma
 
-The SDK performs **device binding** by:
-- generating an ECDSA P-256 key pair on the client
-- sending the **public key** to the backend during enrollment
-- signing each request using the device **private key**
-- backend verifies signed requests using the stored **public key**
+model ApiKey {
+  id          String    @id @default(uuid())
+  name        String    // e.g. "Production OpenAI"
+  keyPrefix   String    @unique // e.g. "kg_prod_..." (Used by SDK to identify project)
+  
+  // The real provider key (Encrypted at rest)
+  providerKeyEncrypted String 
+  
+  devices     Device[]
+  logs        RequestLog[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
 
----
+model Device {
+  id                String    @id @default(uuid())
+  // Hardware Identity
+  publicKey         String    // Base64 SPKI (From SDK)
+  fingerprint       String    // Device Fingerprint Hash
+  
+  // Metadata
+  label             String    // e.g. "Ahmed's Macbook"
+  metadata          Json?     // OS, Browser info
+  
+  // State
+  status            String    // PENDING | ACTIVE | REVOKED
+  
+  // Relations
+  apiKeyId          String
+  apiKey            ApiKey    @relation(fields: [apiKeyId], references: [id])
+  
+  lastSeenAt        DateTime  @default(now())
+  createdAt         DateTime  @default(now())
 
-## 1) Protocol Summary (What the SDK Sends)
+  // Ensure a device registers only once per project
+  @@unique([apiKeyId, publicKey])
+}
 
-### Enrollment (`POST /api/v1/enroll`)
-Body (from SDK):
-```json
+model RequestLog {
+  id          String   @id @default(uuid())
+  deviceId    String?
+  apiKeyId    String
+  endpoint    String
+  status      Int      // 200, 403, etc.
+  timestamp   DateTime @default(now())
+}
+2. Feature: Device Enrollment
+Endpoint: POST /api/v1/devices/enroll Description: Handles the initial handshake from the SDK.
+
+Request Body (DTO):
+
+JSON
+
 {
-  "publicKey": "<Base64 SPKI>",
-  "keyId": "<string key id>",
-  "deviceFingerprint": "<fingerprintjs visitorId>",
-  "label": "Ahmed’s MacBook",
-  "userAgent": "<browser UA>",
-  "metadata": {}
+  "apiKeyPrefix": "kg_prod_123...",
+  "publicKey": "base64_string...",
+  "deviceFingerprint": "hash...",
+  "label": "Chrome on MacOS",
+  "metadata": { ... }
 }
-````
+Business Logic:
 
-Backend must store:
+Find the ApiKey record by keyPrefix. If not found -> Error 404.
 
-* projectApiKey (from your project table or API key record)
-* keyId
-* publicKey (SPKI base64)
-* device fingerprint + label + status
+Check if this publicKey already exists for this Key.
 
-### Signed Request Headers (from SDK)
+If yes -> Return existing deviceId (Idempotency).
 
-The SDK will add:
+Create new Device record with status PENDING.
 
-* `x-keyguard-api-key`: project key (e.g., `kg_prod_123`)
-* `x-keyguard-key-id`: stable key identifier (hash-based)
-* `x-keyguard-timestamp`: ISO8601 timestamp
-* `x-keyguard-nonce`: random nonce (unique per request)
-* `x-keyguard-body-sha256`: SHA-256 hash of RAW request body bytes (empty body is allowed)
-* `x-keyguard-alg`: `ECDSA_P256_SHA256_P1363`
-* `x-keyguard-signature`: Base64 signature
+Return: 201 Created with { deviceId: "...", status: "PENDING" }.
 
-> NOTE: The SDK uses WebCrypto ECDSA. The signature format is typically **IEEE-P1363 (r||s)**.
-> Your verification code must match that format.
+3. Feature: The Security Proxy (The Core Engine)
+Endpoint: POST /api/v1/proxy/* (Wildcard) Description: Intercepts, verifies, and forwards requests to OpenAI.
 
----
+Headers Required:
 
-## 2) Canonical Payload to Verify
+x-keyguard-signature
 
-Backend must rebuild the exact signed payload:
+x-keyguard-timestamp
 
-```
-kg-v1|{timestamp}|{METHOD}|{pathAndQuery}|{bodySha256}|{nonce}|{apiKey}|{keyId}
-```
+x-keyguard-nonce
 
-Rules:
+x-keyguard-key-id (Device Public Key ID)
 
-* METHOD must be uppercase
-* pathAndQuery must be ONLY `/path?query` (no scheme/host)
-* bodySha256 must be computed from the **raw request body bytes** exactly as received
+Business Logic (The Guard):
 
-  * empty body is allowed
+Anti-Replay: Check timestamp (max 10s old). Check Redis for nonce. If exists -> Reject. If new -> Save to Redis (SET NX EX 20).
 
-If payload reconstruction differs by even 1 character, verification fails.
+Device Lookup: Find device by key-id. Check if status === ACTIVE.
 
----
+Crypto Verify: Verify the signature using ECDSA P-256.
 
-## 3) Minimal Database Schema (Example)
+Forwarding Logic:
 
-You need two tables:
+Decrypt the providerKeyEncrypted from DB.
 
-### Projects (API Keys)
+Attach Authorization: Bearer sk-openai-real-key.
 
-* `id`
-* `apiKey` (unique, e.g., `kg_prod_123`)
-* `status`
+Proxy the request to https://api.openai.com/....
 
-### DeviceKeys (registered devices)
+Stream the response back to the client.
 
-* `id`
-* `projectId`
-* `keyId` (string from SDK)
-* `publicKeySpkiBase64`
-* `status` (`ACTIVE`, `REVOKED`, etc.)
-* `createdAt`, `lastSeenAt`
+4. Feature: Dashboard Management
+Description: Endpoints used by the Next.js Frontend.
 
-Uniqueness:
+GET /api/v1/devices
 
-* unique(projectId, keyId)
+Returns list of devices. Support filters: ?status=PENDING.
 
----
+PATCH /api/v1/devices/:id/approve
 
-## 4) Endpoints to Implement
+Updates status to ACTIVE.
 
-### A) POST `/api/v1/enroll`
+DELETE /api/v1/devices/:id
 
-**Purpose:** store the public key under a project.
-
-**Request**
-
-* Header or body must identify the project (recommended: `x-keyguard-api-key`, or include `apiKey` in body)
-
-**Logic**
-
-1. validate project API key exists and active
-2. insert device key record:
-
-   * keyId
-   * publicKeySpkiBase64
-   * status ACTIVE
-   * optional: fingerprint, label, userAgent, metadata
-3. return `deviceId` and status
-
-**Response**
-
-```json
-{ "id": "device-uuid", "status": "ACTIVE" }
-```
-
----
-
-### B) POST `/api/v1/verify-test`
-
-**Purpose:** test signature verification (later becomes middleware).
-
-**Request**
-
-* Any method/path/body is fine, but for testing this endpoint returns `{ valid: true/false }`.
-* Must receive the signed headers listed above.
-
-**Logic**
-
-1. Read headers: apiKey, keyId, signature, timestamp, nonce, bodySha256, alg
-2. DB lookup:
-
-   * project by apiKey
-   * device key by (projectId, keyId) -> get publicKeySpkiBase64
-3. Replay protection (required for a real system):
-
-   * timestamp must be within a window (e.g., 120 seconds)
-   * nonce must be unique per (projectId,keyId) within TTL (store in Redis with TTL)
-4. Reconstruct payload string:
-   `kg-v1|timestamp|METHOD|pathAndQuery|bodySha256|nonce|apiKey|keyId`
-5. Verify signature using the stored public key.
-6. Return `{ valid: true }` if verification passes.
-
-**Response**
-
-```json
-{ "valid": true }
-```
-
----
-
-## 5) Verification Code (Node.js)
-
-### Option 1 (Recommended): Node WebCrypto verify (matches browser WebCrypto)
-
-```ts
-import { webcrypto } from "node:crypto";
-const subtle = webcrypto.subtle;
-
-const importParams: EcKeyImportParams = { name: "ECDSA", namedCurve: "P-256" };
-const verifyParams: EcdsaParams = { name: "ECDSA", hash: { name: "SHA-256" } };
-
-const b64 = (s: string) => Buffer.from(s, "base64");
-
-export async function verifySignatureWebCrypto(
-  publicKeySpkiBase64: string,
-  payload: string,
-  signatureBase64: string
-) {
-  const publicKey = await subtle.importKey(
-    "spki",
-    b64(publicKeySpkiBase64),
-    importParams,
-    true,
-    ["verify"]
-  );
-
-  return subtle.verify(
-    verifyParams,
-    publicKey,
-    b64(signatureBase64),
-    Buffer.from(payload, "utf8")
-  );
-}
-```
-
-### Option 2: node:crypto.verify with P1363 support
-
-```ts
-import { verify, createPublicKey } from "node:crypto";
-
-export function verifySignatureNodeCrypto(
-  publicKeySpkiBase64: string,
-  payload: string,
-  signatureBase64: string
-) {
-  const publicKey = createPublicKey({
-    key: Buffer.from(publicKeySpkiBase64, "base64"),
-    format: "der",
-    type: "spki",
-  });
-
-  return verify(
-    "sha256",
-    Buffer.from(payload, "utf8"),
-    { key: publicKey, dsaEncoding: "ieee-p1363" },
-    Buffer.from(signatureBase64, "base64")
-  );
-}
-```
-
----
-
-## 6) Raw Body Handling (Important)
-
-To compute/compare `x-keyguard-body-sha256`, you must hash the **raw request body bytes** before parsing JSON.
-
-In Express, use a `verify` function in the JSON middleware to capture raw body:
-
-```ts
-app.use(express.json({
-  verify: (req: any, _res, buf) => {
-    req.rawBody = buf; // Buffer
-  }
-}));
-```
-
-Then compute SHA-256 on `req.rawBody` and compare with `x-keyguard-body-sha256`.
-
----
-
-## 7) “Definition of Done” (Phase 1)
-
-Backend is ready when:
-
-1. `POST /api/v1/enroll` stores a device public key under a project
-2. A browser client using the SDK can call `POST /api/v1/verify-test`
-   and backend returns:
-
-   ```json
-   { "valid": true }
-   ```
-
----
-
-## 8) Troubleshooting
-
-If `valid=false`, the most common causes are:
-
-* Payload mismatch: backend used full URL instead of path+query
-* Body mismatch: backend hashed parsed JSON instead of raw bytes
-* Signature format mismatch: backend assumed DER instead of IEEE-P1363
-* Timestamp window too strict or nonce reused
-
-```
-
----
-
+Updates status to REVOKED (Soft delete).
