@@ -1,18 +1,26 @@
 import {
-  Injectable,
-  NotFoundException,
-  ConflictException,
   BadRequestException,
+  ConflictException,
+  Injectable,
+  Logger,
+  NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/core/database/prisma.service';
-import { CreateKeyDto } from './dto/create-key.dto';
-import { QueryKeysDto } from './dto/query-keys.dto';
-import { ApiKeyDto, KeysPaginationResponseDto } from './dto/key-response.dto';
 import dayjs from 'dayjs';
+import { PrismaService } from 'src/core/database/prisma.service';
+import { AuditLogsService } from '../audit-logs/audit-logs.service';
+import { CreateKeyDto } from './dto/create-key.dto';
+import { ApiKeyDto, KeysPaginationResponseDto } from './dto/key-response.dto';
+import { QueryKeysDto } from './dto/query-keys.dto';
+import { ApiKey } from '@/src/generated/client';
 
 @Injectable()
 export class ApiKeysService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(ApiKeysService.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly auditLogsService: AuditLogsService,
+  ) { }
 
   async listKeys(query: QueryKeysDto): Promise<KeysPaginationResponseDto> {
     const { page = 1, limit = 20, status, provider, environment, search } = query;
@@ -60,16 +68,16 @@ export class ApiKeysService {
       }),
     ]);
 
-    const mappedKeys: ApiKeyDto[] = keys.map((key: any) => ({
+    const mappedKeys: ApiKeyDto[] = keys.map((key: ApiKey & { _count: { devices: number } }) => ({
       id: key.id,
       name: key.name,
-      provider: key.provider.toLowerCase() as any,
+      provider: key.provider.toLowerCase() as 'openai' | 'anthropic' | 'google' | 'azure',
       status: this.computeKeyStatus(key),
-      environment: key.environment.toLowerCase() as any,
+      environment: key.environment.toLowerCase() as 'production' | 'development' | 'staging',
       created: key.createdAt.toISOString(),
       lastUsed: key.lastUsed ? key.lastUsed.toISOString() : null,
       expiresAt: key.expiresAt ? key.expiresAt.toISOString() : null,
-      deviceCount: key._count.devices,
+      deviceCount: key._count?.devices ?? 0,
       usageCount: key.usageCount,
       description: key.description ?? '',
       maskedValue: key.maskedValue,
@@ -132,12 +140,36 @@ export class ApiKeysService {
       },
     });
 
+    // Log API key creation
+    try {
+      await this.auditLogsService.createLog({
+        event: 'key.created',
+        severity: 'info',
+        status: 'success',
+        actorId: 'system',
+        actorName: 'System',
+        actorType: 'system',
+        actorIp: '0.0.0.0',
+        targetId: key.id,
+        targetName: key.name,
+        targetType: 'api_key',
+        metadata: {
+          provider: key.provider,
+          environment: key.environment,
+          expiresAt: key.expiresAt,
+        },
+        apiKeyId: key.id,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to create audit log for API key creation: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+
     return {
       id: key.id,
       name: key.name,
-      provider: key.provider.toLowerCase() as any,
+      provider: key.provider.toLowerCase() as 'openai' | 'anthropic' | 'google' | 'azure',
       status: this.computeKeyStatus(key),
-      environment: key.environment.toLowerCase() as any,
+      environment: key.environment.toLowerCase() as 'production' | 'development' | 'staging',
       created: key.createdAt.toISOString(),
       lastUsed: null,
       expiresAt: key.expiresAt ? key.expiresAt.toISOString() : null,
@@ -165,6 +197,29 @@ export class ApiKeysService {
       where: { id },
       data: { status: 'REVOKED' },
     });
+
+    // Log API key revocation
+    try {
+      await this.auditLogsService.createLog({
+        event: 'key.revoked',
+        severity: 'warning',
+        status: 'success',
+        actorId: 'system',
+        actorName: 'System',
+        actorType: 'system',
+        actorIp: '0.0.0.0',
+        targetId: key.id,
+        targetName: key.name,
+        targetType: 'api_key',
+        metadata: {
+          previousStatus: key.status,
+          provider: key.provider,
+        },
+        apiKeyId: key.id,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to create audit log for API key revocation: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
 
     return {
       success: true,

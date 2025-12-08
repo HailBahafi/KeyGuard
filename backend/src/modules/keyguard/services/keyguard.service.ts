@@ -1,19 +1,19 @@
+import { PrismaService } from '@/src/core/database/prisma.service';
 import {
+  BadRequestException,
   Injectable,
   Logger,
-  BadRequestException,
-  UnauthorizedException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
-import { PrismaService } from '@/src/core/database/prisma.service';
-import { SignatureVerificationService } from './signature-verification.service';
+import { AuditLogsService } from '../../audit-logs/audit-logs.service';
 import {
   EnrollDeviceDto,
   EnrollResponseDto,
-  VerifyResponseDto,
   KeyGuardHeaders,
+  VerifyResponseDto,
 } from '../dto';
-import { DeviceCreateInput } from '@/src/generated/models';
+import { SignatureVerificationService } from './signature-verification.service';
 
 /**
  * Main KeyGuard service handling device enrollment and signature verification
@@ -25,7 +25,8 @@ export class KeyGuardService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly signatureVerification: SignatureVerificationService,
-  ) {}
+    private readonly auditLogsService: AuditLogsService,
+  ) { }
 
   /**
    * Enroll a new device by storing its public key
@@ -83,6 +84,32 @@ export class KeyGuardService {
     });
 
     this.logger.log(`Device enrolled successfully: ${device.id}`);
+
+    // Log device enrollment
+    try {
+      await this.auditLogsService.createLog({
+        event: 'device.enrolled',
+        severity: 'info',
+        status: 'success',
+        actorId: device.id,
+        actorName: device.name,
+        actorType: 'device',
+        actorIp: device.ipAddress,
+        actorLocation: device.location,
+        targetId: project.id,
+        targetName: project.name,
+        targetType: 'api_key',
+        metadata: {
+          keyId: device.keyId,
+          fingerprint: device.fingerprintHash,
+          platform: enrollDto.metadata,
+        },
+        deviceId: device.id,
+        apiKeyId: project.id,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to create audit log for enrollment: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
 
     return {
       id: device.id,
@@ -196,10 +223,11 @@ export class KeyGuardService {
 
       // 8. Verify signature
       const isValid = await this.signatureVerification.verifySignature(
-        device.publicKeySpkiBase64 || '',
+        device.publicKeySpkiBase64 ?? '',
         canonicalPayload,
         headers.signature,
       );
+
 
       if (!isValid) {
         return {
@@ -222,7 +250,7 @@ export class KeyGuardService {
       return {
         valid: true,
         deviceId: device.id,
-        keyId: device.keyId || '',
+        keyId: device.keyId ?? '',
       };
     } catch (error) {
       this.logger.error('Verification error:', error);
@@ -286,6 +314,31 @@ export class KeyGuardService {
     });
 
     this.logger.log(`Device revoked: ${deviceId}`);
+
+    // Log device revocation
+    try {
+      await this.auditLogsService.createLog({
+        event: 'device.revoked',
+        severity: 'warning',
+        status: 'success',
+        actorId: 'system',
+        actorName: 'System',
+        actorType: 'system',
+        actorIp: '0.0.0.0',
+        targetId: deviceId,
+        targetName: updated.name,
+        targetType: 'device',
+        metadata: {
+          keyId: updated.keyId,
+          previousStatus: device.status,
+        },
+        deviceId,
+        apiKeyId: project.id,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to create audit log for revocation: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+
     return updated;
   }
 
@@ -319,15 +372,41 @@ export class KeyGuardService {
    * Validate public key format (basic validation)
    */
   private validatePublicKey(publicKey: string) {
+    // Clean the public key
+    const cleanedKey = publicKey.trim().replace(/\s/g, '');
+
     // Check if it's valid base64
     const base64Regex = /^[A-Za-z0-9+/]+=*$/;
-    if (!base64Regex.test(publicKey)) {
-      throw new BadRequestException('Invalid public key format');
+    if (!base64Regex.test(cleanedKey)) {
+      throw new BadRequestException('Invalid public key format: not valid base64');
     }
 
     // Check reasonable length (SPKI P-256 keys are ~91 base64 chars)
-    if (publicKey.length < 50 || publicKey.length > 200) {
+    if (cleanedKey.length < 50 || cleanedKey.length > 200) {
       throw new BadRequestException('Public key length out of valid range');
+    }
+
+    // Try to decode and validate SPKI format
+    try {
+      const buffer = Buffer.from(cleanedKey, 'base64');
+
+      // SPKI format validation:
+      // - Must start with 0x30 (SEQUENCE tag)
+      // - For P-256 keys, typical length is 91 bytes
+      if (buffer.length < 50) {
+        throw new BadRequestException('Public key buffer too short');
+      }
+
+      if (buffer[0] !== 0x30) {
+        throw new BadRequestException('Invalid SPKI format: missing SEQUENCE tag');
+      }
+
+      this.logger.debug(`Public key validated: ${buffer.length} bytes`);
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException(`Failed to decode public key: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 

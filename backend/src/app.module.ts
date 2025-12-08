@@ -1,20 +1,21 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CommonModule } from './common/common.module';
 import { AuthModule } from './core/auth/auth.module';
-import { PrismaModule } from './core/database/prisma.module';
 import { JwtAuthGuard } from './core/auth/jwt-auth.guard';
+import { PrismaModule } from './core/database/prisma.module';
 
 // Feature modules
-import { UsersModule } from './modules/users/users.module';
-import { KeyGuardModule } from './modules/keyguard/keyguard.module';
 import { ApiKeysModule } from './modules/api-keys/api-keys.module';
-import { DevicesModule } from './modules/devices/devices.module';
 import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
+import { DevicesModule } from './modules/devices/devices.module';
+import { KeyGuardModule } from './modules/keyguard/keyguard.module';
+import { ProxyModule } from './modules/proxy/proxy.module';
 import { SettingsModule } from './modules/settings/settings.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { SettingsModule } from './modules/settings/settings.module';
     DevicesModule,
     AuditLogsModule,
     SettingsModule,
+    ProxyModule,
   ],
   controllers: [AppController],
   providers: [
@@ -51,4 +53,4 @@ import { SettingsModule } from './modules/settings/settings.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }

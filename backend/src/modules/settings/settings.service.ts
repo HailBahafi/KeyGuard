@@ -1,26 +1,31 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/core/database/prisma.service';
-import {
-  UpdateGeneralSettingsDto,
-  UpdateSecuritySettingsDto,
-  UpdateNotificationSettingsDto,
-  GenerateApiKeyDto,
-} from './dto/update-settings.dto';
-import {
-  SettingsStateDto,
-  GeneralSettingsDto,
-  SecuritySettingsDto,
-  NotificationSettingsDto,
-  ApiSettingsDto,
-  BackupSettingsDto,
-  AdminApiKeyDto,
-} from './dto/settings-response.dto';
-import { Hashing } from 'src/common/utils/hashing.util';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import dayjs from 'dayjs';
+import { Hashing } from 'src/common/utils/hashing.util';
+import { PrismaService } from 'src/core/database/prisma.service';
+import { AuditLogsService } from '../audit-logs/audit-logs.service';
+import {
+  AdminApiKeyDto,
+  BackupSettingsDto,
+  GeneralSettingsDto,
+  NotificationSettingsDto,
+  SecuritySettingsDto,
+  SettingsStateDto
+} from './dto/settings-response.dto';
+import {
+  GenerateApiKeyDto,
+  UpdateGeneralSettingsDto,
+  UpdateNotificationSettingsDto,
+  UpdateSecuritySettingsDto,
+} from './dto/update-settings.dto';
 
 @Injectable()
 export class SettingsService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(SettingsService.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly auditLogsService: AuditLogsService,
+  ) { }
 
   async getAllSettings(): Promise<SettingsStateDto> {
     const [general, security, notifications, apiKeys, backup] = await Promise.all([
@@ -47,6 +52,28 @@ export class SettingsService {
       create: { key: 'general', value: dto as any },
     });
 
+    // Log settings update
+    try {
+      await this.auditLogsService.createLog({
+        event: 'settings.updated',
+        severity: 'info',
+        status: 'success',
+        actorId: 'system',
+        actorName: 'System',
+        actorType: 'system',
+        actorIp: '0.0.0.0',
+        targetId: 'general',
+        targetName: 'General Settings',
+        targetType: 'settings',
+        metadata: {
+          settingsType: 'general',
+          changes: JSON.parse(JSON.stringify(dto)),
+        },
+      });
+    } catch (error) {
+      this.logger.error(`Failed to create audit log for settings update: ${error}`);
+    }
+
     return dto;
   }
 
@@ -56,6 +83,28 @@ export class SettingsService {
       update: { value: dto as any },
       create: { key: 'security', value: dto as any },
     });
+
+    // Log security settings update
+    try {
+      await this.auditLogsService.createLog({
+        event: 'settings.security.updated',
+        severity: 'warning',
+        status: 'success',
+        actorId: 'system',
+        actorName: 'System',
+        actorType: 'system',
+        actorIp: '0.0.0.0',
+        targetId: 'security',
+        targetName: 'Security Settings',
+        targetType: 'settings',
+        metadata: {
+          settingsType: 'security',
+          changes: JSON.parse(JSON.stringify(dto)),
+        },
+      });
+    } catch (error) {
+      this.logger.error(`Failed to create audit log for security settings update: ${error}`);
+    }
 
     return dto;
   }

@@ -35,24 +35,67 @@ export class SignatureVerificationService {
     signatureBase64: string,
   ): Promise<boolean> {
     try {
+
+      console.log({
+        spki: 'spki',
+        buffer: this.base64ToBuffer(publicKeySpkiBase64),
+        importParams: this.importParams,
+        extractable: true,
+        keyUsages: ['verify'],
+      })
+            // Clean and validate the base64 string
+      const cleanedPublicKey = publicKeySpkiBase64.trim().replace(/\s/g, '');
+
+      if (!cleanedPublicKey) {
+        this.logger.error('Public key is empty');
+        return false;
+      }
+
+      // Convert base64 to buffer with validation
+      let publicKeyBuffer: Buffer;
+      try {
+        publicKeyBuffer = Buffer.from(cleanedPublicKey, 'base64');
+      } catch (bufferError) {
+        this.logger.error('Failed to decode base64 public key:', bufferError);
+        return false;
+      }
+
+      // Validate SPKI format (should start with 0x30 for DER SEQUENCE)
+      if (publicKeyBuffer.length < 50 || publicKeyBuffer[0] !== 0x30) {
+        this.logger.error('Invalid SPKI format: buffer does not start with SEQUENCE tag');
+        return false;
+      }
+
+      this.logger.debug(`Public key buffer length: ${publicKeyBuffer.length} bytes`);
+
+      // Import the public key
       const publicKey = await subtle.importKey(
         'spki',
-        this.base64ToBuffer(publicKeySpkiBase64),
+        publicKeyBuffer,
         this.importParams,
         true,
         ['verify'],
       );
 
+      // Verify the signature
       const isValid = await subtle.verify(
         this.verifyParams,
         publicKey,
         this.base64ToBuffer(signatureBase64),
         Buffer.from(payload, 'utf8'),
       );
+      // console.log({
+      //   isValid,
+      //   payload,
+      //   signatureBase64,
+      //   publicKeySpkiBase64,
+      // });
 
       this.logger.debug(`Signature verification result: ${isValid}`);
       return isValid;
     } catch (error) {
+      console.log("here: ");
+      console.dir(error, { depth: null });
       this.logger.error('Signature verification failed:', error);
       return false;
     }
