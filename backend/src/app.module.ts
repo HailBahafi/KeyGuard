@@ -6,12 +6,14 @@ import { AppService } from './app.service';
 import { CommonModule } from './common/common.module';
 import { AuthModule } from './core/auth/auth.module';
 import { JwtAuthGuard } from './core/auth/jwt-auth.guard';
+import { CacheModule } from './core/cache/cache.module';
 import { PrismaModule } from './core/database/prisma.module';
 
 // Feature modules
 import { ApiKeysModule } from './modules/api-keys/api-keys.module';
 import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
 import { DevicesModule } from './modules/devices/devices.module';
+import { HealthModule } from './modules/health/health.module';
 import { KeyGuardModule } from './modules/keyguard/keyguard.module';
 import { ProxyModule } from './modules/proxy/proxy.module';
 import { SettingsModule } from './modules/settings/settings.module';
@@ -28,6 +30,7 @@ import { UsersModule } from './modules/users/users.module';
     ]),
     // Core modules
     PrismaModule,
+    CacheModule,
     CommonModule,
     AuthModule,
     // Feature modules
@@ -38,6 +41,7 @@ import { UsersModule } from './modules/users/users.module';
     AuditLogsModule,
     SettingsModule,
     ProxyModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [

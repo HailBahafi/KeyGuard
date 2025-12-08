@@ -1,3 +1,4 @@
+import { ApiKey } from '@/src/generated/client';
 import {
   BadRequestException,
   ConflictException,
@@ -11,7 +12,6 @@ import { AuditLogsService } from '../audit-logs/audit-logs.service';
 import { CreateKeyDto } from './dto/create-key.dto';
 import { ApiKeyDto, KeysPaginationResponseDto } from './dto/key-response.dto';
 import { QueryKeysDto } from './dto/query-keys.dto';
-import { ApiKey } from '@/src/generated/client';
 
 @Injectable()
 export class ApiKeysService {
@@ -74,7 +74,7 @@ export class ApiKeysService {
       provider: key.provider.toLowerCase() as 'openai' | 'anthropic' | 'google' | 'azure',
       status: this.computeKeyStatus(key),
       environment: key.environment.toLowerCase() as 'production' | 'development' | 'staging',
-      created: key.createdAt.toISOString(),
+      createdAt: key.createdAt.toISOString(),
       lastUsed: key.lastUsed ? key.lastUsed.toISOString() : null,
       expiresAt: key.expiresAt ? key.expiresAt.toISOString() : null,
       deviceCount: key._count?.devices ?? 0,
@@ -170,7 +170,7 @@ export class ApiKeysService {
       provider: key.provider.toLowerCase() as 'openai' | 'anthropic' | 'google' | 'azure',
       status: this.computeKeyStatus(key),
       environment: key.environment.toLowerCase() as 'production' | 'development' | 'staging',
-      created: key.createdAt.toISOString(),
+      createdAt: key.createdAt.toISOString(),
       lastUsed: null,
       expiresAt: key.expiresAt ? key.expiresAt.toISOString() : null,
       deviceCount: 0,

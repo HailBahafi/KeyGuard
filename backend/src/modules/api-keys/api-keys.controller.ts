@@ -1,32 +1,32 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Delete,
   Body,
-  Param,
-  Query,
+  Controller,
+  Delete,
+  Get,
   HttpCode,
   HttpStatus,
+  Param,
+  Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/core/auth/jwt-auth.guard';
 import { ApiKeysService } from './api-keys.service';
 import { CreateKeyDto } from './dto/create-key.dto';
-import { QueryKeysDto } from './dto/query-keys.dto';
 import {
-  KeysPaginationResponseDto,
   CreateKeyResponseDto,
+  KeysPaginationResponseDto,
   RevokeKeyResponseDto,
 } from './dto/key-response.dto';
+import { QueryKeysDto } from './dto/query-keys.dto';
 
 @ApiTags('API Keys')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('keys')
 export class ApiKeysController {
-  constructor(private readonly apiKeysService: ApiKeysService) {}
+  constructor(private readonly apiKeysService: ApiKeysService) { }
 
   @Get()
   @ApiOperation({ summary: 'List all API keys with filtering and pagination' })
@@ -64,5 +64,20 @@ export class ApiKeysController {
   @ApiResponse({ status: 404, description: 'API key not found' })
   async revokeKey(@Param('id') id: string): Promise<RevokeKeyResponseDto> {
     return this.apiKeysService.revokeKey(id);
+  }
+
+  @Post(':id/rotate')
+  @HttpCode(HttpStatus.NOT_IMPLEMENTED)
+  @ApiOperation({ summary: 'Rotate an API key (coming soon)' })
+  @ApiResponse({
+    status: 501,
+    description: 'Feature not yet implemented',
+  })
+  @ApiResponse({ status: 404, description: 'API key not found' })
+  async rotateKey(@Param('id') id: string): Promise<{ message: string }> {
+    // Stub implementation - to be completed in future
+    return {
+      message: 'Key rotation feature is not yet implemented',
+    };
   }
 }
