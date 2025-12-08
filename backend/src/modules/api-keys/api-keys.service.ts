@@ -7,6 +7,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import dayjs from 'dayjs';
+import { Hashing } from 'src/common/utils/hashing.util';
 import { PrismaService } from 'src/core/database/prisma.service';
 import { AuditLogsService } from '../audit-logs/audit-logs.service';
 import { CreateKeyDto } from './dto/create-key.dto';
@@ -96,7 +97,7 @@ export class ApiKeysService {
     };
   }
 
-  async createKey(createKeyDto: CreateKeyDto): Promise<ApiKeyDto> {
+  async createKey(createKeyDto: CreateKeyDto): Promise<{ key: ApiKeyDto; rawKey: string }> {
     // Check if key with same name already exists
     const existingKey = await this.prisma.prisma.apiKey.findFirst({
       where: { name: createKeyDto.name },
@@ -117,11 +118,14 @@ export class ApiKeysService {
       }
     }
 
-    // Generate full key value (this would be the actual API key)
-    const fullValue = this.generateApiKeyValue();
-    const maskedValue = this.maskApiKey(fullValue);
+    // Generate full key value (the raw API key that user will receive once)
+    const rawKey = this.generateApiKeyValue();
+    const maskedValue = this.maskApiKey(rawKey);
 
-    // Create key
+    // Hash the key with bcrypt for secure storage - never store plain text
+    const hashedValue = await Hashing.hash(rawKey);
+
+    // Create key with hashed value (not plain text)
     const key = await this.prisma.prisma.apiKey.create({
       data: {
         name: createKeyDto.name,
@@ -129,7 +133,7 @@ export class ApiKeysService {
         environment: createKeyDto.environment.toUpperCase() as any,
         description: createKeyDto.description ?? null,
         expiresAt: createKeyDto.expiresAt ? new Date(createKeyDto.expiresAt) : null,
-        fullValue, // In production, this should be encrypted
+        fullValue: hashedValue, // Store bcrypt hash, NOT the raw key
         maskedValue,
         status: 'ACTIVE',
       },
@@ -164,19 +168,23 @@ export class ApiKeysService {
       this.logger.error(`Failed to create audit log for API key creation: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
 
+    // Return both the key metadata and the raw key (only time it's available)
     return {
-      id: key.id,
-      name: key.name,
-      provider: key.provider.toLowerCase() as 'openai' | 'anthropic' | 'google' | 'azure',
-      status: this.computeKeyStatus(key),
-      environment: key.environment.toLowerCase() as 'production' | 'development' | 'staging',
-      createdAt: key.createdAt.toISOString(),
-      lastUsed: null,
-      expiresAt: key.expiresAt ? key.expiresAt.toISOString() : null,
-      deviceCount: 0,
-      usageCount: 0,
-      description: key.description ?? '',
-      maskedValue: key.maskedValue,
+      key: {
+        id: key.id,
+        name: key.name,
+        provider: key.provider.toLowerCase() as 'openai' | 'anthropic' | 'google' | 'azure',
+        status: this.computeKeyStatus(key),
+        environment: key.environment.toLowerCase() as 'production' | 'development' | 'staging',
+        createdAt: key.createdAt.toISOString(),
+        lastUsed: null,
+        expiresAt: key.expiresAt ? key.expiresAt.toISOString() : null,
+        deviceCount: 0,
+        usageCount: 0,
+        description: key.description ?? '',
+        maskedValue: key.maskedValue,
+      },
+      rawKey, // CRITICAL: Only returned here, NEVER in GET requests
     };
   }
 

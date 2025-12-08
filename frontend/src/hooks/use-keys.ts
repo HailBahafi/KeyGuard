@@ -87,8 +87,13 @@ export function useCreateKey() {
 
   return useMutation({
     mutationFn: async (data: CreateKeyDto): Promise<CreateKeyResponse> => {
-      const response = await apiClient.post<{ key: CreateKeyResponse }>('/keys', data);
-      return response.data.key;
+      // Backend returns { key: ApiKeyDto, rawKey: string }
+      const response = await apiClient.post<{ key: ApiKey; rawKey: string }>('/keys', data);
+      // Merge the key object with rawKey so component can access both
+      return {
+        ...response.data.key,
+        rawKey: response.data.rawKey, // CRITICAL: Only available on POST response!
+      };
     },
     onSuccess: () => {
       // Invalidate and refetch keys list

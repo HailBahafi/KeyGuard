@@ -63,6 +63,12 @@ export class KeysPaginationResponseDto {
 export class CreateKeyResponseDto {
   @ApiProperty({ type: ApiKeyDto })
   key: ApiKeyDto;
+
+  @ApiProperty({
+    description: 'The raw API key value. This is only returned ONCE during creation and cannot be retrieved again.',
+    example: 'kg_1733668200000_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6',
+  })
+  rawKey: string;
 }
 
 export class RevokeKeyResponseDto {

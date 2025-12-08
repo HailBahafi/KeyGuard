@@ -44,13 +44,14 @@ export class ApiKeysController {
   @ApiOperation({ summary: 'Create a new API key' })
   @ApiResponse({
     status: 201,
-    description: 'API key created successfully',
+    description: 'API key created successfully. The rawKey is only returned ONCE in this response.',
     type: CreateKeyResponseDto,
   })
   @ApiResponse({ status: 409, description: 'API key with this name already exists' })
   async createKey(@Body() createKeyDto: CreateKeyDto): Promise<CreateKeyResponseDto> {
-    const key = await this.apiKeysService.createKey(createKeyDto);
-    return { key };
+    // Service returns { key, rawKey } - rawKey is ONLY available here
+    const result = await this.apiKeysService.createKey(createKeyDto);
+    return result;
   }
 
   @Delete(':id')
