@@ -79,7 +79,7 @@ export function useApproveDevice() {
 
   return useMutation({
     mutationFn: async ({ deviceId, data }: { deviceId: string; data: ApproveDeviceDto }): Promise<Device> => {
-      const response = await apiClient.post<Device>(`/devices/${deviceId}/approve`, data);
+      const response = await apiClient.patch<Device>(`/devices/${deviceId}/approve`, data);
       return response.data;
     },
     onSuccess: () => {
@@ -118,7 +118,7 @@ export function useSuspendDevice() {
 
   return useMutation({
     mutationFn: async (deviceId: string): Promise<void> => {
-      await apiClient.post(`/devices/${deviceId}/suspend`);
+      await apiClient.patch(`/devices/${deviceId}/suspend`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['devices'] });
@@ -135,7 +135,7 @@ export function useSuspendDevice() {
 export function useEnrollmentCode() {
   return useMutation({
     mutationFn: async (data: EnrollmentCodeDto): Promise<EnrollmentCode> => {
-      const response = await apiClient.post<EnrollmentCode>('/devices/enroll', data);
+      const response = await apiClient.post<EnrollmentCode>('/devices/enrollment-code', data);
       return response.data;
     },
     onSuccess: () => {

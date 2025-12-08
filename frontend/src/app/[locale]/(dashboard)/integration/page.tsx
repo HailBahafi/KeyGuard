@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Code2, Play } from 'lucide-react';
 import { Sidebar } from './_components/sidebar';
 import { QuickStart } from './_components/quick-start';
+import { CodeGenerator } from './_components/code-generator';
 import { ConnectionTest } from './_components/connection-test';
 import { SdkReference } from './_components/sdk-reference';
 import { ApiPlayground } from './_components/api-playground';
@@ -17,9 +18,19 @@ const sections = [
         title: 'Quick Start',
         subsections: [
             { id: 'install', title: 'Install' },
-            { id: 'enroll', title: 'Enroll' },
-            { id: 'sign', title: 'Sign & Send' }
+            { id: 'enroll', title: 'Initialize & Enroll' },
+            { id: 'sign', title: 'Sign Requests' }
         ]
+    },
+    {
+        id: 'code-generator',
+        title: 'Code Generator',
+        subsections: []
+    },
+    {
+        id: 'troubleshooting',
+        title: 'Troubleshooting',
+        subsections: []
     },
     {
         id: 'sdk-reference',
@@ -95,6 +106,7 @@ export default function IntegrationPage() {
                 {/* Main Content */}
                 <main className="space-y-16 min-w-0 max-w-full overflow-hidden">
                     <QuickStart />
+                    <CodeGenerator />
                     <ConnectionTest />
                     <SdkReference />
                 </main>

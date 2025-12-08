@@ -106,7 +106,7 @@ export function useRevokeKey() {
 
   return useMutation({
     mutationFn: async (keyId: string): Promise<void> => {
-      await apiClient.post(`/keys/${keyId}/revoke`);
+      await apiClient.delete(`/keys/${keyId}`);
     },
     onSuccess: () => {
       // Invalidate and refetch keys list

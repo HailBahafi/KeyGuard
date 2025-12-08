@@ -2,6 +2,8 @@
 
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 const codeLines = [
     '// Enroll your device',
@@ -15,6 +17,67 @@ const codeLines = [
     '',
     '// ✓ Device enrolled successfully',
 ];
+
+// Custom style that matches our terminal theme
+const customStyle = {
+    ...oneDark,
+    'pre[class*="language-"]': {
+        ...oneDark['pre[class*="language-"]'],
+        background: 'transparent',
+        margin: 0,
+        padding: 0,
+        overflow: 'visible',
+        fontSize: 'inherit',
+        fontFamily: 'inherit',
+    },
+    'code[class*="language-"]': {
+        ...oneDark['code[class*="language-"]'],
+        background: 'transparent',
+        fontSize: 'inherit',
+        fontFamily: 'inherit',
+    },
+};
+
+interface HighlightedLineProps {
+    line: string;
+    isPartial?: boolean;
+}
+
+function HighlightedLine({ line, isPartial }: HighlightedLineProps) {
+    // Handle empty lines
+    if (!line.trim()) {
+        return <span>&nbsp;</span>;
+    }
+
+    // Handle success messages (keep original styling)
+    if (line.includes('✓')) {
+        return <span className="text-chart-2">{line}</span>;
+    }
+
+    // For code lines, use syntax highlighting
+    return (
+        <SyntaxHighlighter
+            language="typescript"
+            style={customStyle}
+            customStyle={{
+                background: 'transparent',
+                margin: 0,
+                padding: 0,
+                display: 'inline',
+            }}
+            codeTagProps={{
+                style: {
+                    fontFamily: 'inherit',
+                    fontSize: 'inherit',
+                },
+            }}
+            PreTag="span"
+            CodeTag="span"
+        >
+            {line}
+        </SyntaxHighlighter>
+    );
+}
 
 export function AnimatedTerminal() {
     const [displayedLines, setDisplayedLines] = useState<string[]>([]);
@@ -62,37 +125,18 @@ export function AnimatedTerminal() {
 
                 {/* Terminal Body */}
                 <div className="p-6 font-mono text-sm h-[300px] overflow-y-auto bg-card">
-                    <div className="w-full">
+                    <div className="w-full overflow-x-auto">
                         {displayedLines.map((line, index) => (
-                            <div key={index} className="leading-relaxed">
-                                {line.startsWith('//') ? (
-                                    <span className="text-muted-foreground">{line}</span>
-                                ) : line.includes('import') || line.includes('const') || line.includes('await') ? (
-                                    <span className="text-primary">{line}</span>
-                                ) : line.includes('✓') ? (
-                                    <span className="text-chart-2">{line}</span>
-                                ) : (
-                                    <span className="text-foreground">{line}</span>
-                                )}
+                            <div key={index} className="leading-relaxed whitespace-pre">
+                                <HighlightedLine line={line} />
                             </div>
                         ))}
                         {currentLineIndex < codeLines.length && (
-                            <div className="leading-relaxed">
-                                {codeLines[currentLineIndex].substring(0, currentChar).startsWith('//') ? (
-                                    <span className="text-muted-foreground">
-                                        {codeLines[currentLineIndex].substring(0, currentChar)}
-                                    </span>
-                                ) : codeLines[currentLineIndex].substring(0, currentChar).includes('import') ||
-                                    codeLines[currentLineIndex].substring(0, currentChar).includes('const') ||
-                                    codeLines[currentLineIndex].substring(0, currentChar).includes('await') ? (
-                                    <span className="text-primary">
-                                        {codeLines[currentLineIndex].substring(0, currentChar)}
-                                    </span>
-                                ) : (
-                                    <span className="text-foreground">
-                                        {codeLines[currentLineIndex].substring(0, currentChar)}
-                                    </span>
-                                )}
+                            <div className="leading-relaxed whitespace-pre">
+                                <HighlightedLine
+                                    line={codeLines[currentLineIndex].substring(0, currentChar)}
+                                    isPartial
+                                />
                                 <span className="inline-block w-2 h-4 bg-primary animate-pulse ms-0.5" />
                             </div>
                         )}

@@ -21,259 +21,105 @@ export const quickStartSteps = [
     {
         id: 'install',
         step: 1,
-        title: 'Install the SDK',
-        description: 'Add KeyGuard to your project using your package manager',
-        icon: 'Package',
+        title: 'Install',
+        description: 'Add the KeyGuard SDK to your project',
+        icon: 'Terminal',
         codeSnippets: [
             {
                 language: 'typescript' as Language,
-                code: `npm install @keyguard/sdk
-
-# or with yarn
-yarn add @keyguard/sdk
-
-# or with pnpm
-pnpm add @keyguard/sdk`
+                code: `npm install @keyguard/sdk`
             },
             {
                 language: 'python' as Language,
-                code: `pip install keyguard-sdk
-
-# or with poetry
-poetry add keyguard-sdk`
+                code: `pip install keyguard-sdk`
             },
             {
-                language: 'go' as Language,
-                code: `go get github.com/keyguard/sdk-go`
+                language: 'curl' as Language,
+                code: `# No installation needed for cURL - use the REST API directly`
             }
         ]
     },
     {
         id: 'enroll',
         step: 2,
-        title: 'Enroll Your Device',
-        description: 'Bind your device to the API key for secure access',
+        title: 'Initialize & Enroll',
+        description: 'Register the device one-time',
         icon: 'Shield',
-        content: `Device enrollment creates a unique fingerprint for your machine and securely binds it to your API keys. This ensures that only authorized devices can access your keys.`,
+        content: `Device enrollment generates a cryptographic keypair and registers your device with KeyGuard. This only needs to be done once per device.`,
         codeSnippets: [
             {
                 language: 'typescript' as Language,
                 code: `import { KeyGuardClient } from '@keyguard/sdk';
 
-const client = new KeyGuardClient({
-  projectId: 'your-project-id',
-  apiKey: 'your-api-key'
-});
-
-// Enroll this device
-await client.enroll('My-MacBook-Pro');
-
-console.log('Device enrolled successfully!');`,
+const client = new KeyGuardClient({ apiKey: 'kg_prod_...' });
+await client.enroll();`,
                 filename: 'enroll.ts'
             },
             {
                 language: 'python' as Language,
                 code: `from keyguard import KeyGuardClient
 
-client = KeyGuardClient(
-    project_id='your-project-id',
-    api_key='your-api-key'
-)
-
-# Enroll this device
-client.enroll('My-MacBook-Pro')
-
-print('Device enrolled successfully!')`,
+client = KeyGuardClient(api_key='kg_prod_...')
+client.enroll()`,
                 filename: 'enroll.py'
             },
             {
-                language: 'go' as Language,
-                code: `package main
-
-import (
-    "fmt"
-    "github.com/keyguard/sdk-go"
-)
-
-func main() {
-    client := keyguard.NewClient(&keyguard.Config{
-        ProjectID: "your-project-id",
-        APIKey:    "your-api-key",
-    })
-
-    // Enroll this device
-    err := client.Enroll("My-MacBook-Pro")
-    if err != nil {
-        panic(err)
-    }
-
-    fmt.Println("Device enrolled successfully!")
-}`,
-                filename: 'main.go'
+                language: 'curl' as Language,
+                code: `# Enrollment is handled automatically by the SDK
+# For manual enrollment, generate a keypair and POST to /api/v1/devices/enroll`
             }
         ]
     },
     {
         id: 'sign',
         step: 3,
-        title: 'Sign Your Requests',
-        description: 'Use KeyGuard to securely sign and send API requests',
+        title: 'Sign Requests',
+        description: 'Intercept requests before sending',
         icon: 'Key',
-        content: `KeyGuard intercepts your API requests, retrieves the appropriate key, and signs the request with device-specific headers. Your raw keys never leave the vault.`,
+        content: `Sign your API requests with KeyGuard before sending. The SDK adds cryptographic signatures that prove the request came from an authorized device.`,
         codeSnippets: [
             {
                 language: 'typescript' as Language,
-                code: `import { KeyGuardClient } from '@keyguard/sdk';
-
-const client = new KeyGuardClient({
-  projectId: 'your-project-id',
-  apiKey: 'your-api-key'
-});
-
-// Sign a request to OpenAI
-const headers = await client.signRequest({
-  url: 'https://api.openai.com/v1/chat/completions',
+                code: `const headers = await client.signRequest({
   method: 'POST',
-  body: JSON.stringify({
-    model: 'gpt-4',
-    messages: [{ role: 'user', content: 'Hello!' }]
-  })
+  url: 'https://api.openai.com/v1/chat/completions',
+  body: JSON.stringify(data)
 });
 
-// Send the signed request
+// Use the signed headers in your fetch call
 const response = await fetch('https://api.openai.com/v1/chat/completions', {
   method: 'POST',
   headers,
-  body: JSON.stringify({
-    model: 'gpt-4',
-    messages: [{ role: 'user', content: 'Hello!' }]
-  })
-});
-
-const data = await response.json();
-console.log(data.choices[0].message.content);`,
+  body: JSON.stringify(data)
+});`,
                 filename: 'sign.ts'
             },
             {
                 language: 'python' as Language,
-                code: `from keyguard import KeyGuardClient
-import requests
-import json
-
-client = KeyGuardClient(
-    project_id='your-project-id',
-    api_key='your-api-key'
-)
-
-# Sign a request to OpenAI
-headers = client.sign_request(
-    url='https://api.openai.com/v1/chat/completions',
+                code: `headers = client.sign_request(
     method='POST',
-    body=json.dumps({
-        'model': 'gpt-4',
-        'messages': [{'role': 'user', 'content': 'Hello!'}]
-    })
+    url='https://api.openai.com/v1/chat/completions',
+    body=json.dumps(data)
 )
 
-# Send the signed request
+# Use the signed headers in your request
 response = requests.post(
     'https://api.openai.com/v1/chat/completions',
     headers=headers,
-    json={
-        'model': 'gpt-4',
-        'messages': [{'role': 'user', 'content': 'Hello!'}]
-    }
-)
-
-data = response.json()
-print(data['choices'][0]['message']['content'])`,
+    json=data
+)`,
                 filename: 'sign.py'
             },
             {
-                language: 'go' as Language,
-                code: `package main
-
-import (
-    "bytes"
-    "encoding/json"
-    "fmt"
-    "io"
-    "net/http"
-    "github.com/keyguard/sdk-go"
-)
-
-func main() {
-    client := keyguard.NewClient(&keyguard.Config{
-        ProjectID: "your-project-id",
-        APIKey:    "your-api-key",
-    })
-
-    body := map[string]interface{}{
-        "model": "gpt-4",
-        "messages": []map[string]string{
-            {"role": "user", "content": "Hello!"},
-        },
-    }
-    bodyBytes, _ := json.Marshal(body)
-
-    // Sign the request
-    headers, err := client.SignRequest(&keyguard.Request{
-        URL:    "https://api.openai.com/v1/chat/completions",
-        Method: "POST",
-        Body:   bodyBytes,
-    })
-    if err != nil {
-        panic(err)
-    }
-
-    // Send the signed request
-    req, _ := http.NewRequest("POST", 
-        "https://api.openai.com/v1/chat/completions",
-        bytes.NewBuffer(bodyBytes))
-    
-    for k, v := range headers {
-        req.Header.Set(k, v)
-    }
-
-    client := &http.Client{}
-    resp, _ := client.Do(req)
-    defer resp.Body.Close()
-
-    var result map[string]interface{}
-    json.NewDecoder(resp.Body).Decode(&result)
-    
-    fmt.Println(result["choices"].([]interface{})[0].(map[string]interface{})["message"])
-}`,
-                filename: 'main.go'
-            },
-            {
                 language: 'curl' as Language,
-                code: `# First, get the signed headers from KeyGuard
+                code: `# Sign a request using the KeyGuard API
 curl -X POST https://api.keyguard.dev/v1/sign \\
-  -H "Authorization: Bearer your-api-key" \\
+  -H "Authorization: Bearer kg_prod_..." \\
   -H "Content-Type: application/json" \\
   -d '{
-    "url": "https://api.openai.com/v1/chat/completions",
     "method": "POST",
-    "body": "{\\"model\\":\\"gpt-4\\",\\"messages\\":[{\\"role\\":\\"user\\",\\"content\\":\\"Hello!\\"}]}"
-  }'
-
-# Response contains signed headers:
-# {
-#   "Authorization": "Bearer sk-...",
-#   "X-KeyGuard-Signature": "...",
-#   "X-KeyGuard-Device-ID": "..."
-# }
-
-# Use the signed headers in your request
-curl -X POST https://api.openai.com/v1/chat/completions \\
-  -H "Authorization: Bearer sk-..." \\
-  -H "X-KeyGuard-Signature: ..." \\
-  -H "X-KeyGuard-Device-ID: ..." \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "model": "gpt-4",
-    "messages": [{"role": "user", "content": "Hello!"}]
+    "url": "https://api.openai.com/v1/chat/completions",
+    "body": "{\\"model\\":\\"gpt-4\\",\\"messages\\":[...]}"
   }'`
             }
         ]

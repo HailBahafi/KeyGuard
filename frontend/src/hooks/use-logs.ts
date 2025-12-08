@@ -32,7 +32,7 @@ export function useLogs(params: LogsParams = {}) {
       if (params.endDate) searchParams.append('endDate', params.endDate);
 
       const response = await apiClient.get<AuditLogsPaginationData>(
-        `/logs?${searchParams.toString()}`
+        `/audit/logs?${searchParams.toString()}`
       );
       return response.data;
     },
@@ -49,7 +49,7 @@ export function useLog(logId: string) {
   return useQuery({
     queryKey: ['logs', logId],
     queryFn: async (): Promise<AuditLog> => {
-      const response = await apiClient.get<AuditLog>(`/logs/${logId}`);
+      const response = await apiClient.get<AuditLog>(`/audit/logs/${logId}`);
       return response.data;
     },
     enabled: !!logId,

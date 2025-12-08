@@ -2,14 +2,14 @@
 
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Package, Shield, Key } from 'lucide-react';
+import { Terminal, Shield, Key } from 'lucide-react';
 import { CodeBlock } from './code-block';
 import { quickStartSteps, type CodeSnippet } from '@/lib/docs-content';
 import { useLanguageStore } from '@/stores/use-language-store';
 import { useApiKeys } from '@/hooks/use-keys';
 
 const iconMap = {
-    Package,
+    Terminal,
     Shield,
     Key
 };
