@@ -44,7 +44,7 @@ export class KeyGuardService {
     // Validate API key and get project
     const project = await this.validateApiKey(apiKey);
 
-    // Check if device with same fingerprint already exists
+    // Check if device with same fingerprint already exists (idempotent re-enrollment)
     const existingDevice = await this.prisma.prisma.device.findUnique({
       where: {
         fingerprintHash: enrollDto.deviceFingerprint,
@@ -52,9 +52,13 @@ export class KeyGuardService {
     });
 
     if (existingDevice) {
-      throw new BadRequestException(
-        `Device already enrolled`,
-      );
+      // Idempotent: return existing device instead of throwing error
+      this.logger.log(`Device already enrolled, returning existing: ${existingDevice.id} (status: ${existingDevice.status})`);
+      return {
+        id: existingDevice.id,
+        status: existingDevice.status,
+        createdAt: existingDevice.createdAt,
+      };
     }
 
     // Validate public key format (basic check)

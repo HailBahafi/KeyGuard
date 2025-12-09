@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Device } from '@/types/device';
 import {
     Sheet,
@@ -18,12 +19,11 @@ import {
     Monitor,
     MapPin,
     Wifi,
-    Key,
     Activity,
     Hash
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { formatDistanceToNow, format } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 
 interface DeviceDetailsSheetProps {
     device: Device | null;
@@ -42,28 +42,30 @@ export function DeviceDetailsSheet({
     onSuspend,
     onRevoke
 }: DeviceDetailsSheetProps) {
+    const t = useTranslations('Devices');
+
     if (!device) return null;
 
     const getStatusConfig = () => {
         switch (device.status) {
             case 'active':
                 return {
-                    label: 'Active',
+                    label: t('filters.status.active'),
                     className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                 };
             case 'pending':
                 return {
-                    label: 'Pending Approval',
+                    label: t('filters.status.pending'),
                     className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
                 };
             case 'suspended':
                 return {
-                    label: 'Suspended',
+                    label: t('filters.status.suspended'),
                     className: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
                 };
             case 'revoked':
                 return {
-                    label: 'Revoked',
+                    label: t('filters.status.revoked'),
                     className: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
                 };
         }
@@ -77,7 +79,7 @@ export function DeviceDetailsSheet({
                 <SheetHeader>
                     <SheetTitle>{device.name}</SheetTitle>
                     <SheetDescription>
-                        Complete device information and access history
+                        {t('detailsSheet.subtitle')}
                     </SheetDescription>
                 </SheetHeader>
 
@@ -91,7 +93,7 @@ export function DeviceDetailsSheet({
 
                     {/* Owner Information */}
                     <div className="space-y-3">
-                        <h3 className="text-sm font-semibold text-foreground">Owner</h3>
+                        <h3 className="text-sm font-semibold text-foreground">{t('detailsSheet.owner')}</h3>
                         <div className="space-y-1">
                             <p className="text-sm text-foreground">{device.owner.name}</p>
                             <p className="text-sm text-muted-foreground">{device.owner.email}</p>
@@ -104,18 +106,18 @@ export function DeviceDetailsSheet({
                     <div className="space-y-3">
                         <div className="flex items-center gap-2">
                             <Monitor className="h-4 w-4 text-muted-foreground" />
-                            <h3 className="text-sm font-semibold text-foreground">Platform</h3>
+                            <h3 className="text-sm font-semibold text-foreground">{t('detailsSheet.platform')}</h3>
                         </div>
                         <div className="space-y-2">
                             <div className="flex justify-between">
-                                <span className="text-sm text-muted-foreground">Operating System</span>
+                                <span className="text-sm text-muted-foreground">{t('detailsSheet.operatingSystem')}</span>
                                 <span className="text-sm font-medium text-foreground">
                                     {device.platform.os} {device.platform.version}
                                 </span>
                             </div>
                             {device.platform.browser && (
                                 <div className="flex justify-between">
-                                    <span className="text-sm text-muted-foreground">Browser</span>
+                                    <span className="text-sm text-muted-foreground">{t('detailsSheet.browser')}</span>
                                     <span className="text-sm font-medium text-foreground">{device.platform.browser}</span>
                                 </div>
                             )}
@@ -128,15 +130,15 @@ export function DeviceDetailsSheet({
                     <div className="space-y-3">
                         <div className="flex items-center gap-2">
                             <Wifi className="h-4 w-4 text-muted-foreground" />
-                            <h3 className="text-sm font-semibold text-foreground">Network</h3>
+                            <h3 className="text-sm font-semibold text-foreground">{t('detailsSheet.network')}</h3>
                         </div>
                         <div className="space-y-2">
                             <div className="flex justify-between">
-                                <span className="text-sm text-muted-foreground">IP Address</span>
+                                <span className="text-sm text-muted-foreground">{t('detailsSheet.ipAddress')}</span>
                                 <code className="text-sm font-mono text-foreground">{device.ipAddress}</code>
                             </div>
                             <div className="flex justify-between items-center">
-                                <span className="text-sm text-muted-foreground">Location</span>
+                                <span className="text-sm text-muted-foreground">{t('detailsSheet.location')}</span>
                                 <div className="flex items-center gap-1">
                                     <MapPin className="h-3 w-3 text-muted-foreground" />
                                     <span className="text-sm text-foreground">{device.location}</span>
@@ -151,23 +153,23 @@ export function DeviceDetailsSheet({
                     <div className="space-y-3">
                         <div className="flex items-center gap-2">
                             <Activity className="h-4 w-4 text-muted-foreground" />
-                            <h3 className="text-sm font-semibold text-foreground">Activity</h3>
+                            <h3 className="text-sm font-semibold text-foreground">{t('detailsSheet.activity')}</h3>
                         </div>
                         <div className="space-y-2">
                             <div className="flex justify-between">
-                                <span className="text-sm text-muted-foreground">Last Seen</span>
+                                <span className="text-sm text-muted-foreground">{t('detailsSheet.lastSeen')}</span>
                                 <span className="text-sm text-foreground">
                                     {formatDistanceToNow(new Date(device.lastSeen), { addSuffix: true })}
                                 </span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="text-sm text-muted-foreground">Total API Calls</span>
+                                <span className="text-sm text-muted-foreground">{t('detailsSheet.totalCalls')}</span>
                                 <span className="text-sm font-medium text-foreground">
                                     {device.stats.totalCalls.toLocaleString()}
                                 </span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="text-sm text-muted-foreground">Keys Accessed</span>
+                                <span className="text-sm text-muted-foreground">{t('detailsSheet.keysAccessed')}</span>
                                 <span className="text-sm font-medium text-foreground">
                                     {device.stats.keysAccessed}
                                 </span>
@@ -181,11 +183,11 @@ export function DeviceDetailsSheet({
                     <div className="space-y-3">
                         <div className="flex items-center gap-2">
                             <Hash className="h-4 w-4 text-muted-foreground" />
-                            <h3 className="text-sm font-semibold text-foreground">Security</h3>
+                            <h3 className="text-sm font-semibold text-foreground">{t('detailsSheet.security')}</h3>
                         </div>
                         <div className="space-y-2">
                             <div className="space-y-1">
-                                <span className="text-sm text-muted-foreground">Device Fingerprint</span>
+                                <span className="text-sm text-muted-foreground">{t('detailsSheet.fingerprint')}</span>
                                 <code className="block text-xs font-mono p-2 rounded bg-muted text-foreground break-all">
                                     {device.fingerprintHash}
                                 </code>
@@ -198,33 +200,70 @@ export function DeviceDetailsSheet({
                     {/* Actions */}
                     <div className="flex flex-col gap-2">
                         {device.status === 'pending' && (
-                            <Button
-                                onClick={() => {
-                                    onApprove(device);
-                                    onOpenChange(false);
-                                }}
-                                className="w-full"
-                            >
-                                <CheckCircle className="h-4 w-4 me-2" />
-                                Approve Device
-                            </Button>
+                            <>
+                                <Button
+                                    onClick={() => {
+                                        onApprove(device);
+                                        onOpenChange(false);
+                                    }}
+                                    className="w-full"
+                                >
+                                    <CheckCircle className="h-4 w-4 me-2" />
+                                    {t('detailsSheet.approveDevice')}
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                        onSuspend(device);
+                                        onOpenChange(false);
+                                    }}
+                                    className="w-full"
+                                >
+                                    <Ban className="h-4 w-4 me-2" />
+                                    {t('detailsSheet.suspendDevice')}
+                                </Button>
+                                <Button
+                                    variant="destructive"
+                                    onClick={() => {
+                                        onRevoke(device);
+                                        onOpenChange(false);
+                                    }}
+                                    className="w-full"
+                                >
+                                    <XCircle className="h-4 w-4 me-2" />
+                                    {t('detailsSheet.rejectDevice')}
+                                </Button>
+                            </>
                         )}
 
                         {device.status === 'active' && (
-                            <Button
-                                variant="outline"
-                                onClick={() => {
-                                    onSuspend(device);
-                                    onOpenChange(false);
-                                }}
-                                className="w-full"
-                            >
-                                <Ban className="h-4 w-4 me-2" />
-                                Suspend Device
-                            </Button>
+                            <>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                        onSuspend(device);
+                                        onOpenChange(false);
+                                    }}
+                                    className="w-full"
+                                >
+                                    <Ban className="h-4 w-4 me-2" />
+                                    {t('detailsSheet.suspendDevice')}
+                                </Button>
+                                <Button
+                                    variant="destructive"
+                                    onClick={() => {
+                                        onRevoke(device);
+                                        onOpenChange(false);
+                                    }}
+                                    className="w-full"
+                                >
+                                    <XCircle className="h-4 w-4 me-2" />
+                                    {t('detailsSheet.revokeAccess')}
+                                </Button>
+                            </>
                         )}
 
-                        {(device.status === 'active' || device.status === 'suspended') && (
+                        {device.status === 'suspended' && (
                             <Button
                                 variant="destructive"
                                 onClick={() => {
@@ -234,7 +273,7 @@ export function DeviceDetailsSheet({
                                 className="w-full"
                             >
                                 <XCircle className="h-4 w-4 me-2" />
-                                Revoke Access
+                                {t('detailsSheet.revokeAccess')}
                             </Button>
                         )}
                     </div>

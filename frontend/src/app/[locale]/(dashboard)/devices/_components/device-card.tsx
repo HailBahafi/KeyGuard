@@ -130,48 +130,84 @@ export function DeviceCard({
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-2 pt-2 border-t border-border">
+                <div className="flex items-center justify-between gap-1 pt-2 border-t border-border">
                     <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => onViewDetails(device)}
-                        className="flex-1"
                     >
                         <Eye className="h-4 w-4 me-1" />
                         {t('card.details')}
                     </Button>
 
-                    {device.status === 'pending' && (
-                        <Button
-                            variant="default"
-                            size="sm"
-                            onClick={() => onApprove(device)}
-                        >
-                            <CheckCircle className="h-4 w-4 me-1" />
-                            {t('actions.approve')}
-                        </Button>
-                    )}
+                    <div className="flex items-center gap-1">
+                        {device.status === 'pending' && (
+                            <>
+                                <Button
+                                    variant="default"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => onApprove(device)}
+                                    title={t('actions.approve')}
+                                >
+                                    <CheckCircle className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => onSuspend(device)}
+                                    title={t('actions.suspend')}
+                                >
+                                    <Ban className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                    variant="destructive"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => onRevoke(device)}
+                                    title={t('actions.revoke')}
+                                >
+                                    <XCircle className="h-4 w-4" />
+                                </Button>
+                            </>
+                        )}
 
-                    {device.status === 'active' && (
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => onSuspend(device)}
-                        >
-                            <Ban className="h-4 w-4 me-1" />
-                            {t('actions.suspend')}
-                        </Button>
-                    )}
+                        {device.status === 'active' && (
+                            <>
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => onSuspend(device)}
+                                    title={t('actions.suspend')}
+                                >
+                                    <Ban className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                    variant="destructive"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => onRevoke(device)}
+                                    title={t('actions.revoke')}
+                                >
+                                    <XCircle className="h-4 w-4" />
+                                </Button>
+                            </>
+                        )}
 
-                    {(device.status === 'active' || device.status === 'suspended') && (
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => onRevoke(device)}
-                        >
-                            <XCircle className="h-4 w-4" />
-                        </Button>
-                    )}
+                        {device.status === 'suspended' && (
+                            <Button
+                                variant="destructive"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => onRevoke(device)}
+                                title={t('actions.revoke')}
+                            >
+                                <XCircle className="h-4 w-4" />
+                            </Button>
+                        )}
+                    </div>
                 </div>
             </div>
         </Card>

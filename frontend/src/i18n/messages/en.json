@@ -119,7 +119,6 @@
         "dark": "Dark",
         "system": "System"
     },
-
     "Navigation": {
         "home": "Home",
         "dashboard": "Dashboard",
@@ -555,6 +554,37 @@
         "empty": {
             "noDevices": "No devices found matching your filters.",
             "noDevicesSubtext": "Enroll your first device to get started"
+        },
+        "detailsSheet": {
+            "subtitle": "Complete device information and access history",
+            "owner": "Owner",
+            "platform": "Platform",
+            "operatingSystem": "Operating System",
+            "browser": "Browser",
+            "network": "Network",
+            "ipAddress": "IP Address",
+            "location": "Location",
+            "activity": "Activity",
+            "lastSeen": "Last Seen",
+            "totalCalls": "Total API Calls",
+            "keysAccessed": "Keys Accessed",
+            "security": "Security",
+            "fingerprint": "Device Fingerprint",
+            "approveDevice": "Approve Device",
+            "suspendDevice": "Suspend Device",
+            "revokeAccess": "Revoke Access",
+            "rejectDevice": "Reject Device"
+        },
+        "enrollmentDialog": {
+            "title": "Enroll New Device",
+            "subtitle": "Use this one-time enrollment code to register a new device.",
+            "enrollmentCode": "Enrollment Code",
+            "cliCommand": "CLI Command",
+            "expires": "Expires {time}",
+            "expired": "Expired",
+            "generateNewCode": "Generate New Code",
+            "done": "Done",
+            "copied": "Copied!"
         }
     },
     "AuditLogs": {

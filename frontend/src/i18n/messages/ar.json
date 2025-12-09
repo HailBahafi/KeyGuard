@@ -554,6 +554,37 @@
         "empty": {
             "noDevices": "لم يتم العثور على أجهزة تطابق الفلاتر.",
             "noDevicesSubtext": "سجل جهازك الأول للبدء"
+        },
+        "detailsSheet": {
+            "subtitle": "معلومات الجهاز الكاملة وسجل الوصول",
+            "owner": "المالك",
+            "platform": "المنصة",
+            "operatingSystem": "نظام التشغيل",
+            "browser": "المتصفح",
+            "network": "الشبكة",
+            "ipAddress": "عنوان IP",
+            "location": "الموقع",
+            "activity": "النشاط",
+            "lastSeen": "آخر ظهور",
+            "totalCalls": "إجمالي المكالمات",
+            "keysAccessed": "المفاتيح التي تم الوصول إليها",
+            "security": "الأمان",
+            "fingerprint": "بصمة الجهاز",
+            "approveDevice": "موافقة على الجهاز",
+            "suspendDevice": "تعليق الجهاز",
+            "revokeAccess": "إلغاء الوصول",
+            "rejectDevice": "رفض الجهاز"
+        },
+        "enrollmentDialog": {
+            "title": "تسجيل جهاز جديد",
+            "subtitle": "استخدم رمز التسجيل لتسجيل جهاز جديد.",
+            "enrollmentCode": "رمز التسجيل",
+            "cliCommand": "أمر CLI",
+            "expires": "ينتهي {time}",
+            "expired": "منتهي الصلاحية",
+            "generateNewCode": "إنشاء رمز جديد",
+            "done": "تم",
+            "copied": "تم النسخ!"
         }
     },
     "AuditLogs": {
