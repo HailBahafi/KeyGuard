@@ -9,7 +9,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 @Public()
 @Controller('health')
 export class HealthController {
-    @Get()
+    // @Get()
     @ApiOperation({ summary: 'Health check endpoint' })
     @ApiResponse({
         status: 200,
