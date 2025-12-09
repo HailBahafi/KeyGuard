@@ -2,6 +2,7 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,6 +29,8 @@ const timezones = [
 ];
 
 export function GeneralForm({ initialData, onSuccess }: GeneralFormProps) {
+    const t = useTranslations('Settings');
+    const tGeneral = useTranslations('Settings.general');
     const updateMutation = useUpdateGeneralSettings();
     const {
         register,
@@ -52,19 +55,19 @@ export function GeneralForm({ initialData, onSuccess }: GeneralFormProps) {
         <Card id="general" className="p-6 scroll-mt-20">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <div>
-                    <h3 className="text-lg font-semibold mb-4">General Settings</h3>
+                    <h3 className="text-lg font-semibold mb-4">{tGeneral('title')}</h3>
                     <p className="text-sm text-muted-foreground mb-6">
-                        Configure basic instance information and preferences
+                        {tGeneral('description')}
                     </p>
                 </div>
 
                 <div className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="instanceName">Instance Name</Label>
+                        <Label htmlFor="instanceName">{tGeneral('instanceName')}</Label>
                         <Input
                             id="instanceName"
                             {...register('instanceName')}
-                            placeholder="My KeyGuard Instance"
+                            placeholder={tGeneral('instanceNamePlaceholder')}
                         />
                         {errors.instanceName && (
                             <p className="text-sm text-destructive">{errors.instanceName.message}</p>
@@ -72,12 +75,12 @@ export function GeneralForm({ initialData, onSuccess }: GeneralFormProps) {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="adminEmail">Admin Email</Label>
+                        <Label htmlFor="adminEmail">{tGeneral('adminEmail')}</Label>
                         <Input
                             id="adminEmail"
                             type="email"
                             {...register('adminEmail')}
-                            placeholder="admin@example.com"
+                            placeholder={tGeneral('adminEmailPlaceholder')}
                         />
                         {errors.adminEmail && (
                             <p className="text-sm text-destructive">{errors.adminEmail.message}</p>
@@ -85,7 +88,7 @@ export function GeneralForm({ initialData, onSuccess }: GeneralFormProps) {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="timezone">Timezone</Label>
+                        <Label htmlFor="timezone">{tGeneral('timezone')}</Label>
                         <Select
                             value={watch('timezone')}
                             onValueChange={(value) => setValue('timezone', value, { shouldDirty: true })}
@@ -107,12 +110,12 @@ export function GeneralForm({ initialData, onSuccess }: GeneralFormProps) {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="baseUrl">Base URL</Label>
+                        <Label htmlFor="baseUrl">{tGeneral('baseUrl')}</Label>
                         <Input
                             id="baseUrl"
                             type="url"
                             {...register('baseUrl')}
-                            placeholder="https://keyguard.example.com"
+                            placeholder={tGeneral('baseUrlPlaceholder')}
                         />
                         {errors.baseUrl && (
                             <p className="text-sm text-destructive">{errors.baseUrl.message}</p>
@@ -122,9 +125,10 @@ export function GeneralForm({ initialData, onSuccess }: GeneralFormProps) {
 
                 <Button type="submit" disabled={!isDirty || updateMutation.isPending}>
                     {updateMutation.isPending && <Loader2 className="h-4 w-4 me-2 animate-spin" />}
-                    Save Changes
+                    {t('saveChanges')}
                 </Button>
             </form>
         </Card>
     );
 }
+

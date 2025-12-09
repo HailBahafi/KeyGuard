@@ -8,13 +8,14 @@ import { ChevronRight } from 'lucide-react';
 interface SidebarProps {
     sections: Array<{
         id: string;
-        title: string;
-        subsections?: Array<{ id: string; title: string }>;
+        titleKey: string;
+        subsections?: Array<{ id: string; titleKey: string }>;
     }>;
 }
 
 export function Sidebar({ sections }: SidebarProps) {
-    const t = useTranslations('Integration');
+    const t = useTranslations('Integration.sections');
+    const tPage = useTranslations('Integration');
     const [activeSection, setActiveSection] = useState<string>('');
 
     useEffect(() => {
@@ -54,8 +55,8 @@ export function Sidebar({ sections }: SidebarProps) {
     };
 
     return (
-        <nav className="sticky top-6 space-y-1">
-            <h2 className="text-sm font-semibold text-foreground mb-3">{t('onThisPage')}</h2>
+        <nav className="space-y-1">
+            <h2 className="text-sm font-semibold text-foreground mb-3">{tPage('onThisPage')}</h2>
             {sections.map((section) => (
                 <div key={section.id}>
                     <button
@@ -68,7 +69,7 @@ export function Sidebar({ sections }: SidebarProps) {
                                 : 'text-muted-foreground'
                         )}
                     >
-                        {section.title}
+                        {t(section.titleKey)}
                     </button>
                     {section.subsections && (
                         <div className="ms-3 space-y-1 mt-1">
@@ -85,7 +86,7 @@ export function Sidebar({ sections }: SidebarProps) {
                                     )}
                                 >
                                     <ChevronRight className="h-3 w-3 flex-shrink-0" />
-                                    {subsection.title}
+                                    {t(subsection.titleKey)}
                                 </button>
                             ))}
                         </div>
@@ -95,3 +96,4 @@ export function Sidebar({ sections }: SidebarProps) {
         </nav>
     );
 }
+

@@ -11,8 +11,6 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { ApiKey } from '@/hooks/use-keys';
 
 interface RotateKeyDialogProps {
@@ -41,9 +39,9 @@ export function RotateKeyDialog({ apiKey, open, onOpenChange, onConfirm }: Rotat
                     <div className="p-4 bg-muted rounded-md flex items-start gap-3">
                         <RefreshCw className="w-5 h-5 mt-0.5 text-primary" />
                         <div className="space-y-1">
-                            <p className="font-medium text-sm">Rotation Policy</p>
+                            <p className="font-medium text-sm">{t('rotationPolicy')}</p>
                             <p className="text-sm text-muted-foreground">
-                                The current key will be immediately revoked. A new key will be generated and shown to you once.
+                                {t('rotationPolicyDesc')}
                             </p>
                         </div>
                     </div>

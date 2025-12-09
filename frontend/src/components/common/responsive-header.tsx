@@ -30,7 +30,7 @@ const locales = [
 ];
 
 // Helper to generate breadcrumbs from pathname with translations
-function generateBreadcrumbs(pathname: string, locale: string, t: any) {
+function generateBreadcrumbs(pathname: string, locale: string, t: (key: string) => string) {
     // Remove locale prefix (e.g., /en, /ar)
     const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}\//, '/');
 

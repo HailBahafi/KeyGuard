@@ -400,6 +400,33 @@
                 "title": "تم الإنشاء بنجاح!",
                 "warning": "هذه المرة الوحيدة لرؤية القيمة الكاملة",
                 "copyButton": "نسخ المفتاح"
+            },
+            "expiration": "الانتهاء",
+            "expirationPlaceholder": "اختر الانتهاء",
+            "expirationOptions": {
+                "30days": "30 يوم",
+                "60days": "60 يوم",
+                "90days": "90 يوم",
+                "1year": "سنة واحدة",
+                "never": "أبداً"
+            },
+            "expirationDescription": "متى ينتهي مفتاح API",
+            "securityNoticeTitle": "إشعار أمني",
+            "generateKeyButton": "إنشاء المفتاح",
+            "generateKeyHint": "سيقوم KeyGuard بإنشاء مفتاح نائب آمن لأغراض الاختبار.",
+            "confirmCreation": "تأكيد الإنشاء",
+            "confirmCreationDesc": "يرجى التحقق من جميع الإعدادات قبل إنشاء المفتاح.",
+            "copyKeyDialog": {
+                "title": "انسخ مفتاح API الخاص بك",
+                "warning": "⚠️ هذه المرة الوحيدة لرؤية هذا المفتاح. تأكد من نسخه الآن!",
+                "importantTitle": "مهم",
+                "importantDesc": "لأسباب أمنية، لا يمكننا عرض هذا المفتاح مرة أخرى. احتفظ به في مكان آمن!",
+                "yourApiKey": "مفتاح API الخاص بك",
+                "copied": "تم النسخ!",
+                "copiedDesc": "تم نسخ مفتاح API إلى الحافظة.",
+                "keyCreated": "تم إنشاء مفتاح API",
+                "keyCreatedDesc": "تم إنشاء مفتاح API الجديد بنجاح.",
+                "doneButton": "لقد نسخت المفتاح"
             }
         },
         "detailsSheet": {
@@ -453,7 +480,9 @@
             "generateNew": "إنشاء",
             "cancel": "إلغاء",
             "confirm": "تدوير",
-            "success": "تم التدوير!"
+            "success": "تم التدوير!",
+            "rotationPolicy": "سياسة التدوير",
+            "rotationPolicyDesc": "سيتم إلغاء المفتاح الحالي فوراً. سيتم إنشاء مفتاح جديد وعرضه لك مرة واحدة فقط."
         },
         "empty": {
             "noKeys": "لا مفاتيح بعد",
@@ -640,6 +669,25 @@
         "liveIndicator": {
             "live": "مباشر",
             "paused": "متوقف"
+        },
+        "toast": {
+            "liveUpdatesActive": "التحديثات المباشرة نشطة دائماً"
+        },
+        "exportDialog": {
+            "title": "تصدير سجلات التدقيق",
+            "description": "تحميل سجلات التدقيق للامتثال والتحليل",
+            "formatLabel": "تنسيق التصدير",
+            "jsonDescription": "بيانات منظمة كاملة مع كائنات متداخلة",
+            "csvDescription": "تنسيق مسطح متوافق مع Excel وقواعد البيانات",
+            "recordsToExport": "السجلات المراد تصديرها",
+            "filtersApplied": "الفلاتر المطبقة",
+            "fileFormat": "تنسيق الملف",
+            "yes": "نعم",
+            "cancel": "إلغاء",
+            "export": "تصدير",
+            "exporting": "جاري التصدير...",
+            "success": "اكتمل التصدير",
+            "failed": "فشل في تصدير السجلات"
         }
     },
     "Integration": {
@@ -658,7 +706,9 @@
             "clientInit": "تهيئة العميل",
             "enrollDevice": "enroll()",
             "signRequest": "signRequest()",
-            "examples": "أمثلة"
+            "examples": "أمثلة",
+            "openai": "OpenAI",
+            "anthropic": "Anthropic"
         },
         "quickStart": {
             "badge": "البداية السريعة",
@@ -691,19 +741,124 @@
             },
             "successMessage": "مثيل KeyGuard الخاص بك متصل ويقبل الطلبات.",
             "failureTitle": "فشل الاتصال",
-            "failureMessage": "تأكد من أن KeyGuard API يعمل ويمكن الوصول إليه. تحقق من عنوان URL الخاص بـ API في الإعدادات."
+            "failureMessage": "تأكد من أن KeyGuard API يعمل ويمكن الوصول إليه. تحقق من عنوان URL الخاص بـ API في الإعدادات.",
+            "toast": {
+                "pinging": "جاري فحص الاتصال...",
+                "operational": "النظام يعمل",
+                "operationalDesc": "KeyGuard API متصل وجاهز.",
+                "operationalDemo": "النظام يعمل (تجريبي)",
+                "operationalDemoDesc": "الخادم غير متصل. استجابة محاكاة للعرض التوضيحي.",
+                "connectionFailed": "فشل الاتصال",
+                "connectionFailedDesc": "تعذر الوصول إلى KeyGuard API."
+            }
         }
     },
     "Settings": {
         "title": "الإعدادات",
         "subtitle": "إدارة تكوين وتفضيلات مثيل KeyGuard الخاص بك",
         "failedToLoad": "فشل تحميل الإعدادات",
+        "saveChanges": "حفظ التغييرات",
         "sections": {
             "general": "عام",
             "security": "الأمان",
             "notifications": "الإشعارات",
             "api": "مفاتيح API",
             "backup": "النسخ الاحتياطي والاستعادة"
+        },
+        "general": {
+            "title": "الإعدادات العامة",
+            "description": "تكوين معلومات المثيل الأساسية والتفضيلات",
+            "instanceName": "اسم المثيل",
+            "instanceNamePlaceholder": "مثيل KeyGuard الخاص بي",
+            "adminEmail": "البريد الإلكتروني للمسؤول",
+            "adminEmailPlaceholder": "admin@example.com",
+            "timezone": "المنطقة الزمنية",
+            "baseUrl": "الرابط الأساسي",
+            "baseUrlPlaceholder": "https://keyguard.example.com"
+        },
+        "security": {
+            "title": "إعدادات الأمان",
+            "description": "تكوين إعدادات المصادقة والتحكم في الوصول",
+            "sessionTimeout": "مهلة الجلسة",
+            "sessionTimeoutDescription": "سيتم تسجيل خروج المستخدمين بعد فترة عدم النشاط هذه",
+            "sessionTimeouts": {
+                "1hour": "ساعة واحدة",
+                "8hours": "8 ساعات",
+                "24hours": "24 ساعة",
+                "7days": "7 أيام",
+                "30days": "30 يوم"
+            },
+            "enforce2FA": "فرض المصادقة الثنائية",
+            "enforce2FADescription": "مطالبة جميع المسؤولين بتمكين المصادقة الثنائية",
+            "ipWhitelist": "القائمة البيضاء لعناوين IP",
+            "ipWhitelistDescription": "تقييد الوصول إلى عناوين IP أو نطاقات محددة",
+            "ipPlaceholder": "192.168.1.1 أو 10.0.0.0/24",
+            "noIpRestrictions": "لا توجد قيود IP مكونة. جميع عناوين IP مسموح بها."
+        },
+        "notifications": {
+            "title": "إعدادات الإشعارات",
+            "description": "تكوين إشعارات البريد الإلكتروني وإعدادات SMTP",
+            "smtpHost": "خادم SMTP",
+            "smtpHostPlaceholder": "smtp.gmail.com",
+            "smtpPort": "منفذ SMTP",
+            "smtpPortPlaceholder": "587",
+            "smtpUsername": "اسم مستخدم SMTP",
+            "smtpUsernamePlaceholder": "notifications@example.com",
+            "emailAlerts": "تنبيهات البريد الإلكتروني",
+            "emailAlertsDescription": "إرسال إشعارات البريد الإلكتروني للأحداث الحرجة",
+            "comingSoon": "قريباً",
+            "comingSoonDescription": "ستتوفر إعدادات الإشعارات في الإصدار القادم"
+        },
+        "api": {
+            "title": "مفاتيح API",
+            "description": "إدارة مفاتيح API للوصول البرمجي",
+            "generateKey": "إنشاء مفتاح",
+            "table": {
+                "name": "الاسم",
+                "key": "المفتاح",
+                "created": "تاريخ الإنشاء",
+                "lastUsed": "آخر استخدام",
+                "actions": "الإجراءات",
+                "never": "أبداً"
+            },
+            "empty": "لا توجد مفاتيح API بعد. أنشئ واحداً للبدء.",
+            "generateDialog": {
+                "title": "إنشاء مفتاح API",
+                "description": "إنشاء مفتاح API جديد للوصول البرمجي",
+                "keyName": "اسم المفتاح",
+                "keyNamePlaceholder": "مثال: مفتاح الإنتاج",
+                "cancel": "إلغاء",
+                "generate": "إنشاء",
+                "warning": "⚠️ تأكد من نسخ مفتاح API الآن. لن تتمكن من رؤيته مرة أخرى!",
+                "done": "تم"
+            },
+            "revokeDialog": {
+                "title": "إلغاء مفتاح API؟",
+                "description": "سيؤدي هذا إلى إلغاء مفتاح API \"{name}\" نهائياً. لن تتمكن التطبيقات التي تستخدم هذا المفتاح من الوصول بعد الآن.",
+                "cancel": "إلغاء",
+                "revoke": "إلغاء المفتاح"
+            },
+            "toast": {
+                "generated": "تم إنشاء مفتاح API بنجاح",
+                "generateFailed": "فشل في إنشاء مفتاح API",
+                "copied": "تم نسخ مفتاح API إلى الحافظة",
+                "copyFailed": "فشل في النسخ إلى الحافظة",
+                "revoked": "تم إلغاء مفتاح API بنجاح",
+                "revokeFailed": "فشل في إلغاء مفتاح API",
+                "enterName": "الرجاء إدخال اسم المفتاح"
+            }
+        },
+        "backup": {
+            "title": "النسخ الاحتياطي والصيانة",
+            "description": "إدارة النسخ الاحتياطية وإعدادات الاحتفاظ بالبيانات",
+            "manualBackup": "النسخ الاحتياطي اليدوي",
+            "manualBackupDescription": "تحميل نسخة احتياطية كاملة من تكوين وبيانات KeyGuard",
+            "lastBackup": "آخر نسخة احتياطية: {time}",
+            "logRetention": "الاحتفاظ بالسجلات (أيام)",
+            "logRetentionDescription": "سيتم الاحتفاظ بسجلات التدقيق لمدة {days} يوماً قبل الحذف التلقائي",
+            "downloadBackup": "تحميل النسخة الاحتياطية",
+            "comingSoon": "قريباً",
+            "comingSoonDescription": "ستتوفر وظيفة النسخ الاحتياطي في الإصدار القادم"
         }
     }
 }

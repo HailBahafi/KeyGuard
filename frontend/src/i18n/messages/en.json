@@ -400,6 +400,33 @@
                 "title": "Key created successfully!",
                 "warning": "This is the only time you'll see the full key value",
                 "copyButton": "Copy Key"
+            },
+            "expiration": "Expiration",
+            "expirationPlaceholder": "Select expiration",
+            "expirationOptions": {
+                "30days": "30 Days",
+                "60days": "60 Days",
+                "90days": "90 Days",
+                "1year": "1 Year",
+                "never": "Never"
+            },
+            "expirationDescription": "When this API key will expire",
+            "securityNoticeTitle": "Security Notice",
+            "generateKeyButton": "Generate Key",
+            "generateKeyHint": "KeyGuard will generate a secure placeholder key for testing purposes.",
+            "confirmCreation": "Confirm Creation",
+            "confirmCreationDesc": "Please verify all settings before creating the key.",
+            "copyKeyDialog": {
+                "title": "Copy Your API Key",
+                "warning": "This is the only time you'll see this key. Make sure to copy it now!",
+                "importantTitle": "Important",
+                "importantDesc": "For security reasons, we can't show this key again. Store it somewhere safe!",
+                "yourApiKey": "Your API Key",
+                "copied": "Copied!",
+                "copiedDesc": "API key copied to clipboard.",
+                "keyCreated": "API key created",
+                "keyCreatedDesc": "Your new API key has been generated successfully.",
+                "doneButton": "I've Copied the Key"
             }
         },
         "detailsSheet": {
@@ -453,7 +480,9 @@
             "generateNew": "Generate placeholder",
             "cancel": "Cancel",
             "confirm": "Rotate Key",
-            "success": "Key rotated successfully!"
+            "success": "Key rotated successfully!",
+            "rotationPolicy": "Rotation Policy",
+            "rotationPolicyDesc": "The current key will be immediately revoked. A new key will be generated and shown to you once."
         },
         "empty": {
             "noKeys": "No API keys yet",
@@ -640,6 +669,25 @@
         "liveIndicator": {
             "live": "Live",
             "paused": "Paused"
+        },
+        "toast": {
+            "liveUpdatesActive": "Live updates are always active"
+        },
+        "exportDialog": {
+            "title": "Export Audit Logs",
+            "description": "Download audit logs for compliance and analysis",
+            "formatLabel": "Export Format",
+            "jsonDescription": "Full structured data with nested objects",
+            "csvDescription": "Flat format compatible with Excel and databases",
+            "recordsToExport": "Records to export",
+            "filtersApplied": "Filters applied",
+            "fileFormat": "File format",
+            "yes": "Yes",
+            "cancel": "Cancel",
+            "export": "Export",
+            "exporting": "Exporting...",
+            "success": "Export completed",
+            "failed": "Failed to export logs"
         }
     },
     "Integration": {
@@ -658,7 +706,9 @@
             "clientInit": "Client Initialization",
             "enrollDevice": "enroll()",
             "signRequest": "signRequest()",
-            "examples": "Examples"
+            "examples": "Examples",
+            "openai": "OpenAI",
+            "anthropic": "Anthropic"
         },
         "quickStart": {
             "badge": "Quick Start",
@@ -691,19 +741,124 @@
             },
             "successMessage": "Your KeyGuard instance is online and accepting requests.",
             "failureTitle": "Connection Failed",
-            "failureMessage": "Make sure the KeyGuard API is running and accessible. Check your API URL in settings."
+            "failureMessage": "Make sure the KeyGuard API is running and accessible. Check your API URL in settings.",
+            "toast": {
+                "pinging": "Pinging health check...",
+                "operational": "System Operational",
+                "operationalDesc": "KeyGuard API is online and ready.",
+                "operationalDemo": "System Operational (Demo)",
+                "operationalDemoDesc": "Backend is offline. Simulated response for demo.",
+                "connectionFailed": "Connection failed",
+                "connectionFailedDesc": "Unable to reach KeyGuard API."
+            }
         }
     },
     "Settings": {
         "title": "Settings",
         "subtitle": "Manage your KeyGuard instance configuration and preferences",
         "failedToLoad": "Failed to load settings",
+        "saveChanges": "Save Changes",
         "sections": {
             "general": "General",
             "security": "Security",
             "notifications": "Notifications",
             "api": "API Keys",
             "backup": "Backup & Restore"
+        },
+        "general": {
+            "title": "General Settings",
+            "description": "Configure basic instance information and preferences",
+            "instanceName": "Instance Name",
+            "instanceNamePlaceholder": "My KeyGuard Instance",
+            "adminEmail": "Admin Email",
+            "adminEmailPlaceholder": "admin@example.com",
+            "timezone": "Timezone",
+            "baseUrl": "Base URL",
+            "baseUrlPlaceholder": "https://keyguard.example.com"
+        },
+        "security": {
+            "title": "Security Settings",
+            "description": "Configure authentication and access control settings",
+            "sessionTimeout": "Session Timeout",
+            "sessionTimeoutDescription": "Users will be logged out after this period of inactivity",
+            "sessionTimeouts": {
+                "1hour": "1 Hour",
+                "8hours": "8 Hours",
+                "24hours": "24 Hours",
+                "7days": "7 Days",
+                "30days": "30 Days"
+            },
+            "enforce2FA": "Enforce Two-Factor Authentication",
+            "enforce2FADescription": "Require all admin users to enable 2FA",
+            "ipWhitelist": "IP Whitelist",
+            "ipWhitelistDescription": "Restrict access to specific IP addresses or ranges",
+            "ipPlaceholder": "192.168.1.1 or 10.0.0.0/24",
+            "noIpRestrictions": "No IP restrictions configured. All IPs are allowed."
+        },
+        "notifications": {
+            "title": "Notification Settings",
+            "description": "Configure email notifications and SMTP settings",
+            "smtpHost": "SMTP Host",
+            "smtpHostPlaceholder": "smtp.gmail.com",
+            "smtpPort": "SMTP Port",
+            "smtpPortPlaceholder": "587",
+            "smtpUsername": "SMTP Username",
+            "smtpUsernamePlaceholder": "notifications@example.com",
+            "emailAlerts": "Email Alerts",
+            "emailAlertsDescription": "Send email notifications for critical events",
+            "comingSoon": "Coming Soon",
+            "comingSoonDescription": "Notification settings will be available in the next release"
+        },
+        "api": {
+            "title": "API Keys",
+            "description": "Manage API keys for programmatic access",
+            "generateKey": "Generate Key",
+            "table": {
+                "name": "Name",
+                "key": "Key",
+                "created": "Created",
+                "lastUsed": "Last Used",
+                "actions": "Actions",
+                "never": "Never"
+            },
+            "empty": "No API keys yet. Generate one to get started.",
+            "generateDialog": {
+                "title": "Generate API Key",
+                "description": "Create a new API key for programmatic access",
+                "keyName": "Key Name",
+                "keyNamePlaceholder": "e.g., Production Key",
+                "cancel": "Cancel",
+                "generate": "Generate",
+                "warning": "Make sure to copy your API key now. You won't be able to see it again!",
+                "done": "Done"
+            },
+            "revokeDialog": {
+                "title": "Revoke API Key?",
+                "description": "This will permanently revoke the API key \"{name}\". Applications using this key will no longer have access.",
+                "cancel": "Cancel",
+                "revoke": "Revoke Key"
+            },
+            "toast": {
+                "generated": "API key generated successfully",
+                "generateFailed": "Failed to generate API key",
+                "copied": "API key copied to clipboard",
+                "copyFailed": "Failed to copy to clipboard",
+                "revoked": "API key revoked successfully",
+                "revokeFailed": "Failed to revoke API key",
+                "enterName": "Please enter a key name"
+            }
+        },
+        "backup": {
+            "title": "Backup & Maintenance",
+            "description": "Manage backups and data retention settings",
+            "manualBackup": "Manual Backup",
+            "manualBackupDescription": "Download a complete backup of your KeyGuard configuration and data",
+            "lastBackup": "Last backup: {time}",
+            "logRetention": "Log Retention (Days)",
+            "logRetentionDescription": "Audit logs will be retained for {days} days before automatic deletion",
+            "downloadBackup": "Download Backup",
+            "comingSoon": "Coming Soon",
+            "comingSoonDescription": "Backup functionality will be available in the next release"
         }
     }
 }

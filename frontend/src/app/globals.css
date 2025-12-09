@@ -153,6 +153,18 @@
   100% { offset-distance: 100%; }
 }
 
+/* Beam Particle Animation for how-it-works section */
+@keyframes beam-particle {
+  0% { offset-distance: 0%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { offset-distance: 100%; opacity: 0; }
+}
+
+.animate-beam-particle {
+  animation: beam-particle 2s ease-in-out forwards;
+}
+
 /* Glow Pulse */
 @keyframes glow-pulse {
   0%, 100% { opacity: 0.6; transform: scale(1); }

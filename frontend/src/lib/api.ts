@@ -67,7 +67,7 @@ apiClient.interceptors.response.use(
   (response) => {
     return response;
   },
-  async (error: AxiosError<{ message?: string; error?: string; errors?: any }>) => {
+  async (error: AxiosError<{ message?: string; error?: string; errors?: Record<string, string[]> }>) => {
     // Handle network errors
     if (!error.response) {
       // console.error('API Network Error:', error);

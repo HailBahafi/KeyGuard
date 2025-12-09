@@ -137,21 +137,21 @@ export default function DashboardPage() {
                     label={t('metrics.activeKeys')}
                     value={activeKeys}
                     trend={{ direction: 'neutral', value: `${totalKeys} total` }}
-                    onClick={() => console.log('Navigate to keys')}
+                    onClick={() => {}}
                 />
                 <MetricCard
                     icon={Monitor}
                     label={t('metrics.totalDevices')}
                     value={totalDevices}
                     trend={{ direction: 'neutral', value: `${activeDevices} active` }}
-                    onClick={() => console.log('Navigate to devices')}
+                    onClick={() => {}}
                 />
                 <MetricCard
                     icon={ActivityIcon}
                     label={t('metrics.apiCallsToday')}
                     value="0"
                     trend={{ direction: 'neutral', value: 'N/A' }}
-                    onClick={() => console.log('Navigate to logs')}
+                    onClick={() => {}}
                 />
                 <MetricCard
                     icon={AlertTriangle}
@@ -162,7 +162,7 @@ export default function DashboardPage() {
                         value: securityAlerts.length > 0 ? `${securityAlerts.length} active` : 'All clear',
                     }}
                     className={securityAlerts.length > 0 ? 'border-destructive/50' : ''}
-                    onClick={() => console.log('Scroll to alerts')}
+                    onClick={() => {}}
                 />
             </div>
 
@@ -201,9 +201,7 @@ export default function DashboardPage() {
             >
                 <SecurityAlerts
                     alerts={securityAlerts}
-                    onDismiss={(alertId) => {
-                        console.log('Dismiss alert:', alertId);
-                    }}
+                    onDismiss={() => {}}
                 />
             </motion.div>
         </div>

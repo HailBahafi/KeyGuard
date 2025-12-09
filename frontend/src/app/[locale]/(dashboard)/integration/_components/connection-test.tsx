@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,11 +12,12 @@ import { toast } from 'sonner';
 type ConnectionStatus = 'idle' | 'checking' | 'connected' | 'disconnected';
 
 export function ConnectionTest() {
+    const t = useTranslations('Integration.troubleshooting');
     const [status, setStatus] = useState<ConnectionStatus>('idle');
 
     const testConnection = async () => {
         setStatus('checking');
-        toast.info('Pinging health check...');
+        toast.info(t('toast.pinging'));
 
         try {
             // Test the health endpoint with a timeout
@@ -26,28 +28,30 @@ export function ConnectionTest() {
                 await apiClient.get('/health', { signal: controller.signal });
                 clearTimeout(timeoutId);
                 setStatus('connected');
-                toast.success('System Operational', {
-                    description: 'KeyGuard API is online and ready.',
+                toast.success(t('toast.operational'), {
+                    description: t('toast.operationalDesc'),
                 });
-            } catch (error: any) {
+            } catch (error: unknown) {
                 clearTimeout(timeoutId);
 
                 // If backend is offline, simulate success for demo
-                if (error.code === 'ERR_NETWORK' || error.name === 'AbortError') {
+                const axiosError = error as { code?: string; name?: string };
+                if (axiosError.code === 'ERR_NETWORK' || axiosError.name === 'AbortError') {
                     // Simulate a delay for demo mode
                     await new Promise(resolve => setTimeout(resolve, 1000));
                     setStatus('connected');
-                    toast.success('System Operational (Demo)', {
-                        description: 'Backend is offline. Simulated response for demo.',
+                    toast.success(t('toast.operationalDemo'), {
+                        description: t('toast.operationalDemoDesc'),
                     });
                 } else {
                     throw error;
                 }
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             setStatus('disconnected');
-            toast.error('Connection failed', {
-                description: error.message || 'Unable to reach KeyGuard API.',
+            const errorMessage = error instanceof Error ? error.message : t('toast.connectionFailedDesc');
+            toast.error(t('toast.connectionFailed'), {
+                description: errorMessage,
             });
         }
     };
@@ -58,21 +62,21 @@ export function ConnectionTest() {
                 return (
                     <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 border-0">
                         <Loader2 className="h-3 w-3 me-1 animate-spin" />
-                        Checking...
+                        {t('status.checking')}
                     </Badge>
                 );
             case 'connected':
                 return (
                     <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border-0">
                         <CheckCircle2 className="h-3 w-3 me-1" />
-                        System Operational
+                        {t('status.operational')}
                     </Badge>
                 );
             case 'disconnected':
                 return (
                     <Badge className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border-0">
                         <XCircle className="h-3 w-3 me-1" />
-                        Not Connected
+                        {t('status.notConnected')}
                     </Badge>
                 );
             default:
@@ -83,10 +87,10 @@ export function ConnectionTest() {
     return (
         <section id="troubleshooting" className="scroll-mt-20">
             <div className="space-y-4 mb-8">
-                <Badge className="bg-primary/10 text-primary border-0">Verify</Badge>
-                <h2 className="text-3xl font-bold tracking-tight">Troubleshooting</h2>
+                <Badge className="bg-primary/10 text-primary border-0">{t('badge')}</Badge>
+                <h2 className="text-3xl font-bold tracking-tight">{t('title')}</h2>
                 <p className="text-lg text-muted-foreground">
-                    Test your connection to the KeyGuard API
+                    {t('description')}
                 </p>
             </div>
 
@@ -102,9 +106,9 @@ export function ConnectionTest() {
                     {/* Content */}
                     <div className="flex-1 space-y-4">
                         <div>
-                            <h3 className="text-lg font-semibold mb-1">Health Check</h3>
+                            <h3 className="text-lg font-semibold mb-1">{t('healthCheck')}</h3>
                             <p className="text-sm text-muted-foreground">
-                                Test the connection to verify your KeyGuard API is reachable and operational.
+                                {t('healthCheckDesc')}
                             </p>
                         </div>
 
@@ -115,7 +119,7 @@ export function ConnectionTest() {
                                 variant={status === 'connected' ? 'outline' : 'default'}
                             >
                                 {status === 'checking' && <Loader2 className="h-4 w-4 me-2 animate-spin" />}
-                                Ping Health Check
+                                {t('pingButton')}
                             </Button>
                             {getStatusBadge()}
                         </div>
@@ -123,7 +127,7 @@ export function ConnectionTest() {
                         {status === 'connected' && (
                             <div className="p-3 rounded-lg bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-900/30">
                                 <p className="text-sm text-green-800 dark:text-green-400">
-                                    ✓ Your KeyGuard instance is online and accepting requests.
+                                    ✓ {t('successMessage')}
                                 </p>
                             </div>
                         )}
@@ -131,10 +135,10 @@ export function ConnectionTest() {
                         {status === 'disconnected' && (
                             <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30">
                                 <p className="text-sm text-red-800 dark:text-red-400 font-medium mb-1">
-                                    Connection Failed
+                                    {t('failureTitle')}
                                 </p>
                                 <p className="text-xs text-red-700 dark:text-red-400">
-                                    Make sure the KeyGuard API is running and accessible. Check your API URL in settings.
+                                    {t('failureMessage')}
                                 </p>
                             </div>
                         )}
@@ -144,4 +148,3 @@ export function ConnectionTest() {
         </section>
     );
 }
-

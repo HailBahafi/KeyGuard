@@ -8,7 +8,7 @@ import { Settings, Shield, Bell, Key, Database } from 'lucide-react';
 interface Section {
     id: string;
     titleKey: string;
-    icon: any;
+    icon: React.ElementType;
 }
 
 const sections: Section[] = [

@@ -71,7 +71,7 @@ export default function AuditLogsPage() {
     const handleToggleLive = () => {
         // Live updates are handled by React Query's refetchInterval
         // This is just for UI state
-        toast.info('Live updates are always active');
+        toast.info(t('toast.liveUpdatesActive'));
     };
 
     const handleViewDetails = (log: AuditLog) => {

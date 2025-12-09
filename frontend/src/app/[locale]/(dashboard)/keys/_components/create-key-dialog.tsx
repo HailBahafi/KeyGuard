@@ -248,22 +248,22 @@ export function CreateKeyDialog({ open, onOpenChange }: CreateKeyDialogProps) {
                                         name="expiration"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Expiration</FormLabel>
+                                                <FormLabel>{t('expiration')}</FormLabel>
                                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                     <FormControl>
                                                         <SelectTrigger>
-                                                            <SelectValue placeholder="Select expiration" />
+                                                            <SelectValue placeholder={t('expirationPlaceholder')} />
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
-                                                        <SelectItem value="30days">30 Days</SelectItem>
-                                                        <SelectItem value="60days">60 Days</SelectItem>
-                                                        <SelectItem value="90days">90 Days</SelectItem>
-                                                        <SelectItem value="1year">1 Year</SelectItem>
-                                                        <SelectItem value="never">Never</SelectItem>
+                                                        <SelectItem value="30days">{t('expirationOptions.30days')}</SelectItem>
+                                                        <SelectItem value="60days">{t('expirationOptions.60days')}</SelectItem>
+                                                        <SelectItem value="90days">{t('expirationOptions.90days')}</SelectItem>
+                                                        <SelectItem value="1year">{t('expirationOptions.1year')}</SelectItem>
+                                                        <SelectItem value="never">{t('expirationOptions.never')}</SelectItem>
                                                     </SelectContent>
                                                 </Select>
-                                                <FormDescription>When this API key will expire</FormDescription>
+                                                <FormDescription>{t('expirationDescription')}</FormDescription>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
@@ -311,7 +311,7 @@ export function CreateKeyDialog({ open, onOpenChange }: CreateKeyDialogProps) {
                                             />
                                             <Alert>
                                                 <Shield className="h-4 w-4" />
-                                                <AlertTitle>Security Notice</AlertTitle>
+                                                <AlertTitle>{t('securityNoticeTitle')}</AlertTitle>
                                                 <AlertDescription>
                                                     {t('apiKeyValue.securityNotice')}
                                                 </AlertDescription>
@@ -321,7 +321,7 @@ export function CreateKeyDialog({ open, onOpenChange }: CreateKeyDialogProps) {
                                             <div className="p-4 border rounded-md bg-muted/50 text-center">
                                                 <Key className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                                                 <p className="text-sm text-muted-foreground">
-                                                    KeyGuard will generate a secure placeholder key for testing purposes.
+                                                    {t('generateKeyHint')}
                                                 </p>
                                                 <Button
                                                     type="button"
@@ -329,7 +329,7 @@ export function CreateKeyDialog({ open, onOpenChange }: CreateKeyDialogProps) {
                                                     className="mt-4"
                                                     onClick={() => form.setValue('apiKey', `sk-generated-${Math.random().toString(36).substring(7)}`)}
                                                 >
-                                                    Generate Key
+                                                    {t('generateKeyButton')}
                                                 </Button>
                                             </div>
                                         </TabsContent>
@@ -355,28 +355,18 @@ export function CreateKeyDialog({ open, onOpenChange }: CreateKeyDialogProps) {
                                                 <p className="font-medium capitalize">{form.getValues('environment')}</p>
                                             </div>
                                             <div>
-                                                <span className="text-muted-foreground">Expiration</span>
+                                                <span className="text-muted-foreground">{t('expiration')}</span>
                                                 <p className="font-medium">
-                                                    {(() => {
-                                                        const exp = form.getValues('expiration');
-                                                        const labels: Record<string, string> = {
-                                                            '30days': '30 Days',
-                                                            '60days': '60 Days',
-                                                            '90days': '90 Days',
-                                                            '1year': '1 Year',
-                                                            'never': 'Never'
-                                                        };
-                                                        return labels[exp || 'never'] || 'Never';
-                                                    })()}
+                                                    {t(`expirationOptions.${form.getValues('expiration') || 'never'}`)}
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
                                     <Alert className="border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-900/50">
                                         <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-500" />
-                                        <AlertTitle className="text-yellow-800 dark:text-yellow-500">Confirm Creation</AlertTitle>
+                                        <AlertTitle className="text-yellow-800 dark:text-yellow-500">{t('confirmCreation')}</AlertTitle>
                                         <AlertDescription className="text-yellow-700 dark:text-yellow-400">
-                                            Please verify all settings before creating the key.
+                                            {t('confirmCreationDesc')}
                                         </AlertDescription>
                                     </Alert>
                                 </div>
@@ -423,8 +413,8 @@ export function CreateKeyDialog({ open, onOpenChange }: CreateKeyDialogProps) {
                 if (!open) {
                     setShowRawKeyDialog(false);
                     setRawKey(null);
-                    toast.success('API key created', {
-                        description: 'Your new API key has been generated successfully.',
+                    toast.success(t('copyKeyDialog.keyCreated'), {
+                        description: t('copyKeyDialog.keyCreatedDesc'),
                     });
                 }
             }}>
@@ -432,43 +422,42 @@ export function CreateKeyDialog({ open, onOpenChange }: CreateKeyDialogProps) {
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <Key className="h-5 w-5 text-primary" />
-                            Copy Your API Key
+                            {t('copyKeyDialog.title')}
                         </DialogTitle>
                         <DialogDescription>
-                            ⚠️ This is the only time you'll see this key. Make sure to copy it now!
+                            {t('copyKeyDialog.warning')}
                         </DialogDescription>
                     </DialogHeader>
 
                     <div className="space-y-4">
                         <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-900/50">
                             <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-500" />
-                            <AlertTitle className="text-amber-800 dark:text-amber-500">Important</AlertTitle>
+                            <AlertTitle className="text-amber-800 dark:text-amber-500">{t('copyKeyDialog.importantTitle')}</AlertTitle>
                             <AlertDescription className="text-amber-700 dark:text-amber-400">
-                                For security reasons, we can't show this key again. Store it somewhere safe!
+                                {t('copyKeyDialog.importantDesc')}
                             </AlertDescription>
                         </Alert>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-foreground">Your API Key</label>
+                            <label className="text-sm font-medium text-foreground">{t('copyKeyDialog.yourApiKey')}</label>
                             <div className="relative">
-                                <div className="flex items-center p-3 rounded-lg bg-muted border border-border font-mono text-sm break-all">
+                                <div className="flex  items-start p-3 rounded-lg bg-muted border border-border font-mono text-sm break-all">
                                     {rawKey}
-                                </div>
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="absolute top-1 end-1"
                                     onClick={async () => {
                                         if (rawKey) {
                                             await navigator.clipboard.writeText(rawKey);
-                                            toast.success('Copied!', {
-                                                description: 'API key copied to clipboard.',
+                                            toast.success(t('copyKeyDialog.copied'), {
+                                                description: t('copyKeyDialog.copiedDesc'),
                                             });
                                         }
                                     }}
                                 >
                                     <Copy className="h-4 w-4" />
                                 </Button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -477,11 +466,11 @@ export function CreateKeyDialog({ open, onOpenChange }: CreateKeyDialogProps) {
                         <Button onClick={() => {
                             setShowRawKeyDialog(false);
                             setRawKey(null);
-                            toast.success('API key created', {
-                                description: 'Your new API key has been generated successfully.',
+                            toast.success(t('copyKeyDialog.keyCreated'), {
+                                description: t('copyKeyDialog.keyCreatedDesc'),
                             });
                         }}>
-                            I've Copied the Key
+                            {t('copyKeyDialog.doneButton')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

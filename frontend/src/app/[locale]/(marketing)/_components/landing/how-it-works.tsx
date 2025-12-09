@@ -3,7 +3,7 @@
 import { motion, useInView } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Smartphone, Shield, Brain, Lock } from 'lucide-react';
-import { useRef, forwardRef, useState, useEffect } from 'react';
+import { useRef, forwardRef, useState, useEffect, useId } from 'react';
 import { cn } from '@/lib/utils';
 
 // Circle Node with animated border
@@ -68,8 +68,10 @@ function AnimatedBeamLine({
     isActive: boolean;
     colors: { from: string; to: string };
 }) {
-    const pathId = `beam-${Math.random().toString(36).substr(2, 9)}`;
-    const gradientId = `gradient-${pathId}`;
+    // Use useId for stable, hydration-safe unique IDs
+    const uniqueId = useId();
+    const pathId = `beam-${uniqueId}`;
+    const gradientId = `gradient-${uniqueId}`;
     
     // Create curved path
     const midX = (start.x + end.x) / 2;
@@ -106,15 +108,15 @@ function AnimatedBeamLine({
                         animate={{ pathLength: 1, opacity: 1 }}
                         transition={{ duration: 2, ease: "easeInOut" }}
                     />
-                    {/* Glowing particle */}
-                    <motion.circle
+                    {/* Glowing particle - uses CSS animation for offset-distance */}
+                    <circle
                         r="8"
                         fill={colors.from}
                         filter="url(#glow)"
-                        initial={{ offsetDistance: "0%" }}
-                        animate={{ offsetDistance: "100%" }}
-                        style={{ offsetPath: `path('${pathD}')` }}
-                        transition={{ duration: 2, ease: "easeInOut" }}
+                        className="animate-beam-particle"
+                        style={{ 
+                            offsetPath: `path('${pathD}')`,
+                        } as React.CSSProperties}
                     />
                 </>
             )}

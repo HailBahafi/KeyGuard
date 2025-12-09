@@ -1,4 +1,5 @@
 // Documentation Content and Code Snippets for Integration Guide
+// VERIFIED against packages/sdk and apps/backend on 2024-12-09
 
 export type Language = 'typescript' | 'python' | 'go' | 'curl';
 
@@ -52,7 +53,10 @@ export const quickStartSteps = [
                 code: `import { KeyGuardClient } from '@keyguard/sdk';
 
 const client = new KeyGuardClient({ apiKey: 'kg_prod_...' });
-await client.enroll();`,
+
+// Enroll with optional device name
+const enrollment = await client.enroll('My-MacBook-Pro');
+console.log('Key ID:', enrollment.keyId);`,
                 filename: 'enroll.ts'
             },
             {
@@ -60,7 +64,10 @@ await client.enroll();`,
                 code: `from keyguard import KeyGuardClient
 
 client = KeyGuardClient(api_key='kg_prod_...')
-client.enroll()`,
+
+# Enroll with optional device name
+enrollment = client.enroll('My-MacBook-Pro')
+print(f"Key ID: {enrollment['keyId']}")`,
                 filename: 'enroll.py'
             },
             {
@@ -76,51 +83,59 @@ client.enroll()`,
         title: 'Sign Requests',
         description: 'Intercept requests before sending',
         icon: 'Key',
-        content: `Sign your API requests with KeyGuard before sending. The SDK adds cryptographic signatures that prove the request came from an authorized device.`,
+        content: `Sign your API requests with KeyGuard before sending. The SDK adds cryptographic signature headers. Send to the KeyGuard proxy which verifies signatures and injects the protected API key.`,
         codeSnippets: [
             {
                 language: 'typescript' as Language,
-                code: `const headers = await client.signRequest({
+                code: `// 1. Sign the request - generates x-keyguard-* headers
+const signedHeaders = await client.signRequest({
   method: 'POST',
-  url: 'https://api.openai.com/v1/chat/completions',
+  url: '/api/v1/proxy/v1/chat/completions',  // OpenAI path after /proxy
   body: JSON.stringify(data)
 });
 
-// Use the signed headers in your fetch call
-const response = await fetch('https://api.openai.com/v1/chat/completions', {
+// 2. Send to KeyGuard proxy (appends OpenAI path to /proxy)
+const response = await fetch('https://your-keyguard-server/api/v1/proxy/v1/chat/completions', {
   method: 'POST',
-  headers,
+  headers: {
+    ...signedHeaders,
+    'Content-Type': 'application/json'
+  },
   body: JSON.stringify(data)
 });`,
                 filename: 'sign.ts'
             },
             {
                 language: 'python' as Language,
-                code: `headers = client.sign_request(
+                code: `# 1. Sign the request - generates x-keyguard-* headers
+signed_headers = client.sign_request(
     method='POST',
-    url='https://api.openai.com/v1/chat/completions',
+    url='/api/v1/proxy/v1/chat/completions',
     body=json.dumps(data)
 )
 
-# Use the signed headers in your request
+# 2. Send to KeyGuard proxy (appends OpenAI path to /proxy)
 response = requests.post(
-    'https://api.openai.com/v1/chat/completions',
-    headers=headers,
+    'https://your-keyguard-server/api/v1/proxy/v1/chat/completions',
+    headers={**signed_headers, 'Content-Type': 'application/json'},
     json=data
 )`,
                 filename: 'sign.py'
             },
             {
                 language: 'curl' as Language,
-                code: `# Sign a request using the KeyGuard API
-curl -X POST https://api.keyguard.dev/v1/sign \\
-  -H "Authorization: Bearer kg_prod_..." \\
+                code: `# Send signed request to KeyGuard proxy
+# The OpenAI endpoint path is appended after /proxy
+curl -X POST https://your-keyguard-server/api/v1/proxy/v1/chat/completions \\
+  -H "x-keyguard-api-key: kg_prod_..." \\
+  -H "x-keyguard-key-id: <your-key-id>" \\
+  -H "x-keyguard-timestamp: <iso-timestamp>" \\
+  -H "x-keyguard-nonce: <unique-nonce>" \\
+  -H "x-keyguard-body-sha256: <body-hash>" \\
+  -H "x-keyguard-alg: ECDSA_P256_SHA256_P1363" \\
+  -H "x-keyguard-signature: <signature>" \\
   -H "Content-Type: application/json" \\
-  -d '{
-    "method": "POST",
-    "url": "https://api.openai.com/v1/chat/completions",
-    "body": "{\\"model\\":\\"gpt-4\\",\\"messages\\":[...]}"
-  }'`
+  -d '{"model":"gpt-4","messages":[...]}'`
             }
         ]
     }
@@ -132,17 +147,16 @@ export const sdkReference: DocSection[] = [
         id: 'client-initialization',
         title: 'Client Initialization',
         description: 'Create a new KeyGuard client instance',
-        content: 'The KeyGuard client manages device enrollment, request signing, and key retrieval.',
+        content: 'The KeyGuard client manages device enrollment, request signing, and cryptographic operations.',
         codeSnippets: [
             {
                 language: 'typescript' as Language,
                 code: `import { KeyGuardClient } from '@keyguard/sdk';
 
 const client = new KeyGuardClient({
-  projectId: 'your-project-id',  // Required
-  apiKey: 'your-api-key',        // Required
-  baseUrl: 'https://api.keyguard.dev',  // Optional
-  storage: new MemoryStorage()   // Optional, defaults to browser localStorage
+  apiKey: 'kg_prod_...',           // Required - Your KeyGuard API key
+  apiBaseUrl: 'https://...',       // Optional - Only for self-hosted instances
+  storage: new MemoryStorage()     // Optional - Defaults to browser IndexedDB
 });`
             },
             {
@@ -150,73 +164,85 @@ const client = new KeyGuardClient({
                 code: `from keyguard import KeyGuardClient
 
 client = KeyGuardClient(
-    project_id='your-project-id',  # Required
-    api_key='your-api-key',        # Required
-    base_url='https://api.keyguard.dev',  # Optional
-    storage=MemoryStorage()  # Optional, defaults to file storage
+    api_key='kg_prod_...',           # Required - Your KeyGuard API key
+    api_base_url='https://...',      # Optional - Only for self-hosted instances
+    storage=MemoryStorage()          # Optional - Defaults to file storage
 )`
             }
         ]
     },
     {
         id: 'enroll-device',
-        title: 'enroll(deviceName)',
+        title: 'enroll(deviceName?)',
         description: 'Enroll the current device for secure key access',
-        content: 'This method generates a device fingerprint and registers it with KeyGuard. Only enrolled devices can access protected keys.',
+        content: 'This method generates a device fingerprint, creates an ECDSA P-256 keypair, and returns an enrollment payload to register with KeyGuard. Only enrolled devices can sign requests.',
         codeSnippets: [
             {
                 language: 'typescript' as Language,
-                code: `// Returns: Promise<{ deviceId: string, publicKey: string }>
-const result = await client.enroll('My-MacBook-Pro');
+                code: `// Returns: Promise<EnrollmentPayload>
+// EnrollmentPayload = { keyId, publicKey, deviceFingerprint, label, userAgent?, metadata? }
 
-console.log('Device ID:', result.deviceId);
-console.log('Public Key:', result.publicKey);`
+const enrollment = await client.enroll('My-MacBook-Pro');
+
+console.log('Key ID:', enrollment.keyId);           // Unique key identifier
+console.log('Public Key:', enrollment.publicKey);   // Base64 SPKI format
+console.log('Fingerprint:', enrollment.deviceFingerprint);
+console.log('Label:', enrollment.label);            // Device name or auto-generated`
             },
             {
                 language: 'python' as Language,
-                code: `# Returns: dict with deviceId and publicKey
-result = client.enroll('My-MacBook-Pro')
+                code: `# Returns: dict with keyId, publicKey, deviceFingerprint, label
 
-print(f"Device ID: {result['deviceId']}")
-print(f"Public Key: {result['publicKey']}")`
+enrollment = client.enroll('My-MacBook-Pro')
+
+print(f"Key ID: {enrollment['keyId']}")
+print(f"Public Key: {enrollment['publicKey']}")
+print(f"Fingerprint: {enrollment['deviceFingerprint']}")
+print(f"Label: {enrollment['label']}")`
             }
         ]
     },
     {
         id: 'sign-request',
         title: 'signRequest(options)',
-        description: 'Sign an API request with device-specific headers',
-        content: 'Retrieves the appropriate API key and adds authentication headers to your request. The key itself is never exposed.',
+        description: 'Sign an API request with device-specific cryptographic headers',
+        content: 'Creates cryptographic signature headers for request verification. The KeyGuard proxy validates these signatures and injects the protected provider API key before forwarding to OpenAI/Anthropic.',
         codeSnippets: [
             {
                 language: 'typescript' as Language,
-                code: `// Returns: Promise<Record<string, string>> (headers object)
+                code: `// Returns: Promise<SignedRequestHeaders>
 const headers = await client.signRequest({
-  url: 'https://api.openai.com/v1/chat/completions',
+  url: '/api/v1/proxy/v1/chat/completions',
   method: 'POST',
   body: '{"model":"gpt-4","messages":[...]}'
 });
 
-// Headers will include:
-// - Authorization: Bearer sk-...
-// - X-KeyGuard-Signature: ...
-// - X-KeyGuard-Device-ID: ...
-// - X-KeyGuard-Timestamp: ...`
+// Returns these headers (all required by KeyGuard proxy):
+// x-keyguard-api-key      - Your KeyGuard project API key
+// x-keyguard-key-id       - Device's enrolled key identifier
+// x-keyguard-timestamp    - ISO 8601 timestamp
+// x-keyguard-nonce        - Unique request nonce (replay protection)
+// x-keyguard-body-sha256  - SHA-256 hash of request body
+// x-keyguard-alg          - Algorithm: "ECDSA_P256_SHA256_P1363"
+// x-keyguard-signature    - Base64 ECDSA signature`
             },
             {
                 language: 'python' as Language,
-                code: `# Returns: dict with header key-value pairs
+                code: `# Returns: dict with x-keyguard-* header key-value pairs
 headers = client.sign_request(
-    url='https://api.openai.com/v1/chat/completions',
+    url='/api/v1/proxy/v1/chat/completions',
     method='POST',
     body='{"model":"gpt-4","messages":[...]}'
 )
 
-# Headers will include:
-# - Authorization: Bearer sk-...
-# - X-KeyGuard-Signature: ...
-# - X-KeyGuard-Device-ID: ...
-# - X-KeyGuard-Timestamp: ...`
+# Returns these headers (all required by KeyGuard proxy):
+# x-keyguard-api-key      - Your KeyGuard project API key
+# x-keyguard-key-id       - Device's enrolled key identifier
+# x-keyguard-timestamp    - ISO 8601 timestamp
+# x-keyguard-nonce        - Unique request nonce (replay protection)
+# x-keyguard-body-sha256  - SHA-256 hash of request body
+# x-keyguard-alg          - Algorithm used
+# x-keyguard-signature    - Base64 ECDSA signature`
             }
         ]
     }
@@ -234,37 +260,36 @@ export const examples: DocSection[] = [
                 code: `import { KeyGuardClient } from '@keyguard/sdk';
 
 const client = new KeyGuardClient({
-  projectId: process.env.KEYGUARD_PROJECT_ID!,
   apiKey: process.env.KEYGUARD_API_KEY!
 });
 
 async function chat(message: string) {
-  const headers = await client.signRequest({
-    url: 'https://api.openai.com/v1/chat/completions',
-    method: 'POST',
-    body: JSON.stringify({
-      model: 'gpt-4',
-      messages: [{ role: 'user', content: message }]
-    })
+  const body = JSON.stringify({
+    model: 'gpt-4',
+    messages: [{ role: 'user', content: message }]
   });
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  // Sign the request
+  const signedHeaders = await client.signRequest({
+    url: '/api/v1/proxy/v1/chat/completions',
     method: 'POST',
-    headers: {
-      ...headers,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model: 'gpt-4',
-      messages: [{ role: 'user', content: message }]
-    })
+    body
   });
+
+  // Send to KeyGuard proxy - OpenAI path is appended after /proxy
+  const response = await fetch(
+    \`\${process.env.KEYGUARD_SERVER_URL}/api/v1/proxy/v1/chat/completions\`,
+    {
+      method: 'POST',
+      headers: { ...signedHeaders, 'Content-Type': 'application/json' },
+      body
+    }
+  );
 
   const data = await response.json();
   return data.choices[0].message.content;
 }
 
-// Usage
 const reply = await chat('What is the capital of France?');
 console.log(reply);`,
                 filename: 'openai-chat.ts'
@@ -281,34 +306,32 @@ console.log(reply);`,
                 code: `import { KeyGuardClient } from '@keyguard/sdk';
 
 const client = new KeyGuardClient({
-  projectId: process.env.KEYGUARD_PROJECT_ID!,
   apiKey: process.env.KEYGUARD_API_KEY!
 });
 
 async function generateText(prompt: string) {
-  const headers = await client.signRequest({
-    url: 'https://api.anthropic.com/v1/messages',
-    method: 'POST',
-    body: JSON.stringify({
-      model: 'claude-3-opus-20240229',
-      max_tokens: 1024,
-      messages: [{ role: 'user', content: prompt }]
-    })
+  const body = JSON.stringify({
+    model: 'claude-3-opus-20240229',
+    max_tokens: 1024,
+    messages: [{ role: 'user', content: prompt }]
   });
 
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
+  // Sign the request
+  const signedHeaders = await client.signRequest({
+    url: '/api/v1/proxy/v1/messages',  // Anthropic endpoint
     method: 'POST',
-    headers: {
-      ...headers,
-      'Content-Type': 'application/json',
-      'anthropic-version': '2023-06-01'
-    },
-    body: JSON.stringify({
-      model: 'claude-3-opus-20240229',
-      max_tokens: 1024,
-      messages: [{ role: 'user', content: prompt }]
-    })
+    body
   });
+
+  // Send to KeyGuard proxy - Anthropic path after /proxy
+  const response = await fetch(
+    \`\${process.env.KEYGUARD_SERVER_URL}/api/v1/proxy/v1/messages\`,
+    {
+      method: 'POST',
+      headers: { ...signedHeaders, 'Content-Type': 'application/json' },
+      body
+    }
+  );
 
   const data = await response.json();
   return data.content[0].text;
@@ -319,4 +342,5 @@ async function generateText(prompt: string) {
     }
 ];
 
-// Note: mockApiResponses removed - API Playground now generates demo responses inline
+// Note: Backend proxy uses URL-path routing: /api/v1/proxy/{openai-endpoint}
+// The OpenAI/Anthropic endpoint is appended to the proxy URL, NOT passed in body

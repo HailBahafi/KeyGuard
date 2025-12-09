@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
     Dialog,
     DialogContent,
@@ -29,6 +30,7 @@ export function ExportDialog({
     filters,
     totalRecords
 }: ExportDialogProps) {
+    const t = useTranslations('AuditLogs.exportDialog');
     const [format, setFormat] = useState<'csv' | 'json'>('json');
     const [loading, setLoading] = useState(false);
 
@@ -60,11 +62,11 @@ export function ExportDialog({
             link.remove();
             window.URL.revokeObjectURL(url);
 
-            toast.success('Export completed');
+            toast.success(t('success'));
             setLoading(false);
             onOpenChange(false);
         } catch (error) {
-            toast.error('Failed to export logs');
+            toast.error(t('failed'));
             setLoading(false);
         }
     };
@@ -73,16 +75,16 @@ export function ExportDialog({
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Export Audit Logs</DialogTitle>
+                    <DialogTitle>{t('title')}</DialogTitle>
                     <DialogDescription>
-                        Download audit logs for compliance and analysis
+                        {t('description')}
                     </DialogDescription>
                 </DialogHeader>
 
                 <div className="space-y-6">
                     {/* Format Selection */}
                     <div className="space-y-3">
-                        <Label>Export Format</Label>
+                        <Label>{t('formatLabel')}</Label>
                         <RadioGroup value={format} onValueChange={(value) => setFormat(value as 'csv' | 'json')}>
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="json" id="json" />
@@ -91,7 +93,7 @@ export function ExportDialog({
                                     <div>
                                         <p className="text-sm font-medium">JSON</p>
                                         <p className="text-xs text-muted-foreground">
-                                            Full structured data with nested objects
+                                            {t('jsonDescription')}
                                         </p>
                                     </div>
                                 </Label>
@@ -103,7 +105,7 @@ export function ExportDialog({
                                     <div>
                                         <p className="text-sm font-medium">CSV</p>
                                         <p className="text-xs text-muted-foreground">
-                                            Flat format compatible with Excel and databases
+                                            {t('csvDescription')}
                                         </p>
                                     </div>
                                 </Label>
@@ -114,17 +116,17 @@ export function ExportDialog({
                     {/* Export Info */}
                     <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
                         <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Records to export</span>
+                            <span className="text-muted-foreground">{t('recordsToExport')}</span>
                             <span className="font-medium text-foreground">{totalRecords.toLocaleString()}</span>
                         </div>
                         {filters && Object.keys(filters).length > 0 && (
                             <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Filters applied</span>
-                                <span className="font-medium text-foreground">Yes</span>
+                                <span className="text-muted-foreground">{t('filtersApplied')}</span>
+                                <span className="font-medium text-foreground">{t('yes')}</span>
                             </div>
                         )}
                         <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">File format</span>
+                            <span className="text-muted-foreground">{t('fileFormat')}</span>
                             <span className="font-medium text-foreground uppercase">{format}</span>
                         </div>
                     </div>
@@ -137,7 +139,7 @@ export function ExportDialog({
                             onClick={() => onOpenChange(false)}
                             disabled={loading}
                         >
-                            Cancel
+                            {t('cancel')}
                         </Button>
                         <Button
                             className="flex-1"
@@ -147,12 +149,12 @@ export function ExportDialog({
                             {loading ? (
                                 <>
                                     <Download className="h-4 w-4 me-2 animate-bounce" />
-                                    Exporting...
+                                    {t('exporting')}
                                 </>
                             ) : (
                                 <>
                                     <Download className="h-4 w-4 me-2" />
-                                    Export
+                                    {t('export')}
                                 </>
                             )}
                         </Button>
@@ -162,3 +164,4 @@ export function ExportDialog({
         </Dialog>
     );
 }
+

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,6 +35,7 @@ interface ApiSectionProps {
 }
 
 export function ApiSection({ keys, onUpdate }: ApiSectionProps) {
+    const tApi = useTranslations('Settings.api');
     const [isGenerateOpen, setIsGenerateOpen] = useState(false);
     const [keyToRevoke, setKeyToRevoke] = useState<ApiKey | null>(null);
     const [newKeyName, setNewKeyName] = useState('');
@@ -43,7 +45,7 @@ export function ApiSection({ keys, onUpdate }: ApiSectionProps) {
 
     const handleGenerateKey = async () => {
         if (!newKeyName.trim()) {
-            toast.error('Please enter a key name');
+            toast.error(tApi('toast.enterName'));
             return;
         }
 
@@ -56,9 +58,9 @@ export function ApiSection({ keys, onUpdate }: ApiSectionProps) {
             });
             setGeneratedKey(response.data);
             setNewKeyName('');
-            toast.success('API key generated successfully');
+            toast.success(tApi('toast.generated'));
         } catch {
-            toast.error('Failed to generate API key');
+            toast.error(tApi('toast.generateFailed'));
         } finally {
             setLoading(false);
         }
@@ -69,9 +71,9 @@ export function ApiSection({ keys, onUpdate }: ApiSectionProps) {
             await navigator.clipboard.writeText(key);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
-            toast.success('API key copied to clipboard');
+            toast.success(tApi('toast.copied'));
         } catch {
-            toast.error('Failed to copy to clipboard');
+            toast.error(tApi('toast.copyFailed'));
         }
     };
 
@@ -82,11 +84,11 @@ export function ApiSection({ keys, onUpdate }: ApiSectionProps) {
             setLoading(true);
             // TODO: Replace with real endpoint when available: DELETE /settings/api-keys/:id
             await apiClient.delete(`/settings/api-keys/${keyToRevoke.id}`);
-            toast.success('API key revoked successfully');
+            toast.success(tApi('toast.revoked'));
             onUpdate?.();
             setKeyToRevoke(null);
         } catch {
-            toast.error('Failed to revoke API key');
+            toast.error(tApi('toast.revokeFailed'));
         } finally {
             setLoading(false);
         }
@@ -103,14 +105,14 @@ export function ApiSection({ keys, onUpdate }: ApiSectionProps) {
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h3 className="text-lg font-semibold">API Keys</h3>
+                        <h3 className="text-lg font-semibold">{tApi('title')}</h3>
                         <p className="text-sm text-muted-foreground mt-1">
-                            Manage API keys for programmatic access
+                            {tApi('description')}
                         </p>
                     </div>
                     <Button onClick={() => setIsGenerateOpen(true)}>
                         <Plus className="h-4 w-4 me-2" />
-                        Generate Key
+                        {tApi('generateKey')}
                     </Button>
                 </div>
 
@@ -120,11 +122,11 @@ export function ApiSection({ keys, onUpdate }: ApiSectionProps) {
                         <table className="w-full">
                             <thead>
                                 <tr className="border-b border-border bg-muted/30">
-                                    <th className="text-start p-3 text-sm font-medium">Name</th>
-                                    <th className="text-start p-3 text-sm font-medium">Key</th>
-                                    <th className="text-start p-3 text-sm font-medium">Created</th>
-                                    <th className="text-start p-3 text-sm font-medium">Last Used</th>
-                                    <th className="text-end p-3 text-sm font-medium">Actions</th>
+                                    <th className="text-start p-3 text-sm font-medium">{tApi('table.name')}</th>
+                                    <th className="text-start p-3 text-sm font-medium">{tApi('table.key')}</th>
+                                    <th className="text-start p-3 text-sm font-medium">{tApi('table.created')}</th>
+                                    <th className="text-start p-3 text-sm font-medium">{tApi('table.lastUsed')}</th>
+                                    <th className="text-end p-3 text-sm font-medium">{tApi('table.actions')}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -144,7 +146,7 @@ export function ApiSection({ keys, onUpdate }: ApiSectionProps) {
                                         <td className="p-3 text-sm text-muted-foreground">
                                             {apiKey.lastUsedAt
                                                 ? formatDistanceToNow(new Date(apiKey.lastUsedAt), { addSuffix: true })
-                                                : 'Never'}
+                                                : tApi('table.never')}
                                         </td>
                                         <td className="p-3 text-end">
                                             <Button
@@ -163,7 +165,7 @@ export function ApiSection({ keys, onUpdate }: ApiSectionProps) {
 
                     {keys.length === 0 && (
                         <div className="p-8 text-center text-muted-foreground">
-                            No API keys yet. Generate one to get started.
+                            {tApi('empty')}
                         </div>
                     )}
                 </div>
@@ -173,19 +175,19 @@ export function ApiSection({ keys, onUpdate }: ApiSectionProps) {
             <Dialog open={isGenerateOpen} onOpenChange={setIsGenerateOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Generate API Key</DialogTitle>
+                        <DialogTitle>{tApi('generateDialog.title')}</DialogTitle>
                         <DialogDescription>
-                            Create a new API key for programmatic access
+                            {tApi('generateDialog.description')}
                         </DialogDescription>
                     </DialogHeader>
 
                     {!generatedKey ? (
                         <div className="space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="keyName">Key Name</Label>
+                                <Label htmlFor="keyName">{tApi('generateDialog.keyName')}</Label>
                                 <Input
                                     id="keyName"
-                                    placeholder="e.g., Production Key"
+                                    placeholder={tApi('generateDialog.keyNamePlaceholder')}
                                     value={newKeyName}
                                     onChange={(e) => setNewKeyName(e.target.value)}
                                 />
@@ -193,10 +195,10 @@ export function ApiSection({ keys, onUpdate }: ApiSectionProps) {
 
                             <div className="flex justify-end gap-2">
                                 <Button variant="outline" onClick={() => setIsGenerateOpen(false)}>
-                                    Cancel
+                                    {tApi('generateDialog.cancel')}
                                 </Button>
                                 <Button onClick={handleGenerateKey} disabled={loading || !newKeyName.trim()}>
-                                    Generate
+                                    {tApi('generateDialog.generate')}
                                 </Button>
                             </div>
                         </div>
@@ -204,7 +206,7 @@ export function ApiSection({ keys, onUpdate }: ApiSectionProps) {
                         <div className="space-y-4">
                             <div className="p-4 rounded-lg bg-muted">
                                 <p className="text-sm text-muted-foreground mb-2">
-                                    ⚠️ Make sure to copy your API key now. You won&apos;t be able to see it again!
+                                    {tApi('generateDialog.warning')}
                                 </p>
                                 <div className="flex items-center gap-2">
                                     <code className="flex-1 text-sm font-mono bg-background p-3 rounded border border-border break-all">
@@ -221,7 +223,7 @@ export function ApiSection({ keys, onUpdate }: ApiSectionProps) {
                             </div>
 
                             <Button onClick={handleCloseGenerated} className="w-full">
-                                Done
+                                {tApi('generateDialog.done')}
                             </Button>
                         </div>
                     )}
@@ -232,15 +234,15 @@ export function ApiSection({ keys, onUpdate }: ApiSectionProps) {
             <AlertDialog open={!!keyToRevoke} onOpenChange={() => setKeyToRevoke(null)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Revoke API Key?</AlertDialogTitle>
+                        <AlertDialogTitle>{tApi('revokeDialog.title')}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This will permanently revoke the API key `{keyToRevoke?.name}`. Applications using this key will no longer have access.
+                            {tApi('revokeDialog.description', { name: keyToRevoke?.name ?? '' })}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>{tApi('revokeDialog.cancel')}</AlertDialogCancel>
                         <AlertDialogAction onClick={handleRevokeKey} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                            Revoke Key
+                            {tApi('revokeDialog.revoke')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
@@ -248,3 +250,4 @@ export function ApiSection({ keys, onUpdate }: ApiSectionProps) {
         </Card>
     );
 }
+

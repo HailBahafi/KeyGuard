@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo} from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
@@ -9,6 +9,15 @@ export const BackgroundBeams = React.memo(
   ({ className }: { className?: string }) => {
     const { theme } = useTheme();
     const isDark = theme === "dark";
+    
+    // Generate stable random values for animations (client-side only via useMemo)
+    const randomValues = useMemo(() => {
+      return Array.from({ length: 51 }, () => ({
+        y2Offset: 93 + Math.random() * 8,
+        duration: Math.random() * 10 + 10,
+        delay: Math.random() * 10,
+      }));
+    }, []);
     
     // Theme-aware colors
     const beamColors = isDark 
@@ -126,13 +135,13 @@ export const BackgroundBeams = React.memo(
                   x1: ["0%", "100%"],
                   x2: ["0%", "95%"],
                   y1: ["0%", "100%"],
-                  y2: ["0%", `${93 + Math.random() * 8}%`],
+                  y2: ["0%", `${randomValues[index]?.y2Offset ?? 95}%`],
                 }}
                 transition={{
-                  duration: Math.random() * 10 + 10,
+                  duration: randomValues[index]?.duration ?? 15,
                   ease: "easeInOut",
                   repeat: Infinity,
-                  delay: Math.random() * 10,
+                  delay: randomValues[index]?.delay ?? 0,
                 }}
               >
                 <stop stopColor={beamColors.start} stopOpacity="0"></stop>

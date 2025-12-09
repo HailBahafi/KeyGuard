@@ -2,6 +2,7 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,20 +21,21 @@ interface SecurityFormProps {
     onSuccess?: () => void;
 }
 
-const sessionTimeouts = [
-    { value: 3600, label: '1 Hour' },
-    { value: 28800, label: '8 Hours' },
-    { value: 86400, label: '24 Hours' },
-    { value: 604800, label: '7 Days' },
-    { value: 2592000, label: '30 Days' },
-];
-
 export function SecurityForm({ initialData, onSuccess }: SecurityFormProps) {
+    const t = useTranslations('Settings');
+    const tSecurity = useTranslations('Settings.security');
     const updateMutation = useUpdateSecuritySettings();
     const [newIp, setNewIp] = useState('');
 
+    const sessionTimeouts = [
+        { value: 3600, labelKey: '1hour' },
+        { value: 28800, labelKey: '8hours' },
+        { value: 86400, labelKey: '24hours' },
+        { value: 604800, labelKey: '7days' },
+        { value: 2592000, labelKey: '30days' },
+    ];
+
     const {
-        register,
         handleSubmit,
         formState: { errors, isDirty },
         setValue,
@@ -69,16 +71,16 @@ export function SecurityForm({ initialData, onSuccess }: SecurityFormProps) {
         <Card id="security" className="p-6 scroll-mt-20">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <div>
-                    <h3 className="text-lg font-semibold mb-4">Security Settings</h3>
+                    <h3 className="text-lg font-semibold mb-4">{tSecurity('title')}</h3>
                     <p className="text-sm text-muted-foreground mb-6">
-                        Configure authentication and access control settings
+                        {tSecurity('description')}
                     </p>
                 </div>
 
                 <div className="space-y-6">
                     {/* Session Timeout */}
                     <div className="space-y-2">
-                        <Label htmlFor="sessionTimeout">Session Timeout</Label>
+                        <Label htmlFor="sessionTimeout">{tSecurity('sessionTimeout')}</Label>
                         <Select
                             value={watch('sessionTimeoutSeconds').toString()}
                             onValueChange={(value) => setValue('sessionTimeoutSeconds', parseInt(value), { shouldDirty: true })}
@@ -89,13 +91,13 @@ export function SecurityForm({ initialData, onSuccess }: SecurityFormProps) {
                             <SelectContent>
                                 {sessionTimeouts.map((option) => (
                                     <SelectItem key={option.value} value={option.value.toString()}>
-                                        {option.label}
+                                        {tSecurity(`sessionTimeouts.${option.labelKey}`)}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
                         <p className="text-xs text-muted-foreground">
-                            Users will be logged out after this period of inactivity
+                            {tSecurity('sessionTimeoutDescription')}
                         </p>
                         {errors.sessionTimeoutSeconds && (
                             <p className="text-sm text-destructive">{errors.sessionTimeoutSeconds.message}</p>
@@ -105,9 +107,9 @@ export function SecurityForm({ initialData, onSuccess }: SecurityFormProps) {
                     {/* 2FA Enforcement */}
                     <div className="flex items-center justify-between py-4 border-y border-border">
                         <div className="space-y-0.5">
-                            <Label htmlFor="enforce2FA">Enforce Two-Factor Authentication</Label>
+                            <Label htmlFor="enforce2FA">{tSecurity('enforce2FA')}</Label>
                             <p className="text-sm text-muted-foreground">
-                                Require all admin users to enable 2FA
+                                {tSecurity('enforce2FADescription')}
                             </p>
                         </div>
                         <Switch
@@ -120,16 +122,16 @@ export function SecurityForm({ initialData, onSuccess }: SecurityFormProps) {
                     {/* IP Whitelist */}
                     <div className="space-y-4">
                         <div>
-                            <Label>IP Whitelist</Label>
+                            <Label>{tSecurity('ipWhitelist')}</Label>
                             <p className="text-sm text-muted-foreground">
-                                Restrict access to specific IP addresses or ranges
+                                {tSecurity('ipWhitelistDescription')}
                             </p>
                         </div>
 
                         {/* Add IP Input */}
                         <div className="flex gap-2">
                             <Input
-                                placeholder="192.168.1.1 or 10.0.0.0/24"
+                                placeholder={tSecurity('ipPlaceholder')}
                                 value={newIp}
                                 onChange={(e) => setNewIp(e.target.value)}
                                 onKeyDown={(e) => {
@@ -168,7 +170,7 @@ export function SecurityForm({ initialData, onSuccess }: SecurityFormProps) {
 
                         {ipWhitelist.length === 0 && (
                             <p className="text-sm text-muted-foreground italic">
-                                No IP restrictions configured. All IPs are allowed.
+                                {tSecurity('noIpRestrictions')}
                             </p>
                         )}
 
@@ -182,9 +184,10 @@ export function SecurityForm({ initialData, onSuccess }: SecurityFormProps) {
 
                 <Button type="submit" disabled={!isDirty || updateMutation.isPending}>
                     {updateMutation.isPending && <Loader2 className="h-4 w-4 me-2 animate-spin" />}
-                    Save Changes
+                    {t('saveChanges')}
                 </Button>
             </form>
         </Card>
     );
 }
+

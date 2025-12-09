@@ -142,7 +142,7 @@ export function EnrollmentDialog({ open, onOpenChange, onGenerateCode }: Enrollm
                             <div className="rounded-lg bg-zinc-900 border border-border p-3">
                                 <div className="flex items-start gap-3">
                                     <Terminal className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                                    <code className="text-xs text-zinc-300 font-mono flex-1 break-all leading-relaxed select-all">
+                                    <code className="text-left ltr:text-right text-xs text-zinc-300 font-mono flex-1 break-all leading-relaxed select-all">
                                         {cliCommand}
                                     </code>
                                     <Button

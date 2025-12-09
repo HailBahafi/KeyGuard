@@ -12,42 +12,43 @@ import { ConnectionTest } from './_components/connection-test';
 import { SdkReference } from './_components/sdk-reference';
 import { ApiPlayground } from './_components/api-playground';
 import { useLanguageStore } from '@/stores/use-language-store';
+import type { Language } from '@/lib/docs-content';
 
 const sections = [
     {
         id: 'quick-start',
-        title: 'Quick Start',
+        titleKey: 'quickStart',
         subsections: [
-            { id: 'install', title: 'Install' },
-            { id: 'enroll', title: 'Initialize & Enroll' },
-            { id: 'sign', title: 'Sign Requests' }
+            { id: 'install', titleKey: 'install' },
+            { id: 'enroll', titleKey: 'enroll' },
+            { id: 'sign', titleKey: 'sign' }
         ]
     },
     {
         id: 'code-generator',
-        title: 'Code Generator',
+        titleKey: 'codeGenerator',
         subsections: []
     },
     {
         id: 'troubleshooting',
-        title: 'Troubleshooting',
+        titleKey: 'troubleshooting',
         subsections: []
     },
     {
         id: 'sdk-reference',
-        title: 'SDK Reference',
+        titleKey: 'sdkReference',
         subsections: [
-            { id: 'client-initialization', title: 'Client Initialization' },
-            { id: 'enroll-device', title: 'enroll()' },
-            { id: 'sign-request', title: 'signRequest()' }
+            { id: 'client-initialization', titleKey: 'clientInit' },
+            { id: 'enroll-device', titleKey: 'enrollDevice' },
+            { id: 'sign-request', titleKey: 'signRequest' }
         ]
     },
     {
         id: 'examples',
-        title: 'Examples',
+        titleKey: 'examples',
         subsections: [
-            { id: 'openai-example', title: 'OpenAI' },
-            { id: 'anthropic-example', title: 'Anthropic' }
+            { id: 'openai-example', titleKey: 'openai' },
+            { id: 'anthropic-example', titleKey: 'anthropic' }
         ]
     }
 ];
@@ -76,7 +77,7 @@ export default function IntegrationPage() {
                 </div>
                 <div className="flex items-center gap-3 flex-wrap">
                     {/* Language Selector */}
-                    <Select value={language} onValueChange={(value: any) => setLanguage(value)}>
+                    <Select value={language} onValueChange={(value) => setLanguage(value as Language)}>
                         <SelectTrigger className="w-[160px]">
                             <Code2 className="h-4 w-4 me-2" />
                             <SelectValue />
@@ -98,15 +99,17 @@ export default function IntegrationPage() {
                 </div>
             </div>
 
-            {/* Two-Column Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-8 overflow-hidden">
-                {/* Sidebar Navigation */}
-                <aside className="hidden lg:block">
-                    <Sidebar sections={sections} />
+            {/* Two-Column Layout - relative positioning for sticky context */}
+            <div className="lg:flex lg:gap-8">
+                {/* Sidebar Navigation - fixed in viewport */}
+                <aside className="hidden lg:block lg:w-[220px] lg:flex-shrink-0">
+                    <div className="fixed top-24 w-[220px]">
+                        <Sidebar sections={sections} />
+                    </div>
                 </aside>
 
                 {/* Main Content - Code sections remain in English with LTR direction */}
-                <main className="space-y-16 min-w-0 max-w-full overflow-hidden" dir="ltr">
+                <main className="flex-1 space-y-16 min-w-0 overflow-x-hidden" dir="ltr">
                     <QuickStart />
                     <CodeGenerator />
                     <ConnectionTest />

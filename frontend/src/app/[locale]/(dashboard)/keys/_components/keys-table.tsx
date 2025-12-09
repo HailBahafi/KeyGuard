@@ -10,7 +10,6 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { ApiKey } from '@/hooks/use-keys';
 import { KeyActionsMenu } from './key-actions-menu';
 
