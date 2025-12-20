@@ -106,7 +106,7 @@ export class EnrollmentCodeDto {
   code: string;
 
   @ApiProperty()
-  expiresAt: string;
+  expiresAt: string | null;
 }
 
 export class DeviceActionResponseDto {

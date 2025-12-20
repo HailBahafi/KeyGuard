@@ -15,14 +15,9 @@ import { FastifyReply } from 'fastify';
 @Injectable()
 export class ProxyService {
   private readonly logger = new Logger(ProxyService.name);
-  private readonly openaiApiKey: string;
   private readonly openaiBaseUrl: string;
   constructor(private readonly prisma: PrismaService) {
-    this.openaiApiKey = environmentVariables.OPENAI_API_KEY ?? '';
     this.openaiBaseUrl = environmentVariables.OPENAI_BASE_URL ?? 'https://api.openai.com';
-    if (!this.openaiApiKey) {
-      this.logger.warn('OPENAI_API_KEY is not set. Proxy will not work.');
-    }
   }
   /**
    * Forward request to OpenAI API
@@ -40,10 +35,8 @@ export class ProxyService {
     reply: FastifyReply,
     deviceId: string,
     apiKeyId: string,
+    apiKey: string,
   ): Promise<void> {
-    if (!this.openaiApiKey) {
-      throw new BadRequestException('OpenAI API key is not configured');
-    }
     // Construct full OpenAI URL
     const url = `${this.openaiBaseUrl}${endpoint}`;
     this.logger.log(`Forwarding ${method} request to: ${url}`);
@@ -54,10 +47,10 @@ export class ProxyService {
       const isStreaming = body?.stream === true;
       if (isStreaming) {
         // Handle streaming response
-        await this.handleStreamingResponse(url, body, reply, deviceId, apiKeyId, startTime);
+        await this.handleStreamingResponse(url, body, reply, deviceId, apiKeyId, apiKey, startTime);
       } else {
         // Handle regular response
-        await this.handleRegularResponse(url, body, reply, deviceId, apiKeyId, startTime);
+        await this.handleRegularResponse(url, body, reply, deviceId, apiKeyId, apiKey, startTime);
       }
     } catch (error) {
       const latency = Date.now() - startTime;
@@ -90,13 +83,14 @@ export class ProxyService {
     reply: FastifyReply,
     deviceId: string,
     apiKeyId: string,
+    apiKey: string,
     startTime: number,
   ): Promise<void> {
     try {
       const response = await axios.post(url, body, {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.openaiApiKey}`,
+          Authorization: `Bearer ${apiKey}`,
         },
         responseType: 'stream',
       });
@@ -162,13 +156,14 @@ export class ProxyService {
     reply: FastifyReply,
     deviceId: string,
     apiKeyId: string,
+    apiKey: string,
     startTime: number,
   ): Promise<void> {
     try {
       const response: AxiosResponse = await axios.post(url, body, {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.openaiApiKey}`,
+          Authorization: `Bearer ${apiKey}`,
         },
       });
       const latency = Date.now() - startTime;

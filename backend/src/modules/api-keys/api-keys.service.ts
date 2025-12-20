@@ -97,7 +97,7 @@ export class ApiKeysService {
     };
   }
 
-  async createKey(createKeyDto: CreateKeyDto): Promise<{ key: ApiKeyDto; rawKey: string }> {
+  async createKey(createKeyDto: CreateKeyDto, apiKey: string): Promise<{ key: ApiKeyDto; rawKey: string }> {
     // Check if key with same name already exists
     const existingKey = await this.prisma.prisma.apiKey.findFirst({
       where: { name: createKeyDto.name },
@@ -123,7 +123,10 @@ export class ApiKeysService {
     const maskedValue = this.maskApiKey(rawKey);
 
     // Hash the key with bcrypt for secure storage - never store plain text
-    const hashedValue = await Hashing.hash(rawKey);
+    const [hashedValue, hashedApiKey] = await Promise.all([
+      Hashing.hash(rawKey),
+      Hashing.hash(apiKey),
+    ]);
 
     // Create key with hashed value (not plain text)
     const key = await this.prisma.prisma.apiKey.create({
@@ -136,6 +139,7 @@ export class ApiKeysService {
         fullValue: hashedValue, // Store bcrypt hash, NOT the raw key
         maskedValue,
         status: 'ACTIVE',
+        apiKey: hashedApiKey,
       },
       include: {
         _count: {

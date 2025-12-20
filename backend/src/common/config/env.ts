@@ -13,7 +13,5 @@ export const environmentVariables = {
 
   FRONTEND_URL: process.env.FRONTEND_URL,
 
-  OPENAI_API_KEY: process.env.OPENAI_API_KEY,
-
   OPENAI_BASE_URL: process.env.OPENAI_BASE_URL || 'https://api.openai.com',
 };
