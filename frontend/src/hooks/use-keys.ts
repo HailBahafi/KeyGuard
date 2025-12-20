@@ -40,6 +40,7 @@ export interface CreateKeyDto {
   environment: 'production' | 'development' | 'staging';
   description?: string;
   expiresAt?: string;
+  apiKey: string; // The actual API key value (e.g., OpenAI key) to be sent in x-api-key header
 }
 
 export interface CreateKeyResponse extends ApiKey {
@@ -87,8 +88,16 @@ export function useCreateKey() {
 
   return useMutation({
     mutationFn: async (data: CreateKeyDto): Promise<CreateKeyResponse> => {
+      // Extract the API key to send in header, and the rest as body
+      const { apiKey, ...bodyData } = data;
+
       // Backend returns { key: ApiKeyDto, rawKey: string }
-      const response = await apiClient.post<{ key: ApiKey; rawKey: string }>('/keys', data);
+      // Send the actual API key (e.g., OpenAI key) in the x-api-key header
+      const response = await apiClient.post<{ key: ApiKey; rawKey: string }>('/keys', bodyData, {
+        headers: {
+          'x-api-key': apiKey,
+        },
+      });
       // Merge the key object with rawKey so component can access both
       return {
         ...response.data.key,

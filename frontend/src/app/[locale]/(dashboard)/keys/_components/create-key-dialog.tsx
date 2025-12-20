@@ -103,6 +103,7 @@ export function CreateKeyDialog({ open, onOpenChange }: CreateKeyDialogProps) {
                 environment: data.environment || 'development',
                 description: data.description,
                 expiresAt: calculateExpiresAt(data.expiration || 'never'),
+                apiKey: data.apiKey, // Send the actual API key (e.g., OpenAI key) to backend
             },
             {
                 onSuccess: (response) => {
@@ -443,20 +444,20 @@ export function CreateKeyDialog({ open, onOpenChange }: CreateKeyDialogProps) {
                             <div className="relative">
                                 <div className="flex  items-start p-3 rounded-lg bg-muted border border-border font-mono text-sm break-all">
                                     {rawKey}
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={async () => {
-                                        if (rawKey) {
-                                            await navigator.clipboard.writeText(rawKey);
-                                            toast.success(t('copyKeyDialog.copied'), {
-                                                description: t('copyKeyDialog.copiedDesc'),
-                                            });
-                                        }
-                                    }}
-                                >
-                                    <Copy className="h-4 w-4" />
-                                </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={async () => {
+                                            if (rawKey) {
+                                                await navigator.clipboard.writeText(rawKey);
+                                                toast.success(t('copyKeyDialog.copied'), {
+                                                    description: t('copyKeyDialog.copiedDesc'),
+                                                });
+                                            }
+                                        }}
+                                    >
+                                        <Copy className="h-4 w-4" />
+                                    </Button>
                                 </div>
                             </div>
                         </div>

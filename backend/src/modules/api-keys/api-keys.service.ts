@@ -122,7 +122,7 @@ export class ApiKeysService {
     const rawKey = this.generateApiKeyValue();
     const maskedValue = this.maskApiKey(rawKey);
 
-    // Hash the key with bcrypt for secure storage - never store plain text
+    // Hash both keys with bcrypt for secure storage - never store plain text
     const [hashedValue, hashedApiKey] = await Promise.all([
       Hashing.hash(rawKey),
       Hashing.hash(apiKey),
