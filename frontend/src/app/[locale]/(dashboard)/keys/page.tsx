@@ -2,9 +2,16 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, HelpCircle, Key, Code, Smartphone } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useApiKeys, useRevokeKey, useRotateKey, type ApiKey } from '@/hooks/use-keys';
 import { KeysTable } from './_components/keys-table';
 import { KeyFilters } from './_components/key-filters';
@@ -12,11 +19,16 @@ import { CreateKeyDialog } from './_components/create-key-dialog';
 import { KeyDetailsSheet } from './_components/key-details-sheet';
 import { RevokeKeyDialog } from './_components/revoke-dialog';
 import { RotateKeyDialog } from './_components/rotate-dialog';
+import { PlatformKeysTab } from './_components/platform-keys-tab';
+import { EnrollmentTab } from './_components/enrollment-tab';
 
 export default function KeysPage() {
     const t = useTranslations('KeyVault');
 
-    // Filter State
+    // Tab State
+    const [activeTab, setActiveTab] = useState('provider');
+
+    // Filter State (for provider keys tab)
     const [searchQuery, setSearchQuery] = useState('');
     const [filters, setFilters] = useState({
         status: 'all',
@@ -104,38 +116,104 @@ export default function KeysPage() {
                     <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
                     <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
                 </div>
-                <Button onClick={() => setIsCreateOpen(true)}>
-                    <Plus className="h-4 w-4 me-2" />
-                    {t('actions.create')}
-                </Button>
+                {activeTab === 'provider' && (
+                    <Button onClick={() => setIsCreateOpen(true)}>
+                        <Plus className="h-4 w-4 me-2" />
+                        {t('actions.create')}
+                    </Button>
+                )}
             </div>
 
-            {/* Filters & Search */}
-            <div className="flex flex-col gap-4">
-                <div className="relative">
-                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        placeholder={t('search.placeholder')}
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="ps-10 max-w-md"
+            {/* Tabs */}
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+                <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-grid">
+                    <TabsTrigger value="provider" className="flex items-center gap-2">
+                        <Key className="h-4 w-4" />
+                        <span className="hidden sm:inline">{t('tabs.provider')}</span>
+                        <span className="sm:hidden">{t('tabs.providerShort')}</span>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <HelpCircle className="h-3.5 w-3.5 text-muted-foreground" />
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-xs">
+                                    <p>{t('tabs.providerTooltip')}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </TabsTrigger>
+                    <TabsTrigger value="platform" className="flex items-center gap-2">
+                        <Code className="h-4 w-4" />
+                        <span className="hidden sm:inline">{t('tabs.platform')}</span>
+                        <span className="sm:hidden">{t('tabs.platformShort')}</span>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <HelpCircle className="h-3.5 w-3.5 text-muted-foreground" />
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-xs">
+                                    <p>{t('tabs.platformTooltip')}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </TabsTrigger>
+                    <TabsTrigger value="enrollment" className="flex items-center gap-2">
+                        <Smartphone className="h-4 w-4" />
+                        <span className="hidden sm:inline">{t('tabs.enrollment')}</span>
+                        <span className="sm:hidden">{t('tabs.enrollmentShort')}</span>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <HelpCircle className="h-3.5 w-3.5 text-muted-foreground" />
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-xs">
+                                    <p>{t('tabs.enrollmentTooltip')}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </TabsTrigger>
+                </TabsList>
+
+                {/* Provider Keys Tab */}
+                <TabsContent value="provider" className="space-y-6">
+                    {/* Filters & Search */}
+                    <div className="flex flex-col gap-4">
+                        <div className="relative">
+                            <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                placeholder={t('search.placeholder')}
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="ps-10 max-w-md"
+                            />
+                        </div>
+                        <KeyFilters
+                            filters={filters}
+                            onFilterChange={handleFilterChange}
+                            onClearFilters={handleClearFilters}
+                        />
+                    </div>
+
+                    {/* Table */}
+                    <KeysTable
+                        keys={keys}
+                        loading={loading}
+                        onViewDetails={handleViewDetails}
+                        onRotate={handleRotateClick}
+                        onRevoke={handleRevokeClick}
                     />
-                </div>
-                <KeyFilters
-                    filters={filters}
-                    onFilterChange={handleFilterChange}
-                    onClearFilters={handleClearFilters}
-                />
-            </div>
+                </TabsContent>
 
-            {/* Table */}
-            <KeysTable
-                keys={keys}
-                loading={loading}
-                onViewDetails={handleViewDetails}
-                onRotate={handleRotateClick}
-                onRevoke={handleRevokeClick}
-            />
+                {/* Platform Keys Tab */}
+                <TabsContent value="platform">
+                    <PlatformKeysTab />
+                </TabsContent>
+
+                {/* Enrollment Tab */}
+                <TabsContent value="enrollment">
+                    <EnrollmentTab />
+                </TabsContent>
+            </Tabs>
 
             {/* Dialogs */}
             <CreateKeyDialog

@@ -5,7 +5,6 @@ import { SettingsSidebar } from './_components/settings-sidebar';
 import { GeneralForm } from './_components/general-form';
 import { SecurityForm } from './_components/security-form';
 import { NotificationsForm } from './_components/notifications-form';
-import { ApiSection } from './_components/api-section';
 import { BackupCard } from './_components/backup-card';
 import { useSettings } from '@/hooks/use-settings';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -69,13 +68,6 @@ export default function SettingsPage() {
                     />
 
                     <NotificationsForm />
-
-                    <ApiSection
-                        keys={settings.api.keys}
-                        onUpdate={() => {
-                            // Settings will auto-refetch via React Query
-                        }}
-                    />
 
                     <BackupCard lastBackupAt={settings.backup.lastBackupAt} />
                 </main>

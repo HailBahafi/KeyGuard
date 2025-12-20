@@ -509,6 +509,70 @@
             "next": "التالي",
             "page": "صفحة {current} من {total}",
             "showing": "عرض {from}-{to} من {total}"
+        },
+        "tabs": {
+            "provider": "مفاتيح المزود",
+            "providerShort": "المزود",
+            "providerTooltip": "مفاتيح API لمزودي LLM (OpenAI، Anthropic، إلخ) التي يحميها KeyGuard ويوجهها إلى تطبيقاتك",
+            "platform": "مفاتيح المنصة",
+            "platformShort": "المنصة",
+            "platformTooltip": "مفاتيح API للمطورين للتكامل مع واجهة برمجة تطبيقات KeyGuard برمجياً",
+            "enrollment": "رموز التسجيل",
+            "enrollmentShort": "التسجيل",
+            "enrollmentTooltip": "رموز لمرة واحدة لتسجيل أجهزة جديدة مع KeyGuard بشكل آمن"
+        },
+        "platformKeys": {
+            "title": "مفاتيح API للمنصة",
+            "description": "إدارة مفاتيح API للوصول البرمجي إلى KeyGuard",
+            "tooltip": "تتيح هذه المفاتيح للتطبيقات الخارجية التفاعل مع API الخاص بـ KeyGuard للأتمتة والتكاملات",
+            "generateKey": "إنشاء مفتاح",
+            "table": {
+                "name": "الاسم",
+                "key": "المفتاح",
+                "created": "تاريخ الإنشاء",
+                "lastUsed": "آخر استخدام",
+                "actions": "الإجراءات",
+                "never": "أبداً"
+            },
+            "empty": "لا توجد مفاتيح منصة بعد. أنشئ واحداً للتكامل مع API الخاص بـ KeyGuard.",
+            "toast": {
+                "enterName": "الرجاء إدخال اسم المفتاح",
+                "generated": "تم إنشاء مفتاح API بنجاح",
+                "generateFailed": "فشل في إنشاء مفتاح API",
+                "copied": "تم نسخ المفتاح إلى الحافظة",
+                "copyFailed": "فشل في نسخ المفتاح",
+                "revoked": "تم إلغاء مفتاح API بنجاح",
+                "revokeFailed": "فشل في إلغاء مفتاح API"
+            },
+            "generateDialog": {
+                "title": "إنشاء مفتاح API للمنصة",
+                "description": "إنشاء مفتاح API جديد للوصول البرمجي",
+                "keyName": "اسم المفتاح",
+                "keyNamePlaceholder": "مفتاح-التكامل-الخاص-بي",
+                "cancel": "إلغاء",
+                "generate": "إنشاء",
+                "warning": "انسخ هذا المفتاح الآن. لن تتمكن من رؤيته مرة أخرى!",
+                "done": "تم"
+            },
+            "revokeDialog": {
+                "title": "إلغاء مفتاح API",
+                "description": "هل أنت متأكد من إلغاء \"{name}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+                "cancel": "إلغاء",
+                "revoke": "إلغاء"
+            }
+        },
+        "enrollment": {
+            "title": "تسجيل الأجهزة",
+            "description": "إنشاء رموز لتسجيل أجهزة جديدة مع KeyGuard",
+            "tooltip": "رموز التسجيل هي كلمات مرور لمرة واحدة تتيح للأجهزة الجديدة التسجيل بشكل آمن مع مثيل KeyGuard الخاص بك",
+            "currentCode": "رمز التسجيل الحالي",
+            "shareInstruction": "شارك هذا الرمز مع مالك الجهاز لإكمال التسجيل",
+            "enrollmentCode": "رمز التسجيل",
+            "cliCommand": "أمر CLI",
+            "expires": "ينتهي خلال {time}",
+            "expired": "انتهت صلاحية الرمز - أنشئ رمزاً جديداً",
+            "generateNewCode": "إنشاء رمز جديد",
+            "copied": "تم النسخ!"
         }
     },
     "Devices": {
@@ -696,10 +760,14 @@
         "tryApi": "تجربة API",
         "onThisPage": "في هذه الصفحة",
         "sections": {
+            "chooseFlow": "اختر طريقة التكامل",
             "quickStart": "البداية السريعة",
             "install": "التثبيت",
             "enroll": "التهيئة والتسجيل",
             "sign": "توقيع الطلبات",
+            "platformApi": "واجهة المنصة",
+            "getPlatformKey": "الحصول على مفتاح المنصة",
+            "callApi": "استدعاء API",
             "codeGenerator": "مولد الأكواد",
             "troubleshooting": "استكشاف الأخطاء",
             "sdkReference": "مرجع SDK",
@@ -709,6 +777,51 @@
             "examples": "أمثلة",
             "openai": "OpenAI",
             "anthropic": "Anthropic"
+        },
+        "flowSelector": {
+            "badge": "اختر طريقتك",
+            "title": "ماذا تريد أن تدمج؟",
+            "description": "يوفر KeyGuard طريقتين للتكامل حسب حالة استخدامك",
+            "getEnrollmentCode": "الحصول على رمز التسجيل",
+            "getPlatformKey": "الحصول على مفتاح المنصة",
+            "enrollment": {
+                "title": "تسجيل الأجهزة (SDK)",
+                "description": "تأمين استدعاءات API من أجهزة العملاء بالتوقيعات المشفرة",
+                "step1": "1",
+                "step1Desc": "تثبيت SDK في تطبيقك",
+                "step2": "2",
+                "step2Desc": "تسجيل الجهاز بالرمز",
+                "step3": "3",
+                "step3Desc": "توقيع طلبات API",
+                "useCase": "الأفضل لـ",
+                "useCaseDesc": "تطبيقات الجوال، تطبيقات سطح المكتب، أو أي تطبيق من جانب العميل يحتاج إلى إجراء استدعاءات LLM API آمنة"
+            },
+            "platform": {
+                "title": "واجهة المنصة (REST)",
+                "description": "إدارة KeyGuard برمجياً من الخادم الخاص بك",
+                "step1": "1",
+                "step1Desc": "إنشاء مفتاح المنصة",
+                "step2": "2",
+                "step2Desc": "استدعاء نقاط REST API",
+                "useCase": "الأفضل لـ",
+                "useCaseDesc": "أتمتة الخادم، خطوط CI/CD، لوحات الإدارة، أو إدارة الأجهزة/المفاتيح برمجياً"
+            }
+        },
+        "platformApi": {
+            "badge": "واجهة المنصة",
+            "title": "تكامل REST API",
+            "description": "استخدم مفاتيح المنصة لإدارة KeyGuard من خدمات الخادم الخاصة بك",
+            "step": "الخطوة {number}",
+            "availableEndpoints": "نقاط النهاية المتاحة",
+            "endpointDescription": "الوصف",
+            "endpoints": {
+                "listDevices": "عرض جميع الأجهزة المسجلة",
+                "getDevice": "الحصول على تفاصيل الجهاز",
+                "approveDevice": "الموافقة على جهاز معلق",
+                "revokeDevice": "إلغاء وصول الجهاز",
+                "listKeys": "عرض جميع مفاتيح API",
+                "auditLogs": "الحصول على سجلات التدقيق"
+            }
         },
         "quickStart": {
             "badge": "البداية السريعة",

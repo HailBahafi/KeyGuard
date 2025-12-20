@@ -509,6 +509,70 @@
             "next": "Next",
             "page": "Page {current} of {total}",
             "showing": "Showing {from}-{to} of {total} keys"
+        },
+        "tabs": {
+            "provider": "Provider Keys",
+            "providerShort": "Provider",
+            "providerTooltip": "API keys for LLM providers (OpenAI, Anthropic, etc.) that KeyGuard protects and proxies to your applications",
+            "platform": "Platform Keys",
+            "platformShort": "Platform",
+            "platformTooltip": "Developer API keys for integrating with KeyGuard's REST API programmatically",
+            "enrollment": "Enrollment Codes",
+            "enrollmentShort": "Enrollment",
+            "enrollmentTooltip": "One-time codes for registering new devices with KeyGuard securely"
+        },
+        "platformKeys": {
+            "title": "Platform API Keys",
+            "description": "Manage API keys for programmatic access to KeyGuard",
+            "tooltip": "These keys allow external applications to interact with KeyGuard's API for automation and integrations",
+            "generateKey": "Generate Key",
+            "table": {
+                "name": "Name",
+                "key": "Key",
+                "created": "Created",
+                "lastUsed": "Last Used",
+                "actions": "Actions",
+                "never": "Never"
+            },
+            "empty": "No platform keys yet. Generate one to integrate with KeyGuard's API.",
+            "toast": {
+                "enterName": "Please enter a key name",
+                "generated": "API key generated successfully",
+                "generateFailed": "Failed to generate API key",
+                "copied": "Key copied to clipboard",
+                "copyFailed": "Failed to copy key",
+                "revoked": "API key revoked successfully",
+                "revokeFailed": "Failed to revoke API key"
+            },
+            "generateDialog": {
+                "title": "Generate Platform API Key",
+                "description": "Create a new API key for programmatic access",
+                "keyName": "Key Name",
+                "keyNamePlaceholder": "my-integration-key",
+                "cancel": "Cancel",
+                "generate": "Generate",
+                "warning": "Copy this key now. You won't be able to see it again!",
+                "done": "Done"
+            },
+            "revokeDialog": {
+                "title": "Revoke API Key",
+                "description": "Are you sure you want to revoke \"{name}\"? This action cannot be undone.",
+                "cancel": "Cancel",
+                "revoke": "Revoke"
+            }
+        },
+        "enrollment": {
+            "title": "Device Enrollment",
+            "description": "Generate codes to register new devices with KeyGuard",
+            "tooltip": "Enrollment codes are one-time passwords that allow new devices to securely register with your KeyGuard instance",
+            "currentCode": "Current Enrollment Code",
+            "shareInstruction": "Share this code with the device owner to complete enrollment",
+            "enrollmentCode": "Enrollment Code",
+            "cliCommand": "CLI Command",
+            "expires": "Expires in {time}",
+            "expired": "Code expired - generate a new one",
+            "generateNewCode": "Generate New Code",
+            "copied": "Copied!"
         }
     },
     "Devices": {
@@ -696,10 +760,14 @@
         "tryApi": "Try API",
         "onThisPage": "On This Page",
         "sections": {
+            "chooseFlow": "Choose Your Flow",
             "quickStart": "Quick Start",
             "install": "Install",
             "enroll": "Initialize & Enroll",
             "sign": "Sign Requests",
+            "platformApi": "Platform API",
+            "getPlatformKey": "Get Platform Key",
+            "callApi": "Call API",
             "codeGenerator": "Code Generator",
             "troubleshooting": "Troubleshooting",
             "sdkReference": "SDK Reference",
@@ -709,6 +777,51 @@
             "examples": "Examples",
             "openai": "OpenAI",
             "anthropic": "Anthropic"
+        },
+        "flowSelector": {
+            "badge": "Choose Your Path",
+            "title": "What do you want to integrate?",
+            "description": "KeyGuard offers two integration methods depending on your use case",
+            "getEnrollmentCode": "Get Enrollment Code",
+            "getPlatformKey": "Get Platform Key",
+            "enrollment": {
+                "title": "Device Enrollment (SDK)",
+                "description": "Secure API calls from client devices with cryptographic signatures",
+                "step1": "1",
+                "step1Desc": "Install SDK in your app",
+                "step2": "2",
+                "step2Desc": "Enroll device with code",
+                "step3": "3",
+                "step3Desc": "Sign API requests",
+                "useCase": "Best for",
+                "useCaseDesc": "Mobile apps, desktop apps, or any client-side application that needs to make secure LLM API calls"
+            },
+            "platform": {
+                "title": "Platform API (REST)",
+                "description": "Manage KeyGuard programmatically from your backend",
+                "step1": "1",
+                "step1Desc": "Generate Platform Key",
+                "step2": "2",
+                "step2Desc": "Call REST API endpoints",
+                "useCase": "Best for",
+                "useCaseDesc": "Backend automation, CI/CD pipelines, admin dashboards, or managing devices/keys programmatically"
+            }
+        },
+        "platformApi": {
+            "badge": "Platform API",
+            "title": "REST API Integration",
+            "description": "Use Platform Keys to manage KeyGuard from your backend services",
+            "step": "Step {number}",
+            "availableEndpoints": "Available Endpoints",
+            "endpointDescription": "Description",
+            "endpoints": {
+                "listDevices": "List all enrolled devices",
+                "getDevice": "Get device details",
+                "approveDevice": "Approve a pending device",
+                "revokeDevice": "Revoke device access",
+                "listKeys": "List all API keys",
+                "auditLogs": "Get audit logs"
+            }
         },
         "quickStart": {
             "badge": "Quick Start",

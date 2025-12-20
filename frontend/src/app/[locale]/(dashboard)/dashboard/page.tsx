@@ -62,8 +62,8 @@ export default function DashboardPage() {
                 id: log.id,
                 type: log.event.includes('rate_limited') ? 'rate_limit' as const
                     : log.event.includes('suspicious') ? 'suspicious_activity' as const
-                    : log.event.includes('auth') && log.status === 'failure' ? 'auth_failed' as const
-                    : 'suspicious_activity' as const,
+                        : log.event.includes('auth') && log.status === 'failure' ? 'auth_failed' as const
+                            : 'suspicious_activity' as const,
                 severity: log.severity === 'critical' ? 'error' as const : 'warning' as const,
                 message: log.metadata.error || `${log.event} from ${log.actor.name}`,
                 timestamp: log.timestamp,
@@ -124,7 +124,7 @@ export default function DashboardPage() {
                         <RefreshCw className={`h-4 w-4 me-2 ${isLoading ? 'animate-spin' : ''}`} />
                         {t('actions.refresh')}
                     </Button>
-                    <Button size="sm">
+                    <Button size="sm" onClick={() => window.location.href = '/ar/devices'}>
                         {t('actions.addDevice')}
                     </Button>
                 </div>
@@ -137,21 +137,21 @@ export default function DashboardPage() {
                     label={t('metrics.activeKeys')}
                     value={activeKeys}
                     trend={{ direction: 'neutral', value: `${totalKeys} total` }}
-                    onClick={() => {}}
+                    onClick={() => { }}
                 />
                 <MetricCard
                     icon={Monitor}
                     label={t('metrics.totalDevices')}
                     value={totalDevices}
                     trend={{ direction: 'neutral', value: `${activeDevices} active` }}
-                    onClick={() => {}}
+                    onClick={() => { }}
                 />
                 <MetricCard
                     icon={ActivityIcon}
                     label={t('metrics.apiCallsToday')}
                     value="0"
                     trend={{ direction: 'neutral', value: 'N/A' }}
-                    onClick={() => {}}
+                    onClick={() => { }}
                 />
                 <MetricCard
                     icon={AlertTriangle}
@@ -162,7 +162,7 @@ export default function DashboardPage() {
                         value: securityAlerts.length > 0 ? `${securityAlerts.length} active` : 'All clear',
                     }}
                     className={securityAlerts.length > 0 ? 'border-destructive/50' : ''}
-                    onClick={() => {}}
+                    onClick={() => { }}
                 />
             </div>
 
@@ -182,13 +182,13 @@ export default function DashboardPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3, delay: 0.6 }}
                 >
-                    <DeviceOverview 
+                    <DeviceOverview
                         status={{
                             active: activeDevices,
                             idle: devicesData?.devices.filter(d => d.status === 'pending').length || 0,
                             offline: offlineDevices,
-                        }} 
-                        topDevices={[]} 
+                        }}
+                        topDevices={[]}
                     />
                 </motion.div>
             </div>
@@ -201,7 +201,7 @@ export default function DashboardPage() {
             >
                 <SecurityAlerts
                     alerts={securityAlerts}
-                    onDismiss={() => {}}
+                    onDismiss={() => { }}
                 />
             </motion.div>
         </div>

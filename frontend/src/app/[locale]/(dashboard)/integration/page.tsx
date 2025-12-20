@@ -6,7 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Code2, Play } from 'lucide-react';
 import { Sidebar } from './_components/sidebar';
+import { FlowSelector, type IntegrationFlow } from './_components/flow-selector';
 import { QuickStart } from './_components/quick-start';
+import { PlatformApiGuide } from './_components/platform-api-guide';
 import { CodeGenerator } from './_components/code-generator';
 import { ConnectionTest } from './_components/connection-test';
 import { SdkReference } from './_components/sdk-reference';
@@ -16,12 +18,25 @@ import type { Language } from '@/lib/docs-content';
 
 const sections = [
     {
+        id: 'choose-flow',
+        titleKey: 'chooseFlow',
+        subsections: []
+    },
+    {
         id: 'quick-start',
         titleKey: 'quickStart',
         subsections: [
             { id: 'install', titleKey: 'install' },
             { id: 'enroll', titleKey: 'enroll' },
             { id: 'sign', titleKey: 'sign' }
+        ]
+    },
+    {
+        id: 'platform-api',
+        titleKey: 'platformApi',
+        subsections: [
+            { id: 'get-platform-key', titleKey: 'getPlatformKey' },
+            { id: 'call-api', titleKey: 'callApi' }
         ]
     },
     {
@@ -64,6 +79,7 @@ export default function IntegrationPage() {
     const t = useTranslations('Integration');
     const { language, setLanguage } = useLanguageStore();
     const [isPlaygroundOpen, setIsPlaygroundOpen] = useState(false);
+    const [selectedFlow, setSelectedFlow] = useState<IntegrationFlow>(null);
 
     return (
         <div className="animate-in fade-in duration-500 max-w-full overflow-hidden">
@@ -110,10 +126,26 @@ export default function IntegrationPage() {
 
                 {/* Main Content - Code sections remain in English with LTR direction */}
                 <main className="flex-1 space-y-16 min-w-0 overflow-x-hidden" dir="ltr">
-                    <QuickStart />
-                    <CodeGenerator />
+                    {/* Flow Selector - Always visible */}
+                    <FlowSelector
+                        selectedFlow={selectedFlow}
+                        onFlowSelect={setSelectedFlow}
+                    />
+
+                    {/* Enrollment Flow (SDK) - Show when enrollment selected or nothing selected */}
+                    {(selectedFlow === 'enrollment' || selectedFlow === null) && (
+                        <>
+                            <QuickStart />
+                            <CodeGenerator />
+                            <SdkReference />
+                        </>
+                    )}
+
+                    {/* Platform API Flow - Show when platform selected */}
+                    <PlatformApiGuide visible={selectedFlow === 'platform' || selectedFlow === null} />
+
+                    {/* Always show troubleshooting */}
                     <ConnectionTest />
-                    <SdkReference />
                 </main>
             </div>
 

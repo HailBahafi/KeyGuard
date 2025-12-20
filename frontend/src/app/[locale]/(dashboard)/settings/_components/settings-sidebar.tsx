@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
-import { Settings, Shield, Bell, Key, Database } from 'lucide-react';
+import { Settings, Shield, Bell, Database } from 'lucide-react';
 
 interface Section {
     id: string;
@@ -15,7 +15,6 @@ const sections: Section[] = [
     { id: 'general', titleKey: 'general', icon: Settings },
     { id: 'security', titleKey: 'security', icon: Shield },
     { id: 'notifications', titleKey: 'notifications', icon: Bell },
-    { id: 'api', titleKey: 'api', icon: Key },
     { id: 'backup', titleKey: 'backup', icon: Database },
 ];
 
