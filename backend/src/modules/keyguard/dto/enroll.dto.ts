@@ -27,6 +27,10 @@ export class EnrollDeviceDto {
 
   @IsString()
   @IsOptional()
+  enrollmentCode?: string;
+
+  @IsString()
+  @IsOptional()
   userAgent?: string;
 
   @IsObject()

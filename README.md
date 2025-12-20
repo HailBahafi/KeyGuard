@@ -87,15 +87,15 @@ KeyGuard implements **Device Binding** using ECDSA P-256 cryptography:
 │                              KeyGuard Platform                          │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
-│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐     │
-│  │   Frontend      │    │    Backend      │    │      SDK        │     │
-│  │   Dashboard     │    │     API         │    │   (Client)      │     │
-│  │                 │    │                 │    │                 │     │
-│  │  • Next.js 16   │    │  • NestJS 11    │    │  • TypeScript   │     │
-│  │  • React 19     │◄───│  • PostgreSQL   │    │  • ECDSA P-256  │     │
-│  │  • Tailwind     │    │  • Prisma ORM   │    │  • FingerprintJS│     │
-│  │  • Zustand      │    │  • JWT Auth     │    │  • IndexedDB    │     │
-│  └─────────────────┘    └────────┬────────┘    └────────┬────────┘     │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐      │
+│  │   Frontend      │    │    Backend      │    │      SDK        │      │
+│  │   Dashboard     │    │     API         │    │   (Client)      │      │
+│  │                 │    │                 │    │                 │      │
+│  │  • Next.js 16   │    │  • NestJS 11    │    │  • TypeScript   │      │
+│  │  • React 19     │◄───│  • PostgreSQL   │    │  • ECDSA P-256  │      │
+│  │  • Tailwind     │    │  • Prisma ORM   │    │  • FingerprintJS│      │
+│  │  • Zustand      │    │  • JWT Auth     │    │  • IndexedDB    │      │
+│  └─────────────────┘    └────────┬────────┘    └────────┬────────┘      │
 │                                  │                       │              │
 │                                  │    Signature          │              │
 │                                  │    Verification       │              │

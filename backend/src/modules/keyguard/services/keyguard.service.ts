@@ -14,20 +14,17 @@ import {
   VerifyResponseDto,
 } from '../dto';
 import { SignatureVerificationService } from './signature-verification.service';
-
 /**
  * Main KeyGuard service handling device enrollment and signature verification
  */
 @Injectable()
 export class KeyGuardService {
   private readonly logger = new Logger(KeyGuardService.name);
-
   constructor(
     private readonly prisma: PrismaService,
     private readonly signatureVerification: SignatureVerificationService,
     private readonly auditLogsService: AuditLogsService,
   ) { }
-
   /**
    * Enroll a new device by storing its public key
    *
@@ -40,17 +37,14 @@ export class KeyGuardService {
     enrollDto: EnrollDeviceDto,
   ): Promise<EnrollResponseDto> {
     this.logger.log(`Enrolling device with keyId: ${enrollDto.keyId}`);
-
     // Validate API key and get project
     const project = await this.validateApiKey(apiKey);
-
     // Check if device with same fingerprint already exists (idempotent re-enrollment)
     const existingDevice = await this.prisma.prisma.device.findUnique({
       where: {
         fingerprintHash: enrollDto.deviceFingerprint,
       },
     });
-
     if (existingDevice) {
       // Idempotent: return existing device instead of throwing error
       this.logger.log(`Device already enrolled, returning existing: ${existingDevice.id} (status: ${existingDevice.status})`);
@@ -60,16 +54,43 @@ export class KeyGuardService {
         createdAt: existingDevice.createdAt,
       };
     }
-
     // Validate public key format (basic check)
     this.validatePublicKey(enrollDto.publicKey);
-
+    // Determine device status based on enrollment code
+    let deviceStatus: 'ACTIVE' | 'PENDING' = 'PENDING';
+    let enrollmentCodeId: string | undefined;
+    if (enrollDto.enrollmentCode) {
+      this.logger.log(`Verifying enrollment code: ${enrollDto.enrollmentCode}`);
+      // Look up enrollment code in database
+      const enrollmentCode = await this.prisma.prisma.enrollmentCode.findUnique({
+        where: { code: enrollDto.enrollmentCode },
+      });
+      // Validate enrollment code
+      if (enrollmentCode && !enrollmentCode.used && enrollmentCode.expiresAt > new Date()) {
+        this.logger.log(`Valid enrollment code found, setting device status to ACTIVE`);
+        deviceStatus = 'ACTIVE';
+        enrollmentCodeId = enrollmentCode.id;
+        // Mark code as used
+        await this.prisma.prisma.enrollmentCode.update({
+          where: { id: enrollmentCode.id },
+          data: {
+            used: true,
+            usedAt: new Date(),
+          },
+        });
+      } else {
+        this.logger.warn(`Invalid or expired enrollment code: ${enrollDto.enrollmentCode}`);
+        // Device will remain PENDING for manual approval
+      }
+    } else {
+      this.logger.log('No enrollment code provided, device status set to PENDING');
+    }
     // Create device record with new schema
     const device = await this.prisma.prisma.device.create({
       data: {
         name: enrollDto.label || 'Unnamed Device',
         fingerprintHash: enrollDto.deviceFingerprint,
-        status: 'PENDING',
+        status: deviceStatus,
         platform: enrollDto.metadata ?? {},
         ownerName: 'System',
         ownerEmail: 'system@keyguard.io',
@@ -86,9 +107,7 @@ export class KeyGuardService {
         },
       },
     });
-
-    this.logger.log(`Device enrolled successfully: ${device.id}`);
-
+    this.logger.log(`Device enrolled successfully: ${device.id} (status: ${deviceStatus})`);
     // Log device enrollment
     try {
       await this.auditLogsService.createLog({
@@ -107,6 +126,9 @@ export class KeyGuardService {
           keyId: device.keyId,
           fingerprint: device.fingerprintHash,
           platform: enrollDto.metadata,
+          enrollmentCodeUsed: !!enrollmentCodeId,
+          enrollmentCodeId,
+          initialStatus: deviceStatus,
         },
         deviceId: device.id,
         apiKeyId: project.id,
@@ -114,14 +136,12 @@ export class KeyGuardService {
     } catch (error) {
       this.logger.error(`Failed to create audit log for enrollment: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
-
     return {
       id: device.id,
       status: device.status,
       createdAt: device.createdAt,
     };
   }
-
   /**
    * Verify a signed request
    *
@@ -141,7 +161,6 @@ export class KeyGuardService {
       this.logger.log(
         `Verifying request for keyId: ${headers.keyId}, apiKey: ${headers.apiKey}`,
       );
-
       // 1. Validate algorithm
       if (!this.signatureVerification.validateAlgorithm(headers.algorithm)) {
         return {
@@ -149,7 +168,6 @@ export class KeyGuardService {
           error: `Unsupported algorithm: ${headers.algorithm}`,
         };
       }
-
       // 2. Validate timestamp (120 second window)
       if (!this.signatureVerification.validateTimestamp(headers.timestamp)) {
         return {
@@ -157,10 +175,8 @@ export class KeyGuardService {
           error: 'Request timestamp outside valid window',
         };
       }
-
       // 3. Validate API key and get project
       const project = await this.validateApiKey(headers.apiKey);
-
       // 4. Get device and public key
       const device = await this.prisma.prisma.device.findFirst({
         where: {
@@ -168,39 +184,33 @@ export class KeyGuardService {
           keyId: headers.keyId,
         },
       });
-
       if (!device) {
         return {
           valid: false,
           error: `Device with keyId ${headers.keyId} not found`,
         };
       }
-
       if (device.status !== 'ACTIVE') {
         return {
           valid: false,
           error: `Device status is ${device.status}`,
         };
       }
-
       // 5. Check nonce uniqueness (replay protection)
       const nonceExists = await this.checkNonceExists(
         project.id,
         headers.keyId,
         headers.nonce,
       );
-
       if (nonceExists) {
         return {
           valid: false,
           error: 'Nonce has already been used (replay attack detected)',
         };
       }
-
       // 6. Compute body hash and compare
       const computedBodyHash =
         this.signatureVerification.computeBodyHash(rawBody);
-
       if (computedBodyHash !== headers.bodySha256) {
         this.logger.warn(
           `Body hash mismatch. Expected: ${headers.bodySha256}, Got: ${computedBodyHash}`,
@@ -210,7 +220,6 @@ export class KeyGuardService {
           error: 'Body hash mismatch',
         };
       }
-
       // 7. Build canonical payload
       const pathAndQuery =
         this.signatureVerification.extractPathAndQuery(url);
@@ -224,33 +233,26 @@ export class KeyGuardService {
           headers.apiKey,
           headers.keyId,
         );
-
       // 8. Verify signature
       const isValid = await this.signatureVerification.verifySignature(
         device.publicKeySpkiBase64 ?? '',
         canonicalPayload,
         headers.signature,
       );
-
-
       if (!isValid) {
         return {
           valid: false,
           error: 'Invalid signature',
         };
       }
-
       // 9. Store nonce to prevent replay (TTL: 120 seconds)
       await this.storeNonce(project.id, headers.keyId, headers.nonce);
-
       // 10. Update last seen timestamp
       await this.prisma.prisma.device.update({
         where: { id: device.id },
         data: { lastSeen: new Date() },
       });
-
       this.logger.log(`Request verified successfully for device: ${device.id}`);
-
       return {
         valid: true,
         deviceId: device.id,
@@ -264,7 +266,6 @@ export class KeyGuardService {
       };
     }
   }
-
   /**
    * Get device by ID
    */
@@ -273,52 +274,41 @@ export class KeyGuardService {
       where: { id: deviceId },
       include: { apiKey: true },
     });
-
     if (!device) {
       throw new NotFoundException(`Device ${deviceId} not found`);
     }
-
     return device;
   }
-
   /**
    * List all devices for an API key
    */
   async listDevices(apiKey: string) {
     const project = await this.validateApiKey(apiKey);
-
     const devices = await this.prisma.prisma.device.findMany({
       where: { apiKeyId: project.id },
       orderBy: { createdAt: 'desc' },
     });
-
     return devices;
   }
-
   /**
    * Revoke a device
    */
   async revokeDevice(apiKey: string, deviceId: string) {
     const project = await this.validateApiKey(apiKey);
-
     const device = await this.prisma.prisma.device.findFirst({
       where: {
         id: deviceId,
         apiKeyId: project.id,
       },
     });
-
     if (!device) {
       throw new NotFoundException(`Device ${deviceId} not found`);
     }
-
     const updated = await this.prisma.prisma.device.update({
       where: { id: deviceId },
       data: { status: 'REVOKED' },
     });
-
     this.logger.log(`Device revoked: ${deviceId}`);
-
     // Log device revocation
     try {
       await this.auditLogsService.createLog({
@@ -342,10 +332,8 @@ export class KeyGuardService {
     } catch (error) {
       this.logger.error(`Failed to create audit log for revocation: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
-
     return updated;
   }
-
   /**
    * Validate API key exists and is active
    */
@@ -353,58 +341,47 @@ export class KeyGuardService {
     if (!apiKey) {
       throw new BadRequestException('API key is required');
     }
-
     // Find API key by matching the full value
     const project = await this.prisma.prisma.apiKey.findFirst({
       where: {
         fullValue: apiKey,
       },
     });
-
     if (!project) {
       throw new UnauthorizedException('Invalid API key');
     }
-
     if (project.status !== 'ACTIVE') {
       throw new UnauthorizedException('API key is not active');
     }
-
     return project;
   }
-
   /**
    * Validate public key format (basic validation)
    */
   private validatePublicKey(publicKey: string) {
     // Clean the public key
     const cleanedKey = publicKey.trim().replace(/\s/g, '');
-
     // Check if it's valid base64
     const base64Regex = /^[A-Za-z0-9+/]+=*$/;
     if (!base64Regex.test(cleanedKey)) {
       throw new BadRequestException('Invalid public key format: not valid base64');
     }
-
     // Check reasonable length (SPKI P-256 keys are ~91 base64 chars)
     if (cleanedKey.length < 50 || cleanedKey.length > 200) {
       throw new BadRequestException('Public key length out of valid range');
     }
-
     // Try to decode and validate SPKI format
     try {
       const buffer = Buffer.from(cleanedKey, 'base64');
-
       // SPKI format validation:
       // - Must start with 0x30 (SEQUENCE tag)
       // - For P-256 keys, typical length is 91 bytes
       if (buffer.length < 50) {
         throw new BadRequestException('Public key buffer too short');
       }
-
       if (buffer[0] !== 0x30) {
         throw new BadRequestException('Invalid SPKI format: missing SEQUENCE tag');
       }
-
       this.logger.debug(`Public key validated: ${buffer.length} bytes`);
     } catch (error) {
       if (error instanceof BadRequestException) {
@@ -413,7 +390,6 @@ export class KeyGuardService {
       throw new BadRequestException(`Failed to decode public key: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
-
   /**
    * Check if nonce has been used
    */
@@ -431,10 +407,8 @@ export class KeyGuardService {
         },
       },
     });
-
     return !!existing;
   }
-
   /**
    * Store nonce with TTL (120 seconds)
    */
@@ -444,7 +418,6 @@ export class KeyGuardService {
     nonce: string,
   ): Promise<void> {
     const expiresAt = new Date(Date.now() + 120 * 1000); // 120 seconds
-
     await this.prisma.prisma.nonce.create({
       data: {
         apiKeyId,
@@ -454,7 +427,6 @@ export class KeyGuardService {
       },
     });
   }
-
   /**
    * Clean up expired nonces (should be run periodically via cron)
    */
@@ -466,7 +438,6 @@ export class KeyGuardService {
         },
       },
     });
-
     this.logger.log(`Cleaned up ${result.count} expired nonces`);
     return result.count;
   }
