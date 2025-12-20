@@ -32,37 +32,37 @@ KeyGuard is a comprehensive device binding platform designed to secure LLM API k
 │    │                    Backend API                           │                 │
 │    │                    (NestJS)                              │                 │
 │    │                                                          │                 │
-│    │  ┌────────────┐  ┌────────────┐  ┌────────────┐         │                 │
-│    │  │   Auth     │  │  KeyGuard  │  │   Proxy    │         │                 │
-│    │  │  Module    │  │  Module    │  │  Module    │         │                 │
-│    │  │            │  │            │  │            │         │                 │
-│    │  │ • JWT      │  │ • Verify   │  │ • OpenAI   │         │                 │
-│    │  │ • Login    │  │ • Enroll   │  │ • Anthropic│         │                 │
-│    │  │ • Refresh  │  │ • Validate │  │ • Google   │         │                 │
-│    │  └────────────┘  └────────────┘  └────────────┘         │                 │
+│    │  ┌────────────┐  ┌────────────┐  ┌────────────┐          │                 │
+│    │  │   Auth     │  │  KeyGuard  │  │   Proxy    │          │                 │
+│    │  │  Module    │  │  Module    │  │  Module    │          │                 │
+│    │  │            │  │            │  │            │          │                 │
+│    │  │ • JWT      │  │ • Verify   │  │ • OpenAI   │          │                 │
+│    │  │ • Login    │  │ • Enroll   │  │ • Anthropic│          │                 │
+│    │  │ • Refresh  │  │ • Validate │  │ • Google   │          │                 │
+│    │  └────────────┘  └────────────┘  └────────────┘          │                 │
 │    │                                                          │                 │
-│    │  ┌────────────┐  ┌────────────┐  ┌────────────┐         │                 │
-│    │  │  Devices   │  │  API Keys  │  │   Audit    │         │                 │
-│    │  │  Module    │  │  Module    │  │   Module   │         │                 │
-│    │  │            │  │            │  │            │         │                 │
-│    │  │ • Enroll   │  │ • Create   │  │ • Log      │         │                 │
-│    │  │ • Approve  │  │ • Rotate   │  │ • Export   │         │                 │
-│    │  │ • Revoke   │  │ • Revoke   │  │ • Filter   │         │                 │
-│    │  └────────────┘  └────────────┘  └────────────┘         │                 │
+│    │  ┌────────────┐  ┌────────────┐  ┌────────────┐          │                 │
+│    │  │  Devices   │  │  API Keys  │  │   Audit    │          │                 │
+│    │  │  Module    │  │  Module    │  │   Module   │          │                 │
+│    │  │            │  │            │  │            │          │                 │
+│    │  │ • Enroll   │  │ • Create   │  │ • Log      │          │                 │
+│    │  │ • Approve  │  │ • Rotate   │  │ • Export   │          │                 │
+│    │  │ • Revoke   │  │ • Revoke   │  │ • Filter   │          │                 │
+│    │  └────────────┘  └────────────┘  └────────────┘          │                 │
 │    │                                                          │                 │
 │    └────────────────────────┬─────────────────────────────────┘                 │
 │                             │                                                   │
 │             ┌───────────────┼───────────────┐                                   │
 │             ▼               ▼               ▼                                   │
-│    ┌──────────────┐ ┌──────────────┐ ┌──────────────┐                          │
-│    │  PostgreSQL  │ │    Redis     │ │ LLM APIs     │                          │
-│    │  Database    │ │   (Cache)    │ │              │                          │
-│    │              │ │              │ │ • OpenAI     │                          │
-│    │ • Users      │ │ • Sessions   │ │ • Anthropic  │                          │
-│    │ • Devices    │ │ • Rate Limit │ │ • Google     │                          │
-│    │ • API Keys   │ │              │ │ • Azure      │                          │
-│    │ • Audit Logs │ │              │ │              │                          │
-│    └──────────────┘ └──────────────┘ └──────────────┘                          │
+│    ┌──────────────┐ ┌──────────────┐ ┌──────────────┐                           │
+│    │  PostgreSQL  │ │    Redis     │ │ LLM APIs     │                           │
+│    │  Database    │ │   (Cache)    │ │              │                           │
+│    │              │ │              │ │ • OpenAI     │                           │
+│    │ • Users      │ │ • Sessions   │ │ • Anthropic  │                           │
+│    │ • Devices    │ │ • Rate Limit │ │ • Google     │                           │
+│    │ • API Keys   │ │              │ │ • Azure      │                           │
+│    │ • Audit Logs │ │              │ │              │                           │
+│    └──────────────┘ └──────────────┘ └──────────────┘                           │
 │                                                                                 │
 │    ┌──────────────────────────────────────────────────────────┐                 │
 │    │                  Frontend Dashboard                      │                 │
@@ -85,13 +85,13 @@ KeyGuard is a comprehensive device binding platform designed to secure LLM API k
 
 The TypeScript SDK runs in client applications:
 
-| Component | Responsibility |
-|-----------|---------------|
-| **CryptoManager** | ECDSA P-256 key generation and signing |
-| **StorageAdapter** | Secure key storage (IndexedDB/Memory) |
-| **FingerprintProvider** | Device identification |
-| **KeyGuardClient** | Main API for enrollment and signing |
-
+| Component               | Responsibility                              |
+|-------------------------|---------------------------------------------|
+| **CryptoManager**       | ECDSA P-256 key generation and signing      |
+| **StorageAdapter**      | Secure key storage (IndexedDB/Memory)       |
+| **FingerprintProvider** | Device identification                       |
+| **KeyGuardClient**      | Main API for enrollment and signing         |
+─────────────────────────────────────────────────────────────────────────
 **Key Features:**
 - Non-extractable private keys (WebCrypto API)
 - Automatic request signing
@@ -103,16 +103,16 @@ The TypeScript SDK runs in client applications:
 
 The NestJS backend handles all server-side logic:
 
-| Module | Responsibility |
-|--------|---------------|
-| **Auth** | JWT authentication, login, token refresh |
-| **KeyGuard** | Signature verification, device enrollment |
-| **Devices** | Device inventory management |
-| **API Keys** | LLM API key storage and management |
-| **Proxy** | Request proxying to LLM providers |
-| **Audit** | Activity logging and export |
-| **Settings** | System configuration |
-
+| Module           | Responsibility                            |
+|------------------|-------------------------------------------|
+| **Auth**         | JWT authentication, login, token refresh  |
+| **KeyGuard**     | Signature verification, device enrollment |
+| **Devices**      | Device inventory management               |
+| **API Keys**     | LLM API key storage and management        |
+| **Proxy**        | Request proxying to LLM providers         |
+| **Audit**        | Activity logging and export               |
+| **Settings**     | System configuration                      |
+───────────────────────────────────────────────────────────────
 **Key Features:**
 - Signature verification middleware
 - Rate limiting and IP whitelisting
@@ -124,15 +124,14 @@ The NestJS backend handles all server-side logic:
 
 The Next.js admin dashboard provides:
 
-| Feature | Description |
-|---------|-------------|
-| **Device Management** | View, approve, suspend, revoke devices |
-| **API Key Management** | Create, rotate, delete LLM API keys |
-| **Audit Logs** | View and export activity logs |
-| **Settings** | Configure security policies |
-| **Internationalization** | English and Arabic (RTL) support |
-
----
+| Feature                  | Description                              |
+|--------------------------|------------------------------------------|
+| **Device Management**    | View, approve, suspend, revoke devices   |
+| **API Key Management**   | Create, rotate, delete LLM API keys      |
+| **Audit Logs**           | View and export activity logs            |
+| **Settings**             | Configure security policies              |
+| **Internationalization** | English and Arabic (RTL) support         |
+───────────────────────────────────────────────────────────────────────
 
 ## Data Flow
 
@@ -213,15 +212,14 @@ The Next.js admin dashboard provides:
 
 ## Technology Stack
 
-| Layer | Technology | Purpose |
-|-------|------------|---------|
-| **SDK** | TypeScript, WebCrypto, IndexedDB | Client-side cryptography |
-| **Backend** | NestJS, Prisma, PostgreSQL | API and data layer |
-| **Frontend** | Next.js, React, Tailwind | Admin dashboard |
-| **Security** | ECDSA P-256, SHA-256, JWT | Cryptographic operations |
-| **Caching** | Redis (optional) | Session and rate limiting |
-
----
+| Layer           | Technology                           | Purpose                      |
+|-----------------|--------------------------------------|------------------------------|
+| **SDK**         | TypeScript, WebCrypto, IndexedDB     | Client-side cryptography     |
+| **Backend**     | NestJS, Prisma, PostgreSQL           | API and data layer           |
+| **Frontend**    | Next.js, React, Tailwind             | Admin dashboard              |
+| **Security**    | ECDSA P-256, SHA-256, JWT            | Cryptographic operations     |
+| **Caching**     | Redis (optional)                     | Session and rate limiting    |
+-----------------------------------------------------------------------------------------
 
 ## Security Layers
 
@@ -231,7 +229,7 @@ The Next.js admin dashboard provides:
 ├─────────────────────────────────────────────────────────┤
 │                                                         │
 │  Layer 1: Device Binding                                │
-│  ├── ECDSA P-256 key pair per device                   │
+│  ├── ECDSA P-256 key pair per device                    │
 │  ├── Private key never leaves device                    │
 │  └── Non-extractable WebCrypto keys                     │
 │                                                         │
@@ -289,36 +287,35 @@ The Next.js admin dashboard provides:
 
 ## Deployment Architecture
 
-```
+      
 ┌─────────────────────────────────────────────────────────┐
 │                    Production Setup                     │
 ├─────────────────────────────────────────────────────────┤
 │                                                         │
-│  ┌─────────────┐     ┌─────────────────────────────┐   │
-│  │   CDN       │     │      Load Balancer          │   │
-│  │  (Vercel/   │     │      (nginx/AWS ALB)        │   │
-│  │   Netlify)  │     └──────────────┬──────────────┘   │
-│  └──────┬──────┘                    │                  │
-│         │                           │                  │
-│         │              ┌────────────┼────────────┐     │
-│         │              │            │            │     │
-│         ▼              ▼            ▼            ▼     │
-│  ┌────────────┐  ┌──────────┐ ┌──────────┐ ┌──────────┐│
-│  │  Frontend  │  │ Backend  │ │ Backend  │ │ Backend  ││
-│  │  (Static)  │  │ Node 1   │ │ Node 2   │ │ Node 3   ││
-│  └────────────┘  └────┬─────┘ └────┬─────┘ └────┬─────┘│
-│                       │            │            │      │
-│                       └────────────┼────────────┘      │
-│                                    │                   │
-│                       ┌────────────┼────────────┐      │
-│                       ▼            ▼            ▼      │
-│                 ┌──────────┐ ┌──────────┐ ┌──────────┐ │
-│                 │PostgreSQL│ │  Redis   │ │ Secrets  │ │
-│                 │ (Primary)│ │ Cluster  │ │ Manager  │ │
-│                 └──────────┘ └──────────┘ └──────────┘ │
+│  ┌─────────────┐     ┌─────────────────────────────┐    │
+│  │   CDN       │     │      Load Balancer          │    │
+│  │  (Vercel/   │     │      (nginx/AWS ALB)        │    │
+│  │   Netlify)  │     └──────────────┬──────────────┘    │
+│  └──────┬──────┘                    │                   │
+│         │                           │                   │
+│         │              ┌────────────┼────────────┐      │
+│         │              │            │            │      │
+│         ▼              ▼            ▼            ▼      │
+│  ┌────────────┐  ┌──────────┐ ┌──────────┐ ┌──────────┐ │
+│  │  Frontend  │  │ Backend  │ │ Backend  │ │ Backend  │ │
+│  │  (Static)  │  │ Node 1   │ │ Node 2   │ │ Node 3   │ │
+│  └────────────┘  └────┬─────┘ └────┬─────┘ └────┬─────┘ │
+│                       │            │            │       │
+│                       └────────────┼────────────┘       │
+│                                    │                    │
+│                       ┌────────────┼────────────┐       │
+│                       ▼            ▼            ▼       │
+│                 ┌──────────┐ ┌──────────┐ ┌──────────┐  │
+│                 │PostgreSQL│ │  Redis   │ │ Secrets  │  │
+│                 │ (Primary)│ │ Cluster  │ │ Manager  │  │
+│                 └──────────┘ └──────────┘ └──────────┘  │
 │                                                         │
 └─────────────────────────────────────────────────────────┘
-```
 
 ---
 
