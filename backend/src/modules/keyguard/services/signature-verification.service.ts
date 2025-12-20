@@ -148,13 +148,14 @@ export class SignatureVerificationService {
    */
   computeBodyHash(rawBody: Buffer | null): string {
     if (!rawBody || rawBody.length === 0) {
-      // Empty body hash
-      const hash = createHash('sha256').update('').digest('hex');
+      // Empty body hash - SDK uses Base64 encoding
+      const hash = createHash('sha256').update('').digest('base64');
       this.logger.debug(`Computed empty body hash: ${hash}`);
       return hash;
     }
 
-    const hash = createHash('sha256').update(rawBody).digest('hex');
+    // SDK uses Base64 encoding for body hash
+    const hash = createHash('sha256').update(rawBody).digest('base64');
     this.logger.debug(`Computed body hash: ${hash}`);
     return hash;
   }
