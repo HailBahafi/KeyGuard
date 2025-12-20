@@ -152,7 +152,7 @@ function setupCors(app: NestFastifyApplication, isProd: boolean): void {
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-keyguard-signature', 'x-keyguard-timestamp', 'x-keyguard-nonce', 'x-keyguard-body-sha256', 'x-keyguard-key-id', 'x-keyguard-api-key', 'x-keyguard-alg'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key', 'x-keyguard-signature', 'x-keyguard-timestamp', 'x-keyguard-nonce', 'x-keyguard-body-sha256', 'x-keyguard-key-id', 'x-keyguard-api-key', 'x-keyguard-alg'],
   });
 }
 
