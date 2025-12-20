@@ -21,8 +21,6 @@ export const configurationSchema = z.object({
     .optional()
     .default('http://localhost:3000'),
 
-  OPENAI_API_KEY: z.string().optional(),
-
   OPENAI_BASE_URL: z
     .url({ message: 'OPENAI_BASE_URL must be a valid URL' })
     .optional()

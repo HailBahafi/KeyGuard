@@ -14,7 +14,6 @@ export class ProxyRequestDto {
  * Headers required for KeyGuard authentication
  */
 export interface KeyGuardProxyHeaders {
-  apiKey: string;
   keyId: string;
   timestamp: string;
   nonce: string;

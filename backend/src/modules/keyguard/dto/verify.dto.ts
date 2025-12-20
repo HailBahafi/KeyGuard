@@ -18,7 +18,6 @@ export class VerifyResponseDto {
 }
 
 export class KeyGuardHeaders {
-  apiKey: string;
   keyId: string;
   timestamp: string;
   nonce: string;

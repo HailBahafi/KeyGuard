@@ -28,7 +28,10 @@ model AdminApiKey {
 model EnrollmentCode {
     id        String    @id @default(uuid())
     code      String    @unique
-    expiresAt DateTime
+    expiresAt DateTime?
+    description String?
+    userId    String
+    user      User      @relation(fields: [userId], references: [id])
     used      Boolean   @default(false)
     usedAt    DateTime?
     createdAt DateTime  @default(now())

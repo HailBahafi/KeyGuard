@@ -7,8 +7,10 @@ import {
   HttpStatus,
   Param,
   Post,
+  Headers,
   Query,
   UseGuards,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/core/auth/jwt-auth.guard';
@@ -48,9 +50,10 @@ export class ApiKeysController {
     type: CreateKeyResponseDto,
   })
   @ApiResponse({ status: 409, description: 'API key with this name already exists' })
-  async createKey(@Body() createKeyDto: CreateKeyDto): Promise<CreateKeyResponseDto> {
+  async createKey(@Body() createKeyDto: CreateKeyDto, @Headers('x-api-key') apiKey: string): Promise<CreateKeyResponseDto> {
     // Service returns { key, rawKey } - rawKey is ONLY available here
-    const result = await this.apiKeysService.createKey(createKeyDto);
+    if (!apiKey) throw new UnauthorizedException('API key is required');
+    const result = await this.apiKeysService.createKey(createKeyDto, apiKey);
     return result;
   }
 

@@ -66,7 +66,7 @@ export class KeyGuardService {
         where: { code: enrollDto.enrollmentCode },
       });
       // Validate enrollment code
-      if (enrollmentCode && !enrollmentCode.used && enrollmentCode.expiresAt > new Date()) {
+      if (enrollmentCode && !enrollmentCode.used && (enrollmentCode.expiresAt === null || enrollmentCode.expiresAt > new Date())) {
         this.logger.log(`Valid enrollment code found, setting device status to ACTIVE`);
         deviceStatus = 'ACTIVE';
         enrollmentCodeId = enrollmentCode.id;
@@ -159,7 +159,7 @@ export class KeyGuardService {
   ): Promise<VerifyResponseDto> {
     try {
       this.logger.log(
-        `Verifying request for keyId: ${headers.keyId}, apiKey: ${headers.apiKey}`,
+        `Verifying request for keyId: ${headers.keyId}`,
       );
       // 1. Validate algorithm
       if (!this.signatureVerification.validateAlgorithm(headers.algorithm)) {
@@ -176,12 +176,13 @@ export class KeyGuardService {
         };
       }
       // 3. Validate API key and get project
-      const project = await this.validateApiKey(headers.apiKey);
       // 4. Get device and public key
       const device = await this.prisma.prisma.device.findFirst({
         where: {
-          apiKeyId: project.id,
           keyId: headers.keyId,
+        },
+        include: {
+          apiKey: true,
         },
       });
       if (!device) {
@@ -196,6 +197,7 @@ export class KeyGuardService {
           error: `Device status is ${device.status}`,
         };
       }
+      const project = await this.validateApiKey(device.apiKey.apiKey);
       // 5. Check nonce uniqueness (replay protection)
       const nonceExists = await this.checkNonceExists(
         project.id,
@@ -230,7 +232,7 @@ export class KeyGuardService {
           pathAndQuery,
           headers.bodySha256,
           headers.nonce,
-          headers.apiKey,
+          device.apiKey.apiKey,
           headers.keyId,
         );
       // 8. Verify signature

@@ -12,6 +12,7 @@ import {
   EnrollmentCodeDto,
 } from './dto/device-response.dto';
 import dayjs from 'dayjs';
+import { CreateEnrollmentCodeDto } from './dto/create-enrollment-code.dto';
 
 @Injectable()
 export class DevicesService {
@@ -109,21 +110,23 @@ export class DevicesService {
     };
   }
 
-  async generateEnrollmentCode(): Promise<EnrollmentCodeDto> {
+  async generateEnrollmentCode(userId: string, body: CreateEnrollmentCodeDto): Promise<EnrollmentCodeDto> {
     // Generate unique enrollment code
     const code = this.generateCode();
-    const expiresAt = dayjs().add(15, 'minute').toDate();
+    const expiresAt = body.expiresAt ? dayjs(body.expiresAt).toDate() : null;
 
     await this.prisma.prisma.enrollmentCode.create({
       data: {
         code,
         expiresAt,
+        description: body.description,
+        userId,
       },
     });
 
     return {
       code,
-      expiresAt: expiresAt.toISOString(),
+      expiresAt: expiresAt?.toISOString() || null,
     };
   }
 

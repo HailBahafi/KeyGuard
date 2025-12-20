@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
+  Body,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/core/auth/jwt-auth.guard';
@@ -19,6 +20,8 @@ import {
   EnrollmentCodeDto,
   DeviceActionResponseDto,
 } from './dto/device-response.dto';
+import { CurrentUser } from '@/src/common/decorators/current-user.decorator';
+import { CreateEnrollmentCodeDto } from './dto/create-enrollment-code.dto';
 
 @ApiTags('Devices')
 @ApiBearerAuth()
@@ -46,8 +49,8 @@ export class DevicesController {
     description: 'Enrollment code generated successfully',
     type: EnrollmentCodeDto,
   })
-  async generateEnrollmentCode(): Promise<EnrollmentCodeDto> {
-    return this.devicesService.generateEnrollmentCode();
+  async generateEnrollmentCode(@CurrentUser('id') userId: string, @Body() body: CreateEnrollmentCodeDto): Promise<EnrollmentCodeDto> {
+    return this.devicesService.generateEnrollmentCode(userId, body);
   }
 
   @Patch(':id/approve')

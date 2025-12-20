@@ -39,7 +39,6 @@ export class ProxyController {
   async proxyRequest(
     @Req() request: FastifyRequest & { rawBody?: Buffer },
     @Res() reply: FastifyReply,
-    @Headers('x-keyguard-api-key') apiKey: string,
     @Headers('x-keyguard-key-id') keyId: string,
     @Headers('x-keyguard-timestamp') timestamp: string,
     @Headers('x-keyguard-nonce') nonce: string,
@@ -49,7 +48,6 @@ export class ProxyController {
   ) {
     // Validate required headers
     const missingHeaders = [];
-    if (!apiKey) missingHeaders.push('x-keyguard-api-key');
     if (!keyId) missingHeaders.push('x-keyguard-key-id');
     if (!timestamp) missingHeaders.push('x-keyguard-timestamp');
     if (!nonce) missingHeaders.push('x-keyguard-nonce');
@@ -64,7 +62,6 @@ export class ProxyController {
     }
 
     const headers: KeyGuardProxyHeaders = {
-      apiKey,
       keyId,
       timestamp,
       nonce,
@@ -141,6 +138,7 @@ export class ProxyController {
       reply,
       device.id,
       device.apiKeyId,
+      device.apiKey.apiKey,
     );
   }
 }
