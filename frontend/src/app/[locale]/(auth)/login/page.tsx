@@ -63,7 +63,13 @@ export default function LoginPage() {
                 </CardHeader>
                 <CardContent>
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                form.handleSubmit(onSubmit)(e);
+                            }}
+                            className="space-y-4"
+                        >
                             <FormField
                                 control={form.control}
                                 name="email"
@@ -120,7 +126,7 @@ export default function LoginPage() {
                     </button>
                     <div className="text-sm text-muted-foreground">
                         {t('noAccount')}{' '}
-                        <Link 
+                        <Link
                             href={`/${locale}/setup`}
                             className="text-primary hover:underline font-medium"
                         >
