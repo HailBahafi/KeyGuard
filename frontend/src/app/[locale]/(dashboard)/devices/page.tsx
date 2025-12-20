@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Plus, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useDevices, useApproveDevice, useRevokeDevice, useEnrollmentCode } from '@/hooks/use-devices';
+import { useDevices, useApproveDevice, useRevokeDevice } from '@/hooks/use-devices';
 import type { Device } from '@/types/device';
 import { DeviceStatsBar } from './_components/device-stats';
 import { DeviceFilters } from './_components/device-filters';
@@ -43,7 +43,6 @@ export default function DevicesPage() {
 
     const approveMutation = useApproveDevice();
     const revokeMutation = useRevokeDevice();
-    const enrollmentMutation = useEnrollmentCode();
 
     const devices = devicesData?.devices || [];
     const stats = devicesData?.stats || {
@@ -162,10 +161,6 @@ export default function DevicesPage() {
             <EnrollmentDialog
                 open={isEnrollmentOpen}
                 onOpenChange={setIsEnrollmentOpen}
-                onGenerateCode={() => {
-                    // Per Postman spec, enrollment code takes no body
-                    enrollmentMutation.mutate();
-                }}
             />
 
             <DeviceDetailsSheet
