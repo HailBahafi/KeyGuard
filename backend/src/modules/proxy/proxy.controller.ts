@@ -1,4 +1,5 @@
 import { Public } from '@/src/common/decorators/public.decorator';
+import { Encryption } from '@/src/common/utils/encryption.util';
 import {
   All,
   BadRequestException,
@@ -39,6 +40,7 @@ export class ProxyController {
   async proxyRequest(
     @Req() request: FastifyRequest & { rawBody?: Buffer },
     @Res() reply: FastifyReply,
+    @Headers('x-keyguard-api-key') apiKey: string,
     @Headers('x-keyguard-key-id') keyId: string,
     @Headers('x-keyguard-timestamp') timestamp: string,
     @Headers('x-keyguard-nonce') nonce: string,
@@ -48,6 +50,7 @@ export class ProxyController {
   ) {
     // Validate required headers
     const missingHeaders = [];
+    if (!apiKey) missingHeaders.push('x-keyguard-api-key');
     if (!keyId) missingHeaders.push('x-keyguard-key-id');
     if (!timestamp) missingHeaders.push('x-keyguard-timestamp');
     if (!nonce) missingHeaders.push('x-keyguard-nonce');
@@ -62,6 +65,7 @@ export class ProxyController {
     }
 
     const headers: KeyGuardProxyHeaders = {
+      apiKey,
       keyId,
       timestamp,
       nonce,
@@ -130,7 +134,16 @@ export class ProxyController {
     // Step 4: Get device and API key info for logging
     const device = await this.keyguardService.getDevice(verificationResult.deviceId!);
 
-    // Step 5: Forward to OpenAI
+    // Step 5: Decrypt the API key (stored encrypted with AES-256-GCM)
+    let decryptedApiKey: string;
+    try {
+      decryptedApiKey = Encryption.decrypt(device.apiKey.apiKey);
+    } catch (error) {
+      this.logger.error(`Failed to decrypt API key: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new BadRequestException('Failed to decrypt API key. The key may be corrupted or stored with old encryption.');
+    }
+
+    // Step 6: Forward to OpenAI with decrypted key
     await this.proxyService.forwardToOpenAI(
       openaiEndpoint,
       body,
@@ -138,7 +151,7 @@ export class ProxyController {
       reply,
       device.id,
       device.apiKeyId,
-      device.apiKey.apiKey,
+      decryptedApiKey,
     );
   }
 }

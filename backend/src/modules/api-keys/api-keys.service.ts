@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import dayjs from 'dayjs';
 import { Hashing } from 'src/common/utils/hashing.util';
+import { Encryption } from 'src/common/utils/encryption.util';
 import { PrismaService } from 'src/core/database/prisma.service';
 import { AuditLogsService } from '../audit-logs/audit-logs.service';
 import { CreateKeyDto } from './dto/create-key.dto';
@@ -122,13 +123,12 @@ export class ApiKeysService {
     const rawKey = this.generateApiKeyValue();
     const maskedValue = this.maskApiKey(rawKey);
 
-    // Hash both keys with bcrypt for secure storage - never store plain text
-    const [hashedValue, hashedApiKey] = await Promise.all([
-      Hashing.hash(rawKey),
-      Hashing.hash(apiKey),
-    ]);
+    // Hash the rawKey (KeyGuard key) with bcrypt for secure validation
+    // Encrypt the apiKey (OpenAI key) with AES-256-GCM so it can be decrypted for proxy
+    const hashedValue = await Hashing.hash(rawKey);
+    const encryptedApiKey = Encryption.encrypt(apiKey);
 
-    // Create key with hashed value (not plain text)
+    // Create key with hashed KeyGuard key and encrypted external API key
     const key = await this.prisma.prisma.apiKey.create({
       data: {
         name: createKeyDto.name,
@@ -139,7 +139,7 @@ export class ApiKeysService {
         fullValue: hashedValue, // Store bcrypt hash, NOT the raw key
         maskedValue,
         status: 'ACTIVE',
-        apiKey: hashedApiKey,
+        apiKey: encryptedApiKey, // Store AES-256-GCM encrypted, can be decrypted for proxy
       },
       include: {
         _count: {

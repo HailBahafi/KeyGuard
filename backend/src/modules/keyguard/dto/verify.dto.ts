@@ -18,6 +18,7 @@ export class VerifyResponseDto {
 }
 
 export class KeyGuardHeaders {
+  apiKey: string;  // Raw API key from x-keyguard-api-key header
   keyId: string;
   timestamp: string;
   nonce: string;

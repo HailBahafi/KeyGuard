@@ -39,12 +39,22 @@ export class SignatureGuard implements CanActivate {
             throw new UnauthorizedException('Missing required KeyGuard headers');
         }
 
-        // 1. Validate API key and get project
-        const project = await this.prisma.prisma.apiKey.findFirst({
-            where: { fullValue: apiKey },
+        // 1. Validate API key using bcrypt comparison (since fullValue stores hashed keys)
+        const bcrypt = await import('bcryptjs');
+        const activeKeys = await this.prisma.prisma.apiKey.findMany({
+            where: { status: 'ACTIVE' },
         });
 
-        if (!project || project.status !== 'ACTIVE') {
+        let project = null;
+        for (const key of activeKeys) {
+            const isMatch = await bcrypt.compare(apiKey, key.fullValue);
+            if (isMatch) {
+                project = key;
+                break;
+            }
+        }
+
+        if (!project) {
             throw new UnauthorizedException('Invalid or inactive API key');
         }
 

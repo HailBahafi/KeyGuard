@@ -197,7 +197,7 @@ export class KeyGuardService {
           error: `Device status is ${device.status}`,
         };
       }
-      const project = await this.validateApiKey(device.apiKey.apiKey);
+      const project = await this.validateApiKey(headers.apiKey);
       // 5. Check nonce uniqueness (replay protection)
       const nonceExists = await this.checkNonceExists(
         project.id,
@@ -232,7 +232,7 @@ export class KeyGuardService {
           pathAndQuery,
           headers.bodySha256,
           headers.nonce,
-          device.apiKey.apiKey,
+          headers.apiKey,  // Use raw API key from request header for signature verification
           headers.keyId,
         );
       // 8. Verify signature
@@ -338,24 +338,37 @@ export class KeyGuardService {
   }
   /**
    * Validate API key exists and is active
+   * Uses bcrypt comparison since fullValue stores hashed keys
    */
   private async validateApiKey(apiKey: string) {
     if (!apiKey) {
       throw new BadRequestException('API key is required');
     }
-    // Find API key by matching the full value
-    const project = await this.prisma.prisma.apiKey.findFirst({
+
+    // Get all active API keys for comparison
+    // Note: This is necessary because we store bcrypt hashes in fullValue
+    const activeKeys = await this.prisma.prisma.apiKey.findMany({
       where: {
-        fullValue: apiKey,
+        status: 'ACTIVE',
       },
     });
-    if (!project) {
-      throw new UnauthorizedException('Invalid API key');
+
+    // Compare provided key against each stored hash
+    for (const project of activeKeys) {
+      try {
+        // Use bcrypt to compare the provided key against the stored hash
+        const bcrypt = await import('bcryptjs');
+        const isMatch = await bcrypt.compare(apiKey, project.fullValue);
+        if (isMatch) {
+          return project;
+        }
+      } catch (error) {
+        // If comparison fails, continue to next key
+        this.logger.debug(`API key comparison failed for ${project.id}: ${error}`);
+      }
     }
-    if (project.status !== 'ACTIVE') {
-      throw new UnauthorizedException('API key is not active');
-    }
-    return project;
+
+    throw new UnauthorizedException('Invalid API key');
   }
   /**
    * Validate public key format (basic validation)
