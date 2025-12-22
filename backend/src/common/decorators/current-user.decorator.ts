@@ -1,6 +1,6 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { FastifyRequest, RouteGenericInterface } from 'fastify';
-import { User } from 'src/generated/client';
+import { User } from '@prisma/client';
 
 export type CurrentUserType = User
 

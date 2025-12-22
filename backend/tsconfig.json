@@ -4,11 +4,13 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "target": "es2022",
-    "lib": ["es2022", "dom"],
+    "lib": [
+      "es2022",
+      "dom"
+    ],
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-
     // Output Configuration
     "outDir": "./dist",
     "rootDir": "./",
@@ -18,17 +20,31 @@
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-
     // Path Mapping (يساعد في الاستيرادات النظيفة)
     "baseUrl": "./",
     "paths": {
-      "@/*": ["*"],
-      "@/common/*": ["src/common/*"],
-      "@/core/*": ["src/core/*"],
-      "@/modules/*": ["src/modules/*"],
-      "@/generated/*": ["src/generated/*"]
+      "@/*": [
+        "*"
+      ],
+      "@/common/*": [
+        "src/common/*"
+      ],
+      "@/core/*": [
+        "src/core/*"
+      ],
+      "@/modules/*": [
+        "src/modules/*"
+      ],
+      "@/generated/*": [
+        "src/generated/*"
+      ],
+      "@prisma/client": [
+        "src/generated/client"
+      ],
+      "@prisma/client/*": [
+        "src/generated/client/*"
+      ]
     },
-
     // Type Checking (تحسينات مهمة للأمان)
     "strict": true,
     "noImplicitAny": true,
@@ -40,7 +56,6 @@
     "noImplicitThis": true,
     "noImplicitOverride": true,
     "exactOptionalPropertyTypes": true,
-
     // Additional Checks (فحوصات إضافية)
     "noUnusedLocals": false,
     "noUnusedParameters": false,
@@ -48,18 +63,20 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitUseStrict": false,
     "noPropertyAccessFromIndexSignature": false,
-
     // Advanced Options
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "incremental": true,
     "tsBuildInfoFile": "./dist/.tsbuildinfo",
-
     // Performance Optimizations
     "preserveWatchOutput": true,
     "pretty": true
   },
-  "include": ["src/**/*", "test/**/*", "prisma/**/*"],
+  "include": [
+    "src/**/*",
+    "test/**/*",
+    "prisma/**/*"
+  ],
   "exclude": [
     "node_modules",
     "dist",
@@ -69,7 +86,9 @@
     "**/*.test.ts"
   ],
   "ts-node": {
-    "require": ["tsconfig-paths/register"],
+    "require": [
+      "tsconfig-paths/register"
+    ],
     "transpileOnly": true,
     "files": true
   }

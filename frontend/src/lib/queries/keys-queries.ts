@@ -1,4 +1,8 @@
-// Mock data for Key Vault
+/**
+ * Keys Queries - Real API calls to backend
+ */
+
+import { apiClient } from '@/lib/api';
 
 export interface ApiKey {
     id: string;
@@ -25,54 +29,58 @@ export interface KeysPaginationData {
     };
 }
 
-// Generate mock keys
-function generateMockKeys(): ApiKey[] {
-    const providers: Array<'openai' | 'anthropic' | 'google' | 'azure'> = ['openai', 'anthropic', 'google', 'azure'];
-    const statuses: Array<'active' | 'idle' | 'expired' | 'revoked'> = ['active', 'idle', 'expired', 'revoked'];
-    const environments: Array<'production' | 'development' | 'staging'> = ['production', 'development', 'staging'];
-
-    const keyNames = [
-        'openai-production',
-        'anthropic-dev',
-        'backup-key',
-        'staging-openai',
-        'google-prod',
-        'azure-test',
-        'openai-dev',
-        'anthropic-prod'
-    ];
-
-    return keyNames.map((name, index) => {
-        const provider = providers[index % providers.length];
-        const status = index === 0 || index === 1 ? 'active' : statuses[index % statuses.length];
-        const env = environments[index % environments.length];
-
-        const created = new Date(Date.now() - (index + 1) * 86400000 * 30); // Months ago
-        const lastUsed = status === 'active' ? new Date(Date.now() - Math.random() * 86400000 * 2) : null; // Within 2 days
-        const expiresAt = status !== 'expired' && Math.random() > 0.3
-            ? new Date(Date.now() + (30 + index * 10) * 86400000) // 30-100 days from now
-            : null;
-
-        return {
-            id: `key_${index + 1}`,
-            name,
-            provider,
-            status,
-            environment: env,
-            created: created.toISOString(),
-            lastUsed: lastUsed?.toISOString() || null,
-            expiresAt: expiresAt?.toISOString() || null,
-            deviceCount: status === 'active' ? Math.floor(Math.random() * 5) + 1 : 0,
-            usageCount: status === 'active' ? Math.floor(Math.random() * 10000) + 100 : 0,
-            description: index % 2 === 0 ? `${env} environment key` : undefined,
-            maskedValue: `sk-...${Math.random().toString(36).substring(2, 8)}`
-        };
-    });
+// Backend response interfaces
+interface BackendApiKey {
+    id: string;
+    name: string;
+    provider: string;
+    status: string;
+    environment: string;
+    createdAt: string;
+    lastUsed: string | null;
+    expiresAt: string | null;
+    deviceCount: number;
+    usageCount: number;
+    description?: string;
+    maskedValue: string;
 }
 
-const mockKeys = generateMockKeys();
+interface BackendKeysResponse {
+    keys: BackendApiKey[];
+    pagination: {
+        total: number;
+        page: number;
+        limit: number;
+        pages: number;
+    };
+}
 
-// Mock API call
+interface CreateKeyResponse {
+    key: BackendApiKey;
+    rawKey: string;
+}
+
+// Map backend key to frontend format
+function mapBackendKey(key: BackendApiKey): ApiKey {
+    return {
+        id: key.id,
+        name: key.name,
+        provider: key.provider.toLowerCase() as ApiKey['provider'],
+        status: key.status.toLowerCase() as ApiKey['status'],
+        environment: key.environment.toLowerCase() as ApiKey['environment'],
+        created: key.createdAt,
+        lastUsed: key.lastUsed,
+        expiresAt: key.expiresAt,
+        deviceCount: key.deviceCount,
+        usageCount: key.usageCount,
+        description: key.description,
+        maskedValue: key.maskedValue,
+    };
+}
+
+/**
+ * Fetch API keys from the backend
+ */
 export async function fetchKeys(
     page: number = 1,
     limit: number = 20,
@@ -83,72 +91,73 @@ export async function fetchKeys(
         search?: string;
     }
 ): Promise<KeysPaginationData> {
-    await new Promise(resolve => setTimeout(resolve, 300));
+    try {
+        // Build query params
+        const params = new URLSearchParams();
+        params.set('page', page.toString());
+        params.set('limit', limit.toString());
+        
+        if (filters?.status && filters.status !== 'all') {
+            params.set('status', filters.status);
+        }
+        if (filters?.provider && filters.provider !== 'all') {
+            params.set('provider', filters.provider);
+        }
+        if (filters?.environment && filters.environment !== 'all') {
+            params.set('environment', filters.environment);
+        }
+        if (filters?.search) {
+            params.set('search', filters.search);
+        }
 
-    let filteredKeys = [...mockKeys];
+        const response = await apiClient.get<BackendKeysResponse>(`/keys?${params.toString()}`);
+        const data = response.data;
 
-    // Apply filters
-    if (filters?.status && filters.status !== 'all') {
-        filteredKeys = filteredKeys.filter(k => k.status === filters.status);
+        return {
+            keys: data.keys.map(mapBackendKey),
+            pagination: data.pagination,
+        };
+    } catch (error) {
+        console.error('Failed to fetch keys:', error);
+        return {
+            keys: [],
+            pagination: { total: 0, page: 1, limit: 20, pages: 0 },
+        };
     }
-    if (filters?.provider && filters.provider !== 'all') {
-        filteredKeys = filteredKeys.filter(k => k.provider === filters.provider);
-    }
-    if (filters?.environment && filters.environment !== 'all') {
-        filteredKeys = filteredKeys.filter(k => k.environment === filters.environment);
-    }
-    if (filters?.search) {
-        const search = filters.search.toLowerCase();
-        filteredKeys = filteredKeys.filter(k =>
-            k.name.toLowerCase().includes(search) ||
-            k.provider.toLowerCase().includes(search)
-        );
-    }
+}
 
-    // Pagination
-    const start = (page - 1) * limit;
-    const end = start + limit;
-    const paginatedKeys = filteredKeys.slice(start, end);
+/**
+ * Create a new API key
+ * @returns The created key and the raw key value (only shown once!)
+ */
+export async function createKey(data: { 
+    name: string; 
+    provider: string; 
+    environment?: string; 
+    expiresAt?: string; 
+    description?: string;
+}, apiKey: string): Promise<{ key: ApiKey; rawKey: string }> {
+    const response = await apiClient.post<CreateKeyResponse>('/keys', {
+        name: data.name,
+        provider: data.provider,
+        environment: data.environment || 'development',
+        expiresAt: data.expiresAt,
+        description: data.description,
+    }, {
+        headers: {
+            'x-api-key': apiKey, // The actual external API key (e.g., OpenAI key)
+        },
+    });
 
     return {
-        keys: paginatedKeys,
-        pagination: {
-            total: filteredKeys.length,
-            page,
-            limit,
-            pages: Math.ceil(filteredKeys.length / limit)
-        }
+        key: mapBackendKey(response.data.key),
+        rawKey: response.data.rawKey,
     };
 }
 
-// Create key mock
-export async function createKey(data: { name: string; provider: string; environment?: string; expiresAt?: string; description?: string }): Promise<ApiKey> {
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    const newKey: ApiKey = {
-        id: `key_${mockKeys.length + 1}`,
-        name: data.name,
-        provider: data.provider as 'openai' | 'anthropic' | 'google' | 'azure',
-        status: 'active',
-        environment: data.environment as 'production' | 'development' | 'staging' || 'development',
-        created: new Date().toISOString(),
-        lastUsed: null,
-        expiresAt: data.expiresAt || null,
-        deviceCount: 0,
-        usageCount: 0,
-        description: data.description,
-        maskedValue: `sk-...${Math.random().toString(36).substring(2, 8)}`
-    };
-
-    mockKeys.push(newKey);
-    return newKey;
-}
-
-// Revoke key mock
+/**
+ * Revoke an API key
+ */
 export async function revokeKey(keyId: string): Promise<void> {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    const key = mockKeys.find(k => k.id === keyId);
-    if (key) {
-        key.status = 'revoked';
-    }
+    await apiClient.delete(`/keys/${keyId}`);
 }
