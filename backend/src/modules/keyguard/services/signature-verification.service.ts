@@ -35,15 +35,7 @@ export class SignatureVerificationService {
     signatureBase64: string,
   ): Promise<boolean> {
     try {
-
-      console.log({
-        spki: 'spki',
-        buffer: this.base64ToBuffer(publicKeySpkiBase64),
-        importParams: this.importParams,
-        extractable: true,
-        keyUsages: ['verify'],
-      })
-            // Clean and validate the base64 string
+      // Clean and validate the base64 string
       const cleanedPublicKey = publicKeySpkiBase64.trim().replace(/\s/g, '');
 
       if (!cleanedPublicKey) {
@@ -84,19 +76,10 @@ export class SignatureVerificationService {
         this.base64ToBuffer(signatureBase64),
         Buffer.from(payload, 'utf8'),
       );
-      // console.log({
-      //   isValid,
-      //   payload,
-      //   signatureBase64,
-      //   publicKeySpkiBase64,
-      // });
-
       this.logger.debug(`Signature verification result: ${isValid}`);
       return isValid;
     } catch (error) {
-      console.log("here: ");
-      console.dir(error, { depth: null });
-      this.logger.error('Signature verification failed:', error);
+      this.logger.error('Signature verification failed:', error instanceof Error ? error.message : 'Unknown error');
       return false;
     }
   }
@@ -136,7 +119,8 @@ export class SignatureVerificationService {
     ];
 
     const payload = parts.join('|');
-    this.logger.debug(`Built canonical payload: ${payload}`);
+    // Note: Not logging the full payload as it contains the API key
+    this.logger.debug(`Built canonical payload for keyId: ${keyId}`);
     return payload;
   }
 
