@@ -146,7 +146,7 @@ class PrismaErrorMapper {
 
         for (const pattern of fieldPatterns) {
             const match = message.match(pattern);
-            if (match && match[1]) {
+            if (match?.[1]) {
                 return match[1];
             }
         }
@@ -168,7 +168,7 @@ class PrismaErrorMapper {
 
         for (const pattern of dbPatterns) {
             const match = message.match(pattern);
-            if (match && match[1]) {
+            if (match?.[1]) {
                 return match[1];
             }
         }
@@ -191,7 +191,7 @@ class PrismaErrorMapper {
 
         for (const pattern of tablePatterns) {
             const match = message.match(pattern);
-            if (match && match[1]) {
+            if (match?.[1]) {
                 return match[1];
             }
         }

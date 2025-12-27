@@ -4,9 +4,10 @@ import { promises as fs } from 'fs';
 import { join } from 'path';
 import * as winston from 'winston';
 import { PaginationDto } from '../base/pagination.dto';
+
 @Injectable()
 export class LoggerService {
-  private logger: winston.Logger;
+  private readonly logger: winston.Logger;
   constructor() {
     this.logger = winston.createLogger({
       transports: [new winston.transports.Console()],

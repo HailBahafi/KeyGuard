@@ -2,6 +2,21 @@ import { ReactNode } from 'react';
 import Link from 'next/link';
 import { LanguageSwitcher } from '@/components/common/language-switcher';
 import { ThemeToggle } from '@/components/common/theme-toggle';
+import type { Metadata } from 'next';
+
+/**
+ * Auth pages should not be indexed by search engines
+ */
+export const metadata: Metadata = {
+    robots: {
+        index: false,
+        follow: false,
+        googleBot: {
+            index: false,
+            follow: false,
+        },
+    },
+};
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
     return (

@@ -90,6 +90,7 @@ export function GeneralForm({ initialData, onSuccess }: GeneralFormProps) {
                     <div className="space-y-2">
                         <Label htmlFor="timezone">{tGeneral('timezone')}</Label>
                         <Select
+                            // eslint-disable-next-line react-hooks/incompatible-library
                             value={watch('timezone')}
                             onValueChange={(value) => setValue('timezone', value, { shouldDirty: true })}
                         >

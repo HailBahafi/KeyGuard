@@ -1,23 +1,35 @@
 "use client";
 
-import React, { useMemo} from "react";
+import React, { useMemo, useId } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
+
+// Seeded random number generator for stable values
+function seededRandom(seed: number): () => number {
+  return () => {
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    return (seed / 0x7fffffff);
+  };
+}
 
 export const BackgroundBeams = React.memo(
   ({ className }: { className?: string }) => {
     const { theme } = useTheme();
     const isDark = theme === "dark";
+    const id = useId();
     
-    // Generate stable random values for animations (client-side only via useMemo)
+    // Generate stable random values using seeded generator based on component id
     const randomValues = useMemo(() => {
+      // Create a seed from the id string
+      const seed = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const random = seededRandom(seed);
       return Array.from({ length: 51 }, () => ({
-        y2Offset: 93 + Math.random() * 8,
-        duration: Math.random() * 10 + 10,
-        delay: Math.random() * 10,
+        y2Offset: 93 + random() * 8,
+        duration: random() * 10 + 10,
+        delay: random() * 10,
       }));
-    }, []);
+    }, [id]);
     
     // Theme-aware colors
     const beamColors = isDark 

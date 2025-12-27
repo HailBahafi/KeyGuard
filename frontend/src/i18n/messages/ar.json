@@ -1,4 +1,47 @@
 {
+    "Metadata": {
+        "site": {
+            "name": "KeyGuard",
+            "title": "KeyGuard - حماية مفاتيح API بتقنية انعدام الثقة",
+            "description": "أمّن مفاتيح OpenAI و Anthropic و Google AI بربطها بالأجهزة الموثوقة والتوقيعات المشفرة. مفتوح المصدر، مستضاف ذاتياً، جاهز للمؤسسات.",
+            "keywords": "أمان مفاتيح API, حماية LLM, حماية مفاتيح OpenAI, ربط الأجهزة, انعدام الثقة, التوقيعات المشفرة, إدارة مفاتيح API, الأمان المستضاف ذاتياً, أمان API للمؤسسات",
+            "ogImageAlt": "KeyGuard - أمّن مفاتيح LLM API بربط الأجهزة"
+        },
+        "pages": {
+            "home": {
+                "title": "أمّن مفاتيح LLM API الخاصة بك",
+                "description": "أوقف سرقة مفاتيح API. اربط مفاتيح OpenAI و Anthropic و Google AI بالأجهزة الموثوقة بالتوقيعات المشفرة."
+            },
+            "login": {
+                "title": "تسجيل الدخول",
+                "description": "الوصول إلى لوحة تحكم KeyGuard لإدارة الأجهزة ومفاتيح API."
+            },
+            "dashboard": {
+                "title": "لوحة التحكم",
+                "description": "راقب استخدام API ونشاط الأجهزة وتنبيهات الأمان في الوقت الفعلي."
+            },
+            "keys": {
+                "title": "مفاتيح API",
+                "description": "إدارة وتأمين مفاتيح API الخاصة بمزودي LLM مع KeyGuard."
+            },
+            "devices": {
+                "title": "الأجهزة",
+                "description": "عرض وإدارة الأجهزة المسجلة التي يمكنها الوصول لمفاتيح API المحمية."
+            },
+            "audit": {
+                "title": "سجلات التدقيق",
+                "description": "تتبع جميع عمليات الوصول لمفاتيح API وأحداث الأمان للامتثال."
+            },
+            "integration": {
+                "title": "دليل التكامل",
+                "description": "تعلم كيفية دمج KeyGuard SDK في تطبيقاتك."
+            },
+            "settings": {
+                "title": "الإعدادات",
+                "description": "تكوين إعدادات وتفضيلات مثيل KeyGuard الخاص بك."
+            }
+        }
+    },
     "LandingPage": {
         "hero": {
             "headline": "أمان بدون ثقة لمفاتيح LLM الخاصة بك",

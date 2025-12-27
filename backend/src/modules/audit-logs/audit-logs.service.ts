@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+ 
+ 
+ 
 /**
  * Note: ESLint unsafe-* rules are disabled in this file because
  * the Prisma generated client uses @ts-nocheck which causes TypeScript
@@ -103,7 +103,7 @@ export class AuditLogsService {
       }),
     ]);
 
-    const mappedLogs: AuditLogDto[] = (logs as AuditLog[]).map((log: AuditLog) => ({
+    const mappedLogs: AuditLogDto[] = (logs).map((log: AuditLog) => ({
       id: log.id,
       timestamp: log.timestamp.toISOString(),
       severity: log.severity.toLowerCase() as 'info' | 'warning' | 'critical',
@@ -230,6 +230,6 @@ export class AuditLogsService {
         deviceId: logData.deviceId ?? null,
         apiKeyId: logData.apiKeyId ?? null,
       },
-    })) as AuditLog;
+    }));
   }
 }

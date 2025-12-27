@@ -7,7 +7,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api';
 import { toast } from 'sonner';
-import type { Device, DevicesPaginationData, DeviceStats, EnrollmentCode } from '@/types/device';
+import type { Device, DevicesPaginationData, EnrollmentCode } from '@/types/device';
 
 interface DevicesParams {
   page?: number;

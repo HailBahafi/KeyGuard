@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
+ 
 /**
  * Note: ESLint unsafe-call rule is disabled for the Prisma extension
  * method calls which TypeScript cannot properly type due to the complex

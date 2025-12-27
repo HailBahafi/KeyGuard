@@ -8,8 +8,8 @@ import {
     XCircle,
     AlertTriangle,
     Info,
-    Eye,
-    ChevronRight
+    ChevronRight,
+    type LucideIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format, formatDistanceToNow } from 'date-fns';
@@ -37,33 +37,23 @@ export function LogRow({ log, onClick, isNew = false }: LogRowProps) {
         };
     };
 
-    // Severity icon
-    const getSeverityIcon = () => {
-        switch (log.severity) {
-            case 'critical':
-                return AlertTriangle;
-            case 'warning':
-                return AlertTriangle;
-            default:
-                return Info;
-        }
+    // Severity icon mapping (pure - no component creation during render)
+    const severityIconMap: Record<string, LucideIcon> = {
+        critical: AlertTriangle,
+        warning: AlertTriangle,
+        info: Info,
     };
 
-    const getSeverityColor = () => {
-        switch (log.severity) {
-            case 'critical':
-                return 'text-red-600 dark:text-red-500';
-            case 'warning':
-                return 'text-yellow-600 dark:text-yellow-500';
-            default:
-                return 'text-blue-600 dark:text-blue-500';
-        }
+    const severityColorMap: Record<string, string> = {
+        critical: 'text-red-600 dark:text-red-500',
+        warning: 'text-yellow-600 dark:text-yellow-500',
+        info: 'text-blue-600 dark:text-blue-500',
     };
 
     const statusConfig = getStatusConfig();
     const StatusIcon = statusConfig.icon;
-    const SeverityIcon = getSeverityIcon();
-    const severityColor = getSeverityColor();
+    const SeverityIcon = severityIconMap[log.severity] || Info;
+    const severityColor = severityColorMap[log.severity] || 'text-blue-600 dark:text-blue-500';
 
     const timestamp = new Date(log.timestamp);
     const timeString = format(timestamp, 'HH:mm:ss');

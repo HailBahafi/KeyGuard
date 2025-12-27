@@ -10,8 +10,8 @@ import { PrismaService } from 'src/core/database/prisma.service';
 @Injectable()
 export class IpWhitelistGuard implements CanActivate {
   constructor(
-    private reflector: Reflector,
-    private prisma: PrismaService,
+    private readonly reflector: Reflector,
+    private readonly prisma: PrismaService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -62,7 +62,7 @@ export class IpWhitelistGuard implements CanActivate {
     const forwarded = request.headers['x-forwarded-for'];
     if (forwarded) {
       const ips = typeof forwarded === 'string' ? forwarded.split(',') : forwarded;
-      return ips && ips[0] ? ips[0].trim() : '0.0.0.0';
+      return ips?.[0] ? ips[0].trim() : '0.0.0.0';
     }
 
     const realIp = request.headers['x-real-ip'];

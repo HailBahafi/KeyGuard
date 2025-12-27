@@ -8,13 +8,12 @@ import { Button } from '@/components/ui/button';
 import {
     Monitor,
     Smartphone,
-    Tablet,
     CheckCircle,
     XCircle,
     Clock,
     Ban,
     Eye,
-    MoreVertical
+    type LucideIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
@@ -36,16 +35,9 @@ export function DeviceCard({
 }: DeviceCardProps) {
     const t = useTranslations('Devices');
 
-    // Select icon based on platform
-    const getDeviceIcon = () => {
-        const { os } = device.platform;
-        if (os === 'iOS' || os === 'Android') {
-            return Smartphone;
-        }
-        return Monitor;
-    };
-
-    const DeviceIcon = getDeviceIcon();
+    // Select icon based on platform (pure mapping)
+    const isMobile = device.platform.os === 'iOS' || device.platform.os === 'Android';
+    const DeviceIcon: LucideIcon = isMobile ? Smartphone : Monitor;
 
     // Status badge configuration
     const getStatusConfig = () => {

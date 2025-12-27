@@ -45,6 +45,7 @@ export function SecurityForm({ initialData, onSuccess }: SecurityFormProps) {
         defaultValues: initialData,
     });
 
+    // eslint-disable-next-line react-hooks/incompatible-library -- react-hook-form watch() cannot be memoized
     const ipWhitelist = watch('ipWhitelist') || [];
 
     const onSubmit = (data: SecuritySettingsFormData) => {

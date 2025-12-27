@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/stores/use-auth-store';
 import { Loader2 } from 'lucide-react';
@@ -8,6 +8,11 @@ import { Loader2 } from 'lucide-react';
 interface AuthGuardProps {
     children: React.ReactNode;
 }
+
+// Hydration utilities for SSR compatibility
+const emptySubscribe = (): (() => void) => () => {};
+const getClientSnapshot = (): boolean => true;
+const getServerSnapshot = (): boolean => false;
 
 /**
  * AuthGuard - Protects routes requiring authentication
@@ -19,12 +24,9 @@ export function AuthGuard({ children }: AuthGuardProps) {
     const router = useRouter();
     const pathname = usePathname();
     const { accessToken } = useAuthStore();
-    const [isHydrated, setIsHydrated] = useState(false);
-
-    // Wait for Zustand to hydrate from localStorage
-    useEffect(() => {
-        setIsHydrated(true);
-    }, []);
+    
+    // Use useSyncExternalStore for hydration-safe mounting detection
+    const isHydrated = useSyncExternalStore(emptySubscribe, getClientSnapshot, getServerSnapshot);
 
     useEffect(() => {
         if (isHydrated && !accessToken) {

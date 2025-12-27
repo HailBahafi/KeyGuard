@@ -305,12 +305,14 @@ Deploy to your preferred platform:
 
 | Module | Status | Endpoints | Tests |
 |--------|--------|-----------|-------|
-| Authentication | ✅ Complete | 2 | ✅ 8 tests |
-| API Keys | ✅ Complete | 3 | ✅ 17 tests |
-| Devices | ✅ Complete | 5 | ✅ 16 tests |
-| Audit Logs | ✅ Complete | 2 | ✅ 13 tests |
-| Settings | ✅ Complete | 8 | ✅ 21 tests |
-| **Total** | ✅ **100%** | **20** | ✅ **75 tests** |
+| Authentication | ✅ Complete | 2 | 🚧 Planned |
+| API Keys | ✅ Complete | 3 | 🚧 Planned |
+| Devices | ✅ Complete | 5 | 🚧 Planned |
+| Audit Logs | ✅ Complete | 2 | 🚧 Planned |
+| Settings | ✅ Complete | 8 | 🚧 Planned |
+| **Total** | ✅ **100%** | **20** | 🚧 **In Progress** |
+
+> **Note:** Test coverage is currently being implemented. Contributions welcome! See [CONTRIBUTING.md](../CONTRIBUTING.md)
 
 ---
 

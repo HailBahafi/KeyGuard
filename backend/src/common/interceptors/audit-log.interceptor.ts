@@ -95,7 +95,7 @@ export class AuditLogInterceptor implements NestInterceptor {
     const forwarded = request.headers['x-forwarded-for'];
     if (forwarded) {
       const ips = typeof forwarded === 'string' ? forwarded.split(',') : forwarded;
-      return ips && ips[0] ? ips[0].trim() : '0.0.0.0';
+      return ips?.[0] ? ips[0].trim() : '0.0.0.0';
     }
 
     return request.ip || '0.0.0.0';

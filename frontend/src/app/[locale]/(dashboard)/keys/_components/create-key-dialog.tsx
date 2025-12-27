@@ -25,7 +25,6 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
     Form,
     FormControl,
@@ -83,6 +82,7 @@ export function CreateKeyDialog({ open, onOpenChange }: CreateKeyDialogProps) {
         setStep((prev) => Math.max(prev - 1, 0));
     };
 
+    // Calculate expiration date (called in event handler, not render)
     const calculateExpiresAt = (expiration: string): string | undefined => {
         if (expiration === 'never') return undefined;
         const daysMap: Record<string, number> = {
@@ -92,7 +92,10 @@ export function CreateKeyDialog({ open, onOpenChange }: CreateKeyDialogProps) {
             '1year': 365
         };
         const days = daysMap[expiration];
-        return new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
+        if (!days) return undefined;
+        const now = new Date();
+        now.setDate(now.getDate() + days);
+        return now.toISOString();
     };
 
     const onSubmit = async (data: KeyFormData) => {

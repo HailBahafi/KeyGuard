@@ -55,7 +55,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
           details = this.formatValidationErrors(responseObj.errors);
         }
       } else {
-        message = exceptionResponse as string;
+        message = exceptionResponse;
         error = exception.name;
       }
     } else if (exception instanceof Error) {

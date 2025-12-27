@@ -65,7 +65,7 @@ export function ExportDialog({
             toast.success(t('success'));
             setLoading(false);
             onOpenChange(false);
-        } catch (error) {
+        } catch {
             toast.error(t('failed'));
             setLoading(false);
         }

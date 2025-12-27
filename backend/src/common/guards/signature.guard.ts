@@ -62,7 +62,7 @@ export class SignatureGuard implements CanActivate {
         const device = await this.prisma.prisma.device.findFirst({
             where: {
                 apiKeyId: project.id,
-                keyId: keyId,
+                keyId,
             },
         });
 

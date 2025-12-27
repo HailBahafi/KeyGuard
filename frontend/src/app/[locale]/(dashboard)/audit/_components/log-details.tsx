@@ -19,7 +19,6 @@ import {
     Info,
     MapPin,
     Globe,
-    Clock,
     Zap,
     Hash,
     User,

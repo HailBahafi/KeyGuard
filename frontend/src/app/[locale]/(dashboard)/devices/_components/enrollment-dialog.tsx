@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import {
     Dialog,
@@ -28,6 +28,7 @@ export function EnrollmentDialog({ open, onOpenChange, onGenerateCode }: Enrollm
     const [enrollmentCode, setEnrollmentCode] = useState<EnrollmentCode | null>(null);
     const [copied, setCopied] = useState<'code' | 'cli' | null>(null);
     const [timeLeft, setTimeLeft] = useState<string>('');
+    const hasLoadedRef = useRef(false);
 
     const loadEnrollmentCode = () => {
         enrollmentMutation.mutate(undefined, {
@@ -41,11 +42,16 @@ export function EnrollmentDialog({ open, onOpenChange, onGenerateCode }: Enrollm
         });
     };
 
+    // Load enrollment code when dialog opens (only once per open)
     useEffect(() => {
-        if (open && !enrollmentCode) {
+        if (open && !hasLoadedRef.current) {
+            hasLoadedRef.current = true;
             loadEnrollmentCode();
+        } else if (!open) {
+            // Reset the flag when dialog closes
+            hasLoadedRef.current = false;
         }
-    }, [open]);
+    }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (!enrollmentCode) return;
