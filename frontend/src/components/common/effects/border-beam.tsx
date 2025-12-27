@@ -9,7 +9,6 @@ interface BorderBeamProps {
     duration?: number;
     colorFrom?: string;
     colorTo?: string;
-    size?: number;
 }
 
 export function BorderBeam({
@@ -18,7 +17,6 @@ export function BorderBeam({
     duration = 3,
     colorFrom = '#3b82f6',
     colorTo = '#8b5cf6',
-    size = 100,
 }: BorderBeamProps) {
     return (
         <div className={cn('relative rounded-2xl overflow-hidden', className)}>

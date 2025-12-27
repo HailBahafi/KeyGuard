@@ -40,7 +40,7 @@ apiClient.interceptors.request.use(
           if (token) {
             config.headers.Authorization = `Bearer ${token}`;
           }
-        } catch (error) {
+        } catch {
           // Invalid storage format, ignore
         }
       }

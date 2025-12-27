@@ -1,4 +1,47 @@
 {
+    "Metadata": {
+        "site": {
+            "name": "KeyGuard",
+            "title": "KeyGuard - Zero-Trust API Key Protection for LLMs",
+            "description": "Secure your OpenAI, Anthropic, and Google AI API keys with device binding and cryptographic signatures. Open-source, self-hosted, enterprise-ready.",
+            "keywords": "API key security, LLM security, OpenAI key protection, device binding, zero trust, cryptographic signatures, API key management, self-hosted security, enterprise API security, ECDSA signatures",
+            "ogImageAlt": "KeyGuard - Secure your LLM API keys with device binding"
+        },
+        "pages": {
+            "home": {
+                "title": "Secure Your LLM API Keys",
+                "description": "Stop API key theft. Bind your OpenAI, Anthropic, and Google AI keys to trusted devices with cryptographic signatures."
+            },
+            "login": {
+                "title": "Sign In",
+                "description": "Access your KeyGuard dashboard to manage devices and API keys."
+            },
+            "dashboard": {
+                "title": "Dashboard",
+                "description": "Monitor your API usage, device activity, and security alerts in real-time."
+            },
+            "keys": {
+                "title": "API Keys",
+                "description": "Manage and secure your LLM provider API keys with KeyGuard."
+            },
+            "devices": {
+                "title": "Devices",
+                "description": "View and manage enrolled devices that can access your protected API keys."
+            },
+            "audit": {
+                "title": "Audit Logs",
+                "description": "Track all API key access and security events for compliance."
+            },
+            "integration": {
+                "title": "Integration Guide",
+                "description": "Learn how to integrate KeyGuard SDK into your applications."
+            },
+            "settings": {
+                "title": "Settings",
+                "description": "Configure your KeyGuard instance settings and preferences."
+            }
+        }
+    },
     "LandingPage": {
         "hero": {
             "headline": "Zero-Trust Security for your LLM Keys",

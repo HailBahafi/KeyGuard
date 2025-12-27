@@ -143,11 +143,14 @@ function setupCors(app: NestFastifyApplication, isProd: boolean): void {
 
   app.enableCors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps or curl requests)
+      // Allow requests with no origin (like mobile apps, curl, or file:// protocol)
       if (!origin) return callback(null, true);
       if (allowedOrigins.includes(origin)) return callback(null, true);
-      // In development, allow all localhost origins for testing
-      if (!isProd && /localhost|127\.0\.0\.1/.test(origin)) return callback(null, true);
+      // In development, allow all localhost origins and any origin for testing
+      if (!isProd) {
+        // Allow localhost, 127.0.0.1, and any origin in development mode for easy testing
+        return callback(null, true);
+      }
       return callback(new Error('Not allowed by CORS'), false);
     },
     credentials: true,

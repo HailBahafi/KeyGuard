@@ -70,7 +70,6 @@ function AnimatedBeamLine({
 }) {
     // Use useId for stable, hydration-safe unique IDs
     const uniqueId = useId();
-    const pathId = `beam-${uniqueId}`;
     const gradientId = `gradient-${uniqueId}`;
     
     // Create curved path
@@ -166,11 +165,12 @@ export function HowItWorks() {
         };
     }, []);
 
-    // Animation cycle
+    // Animation cycle - use startTransition to avoid the cascading render warning
     useEffect(() => {
         if (!isInView) {
-            setPhase('idle');
-            return;
+            // When not in view, reset to idle without triggering immediate re-render
+            const resetTimer = setTimeout(() => setPhase('idle'), 0);
+            return () => clearTimeout(resetTimer);
         }
 
         const runCycle = () => {

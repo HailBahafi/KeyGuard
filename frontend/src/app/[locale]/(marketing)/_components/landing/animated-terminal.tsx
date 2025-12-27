@@ -40,10 +40,9 @@ const customStyle = {
 
 interface HighlightedLineProps {
     line: string;
-    isPartial?: boolean;
 }
 
-function HighlightedLine({ line, isPartial }: HighlightedLineProps) {
+function HighlightedLine({ line }: HighlightedLineProps) {
     // Handle empty lines
     if (!line.trim()) {
         return <span>&nbsp;</span>;
@@ -135,7 +134,6 @@ export function AnimatedTerminal() {
                             <div className="leading-relaxed whitespace-pre overflow-hidden text-ellipsis">
                                 <HighlightedLine
                                     line={codeLines[currentLineIndex].substring(0, currentChar)}
-                                    isPartial
                                 />
                                 <span className="inline-block w-2 h-4 bg-primary animate-pulse ms-0.5" />
                             </div>

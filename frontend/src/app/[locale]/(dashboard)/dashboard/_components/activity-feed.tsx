@@ -24,14 +24,9 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
     const t = useTranslations('Dashboard.activity');
     const tEmpty = useTranslations('Dashboard.empty');
 
-    const formatTime = (timestamp: string) => {
-        const date = new Date(timestamp);
-        const minutes = Math.floor((Date.now() - date.getTime()) / 60000);
-
-        if (minutes < 1) return t('timeAgo.justNow');
-        if (minutes < 60) return t('timeAgo.minutesAgo', { count: minutes });
-        if (minutes < 1440) return t('timeAgo.hoursAgo', { count: Math.floor(minutes / 60) });
-        return t('timeAgo.daysAgo', { count: Math.floor(minutes / 1440) });
+    // Use formatDistanceToNow which is pure during render
+    const formatTime = (timestamp: string): string => {
+        return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
     };
 
     if (activities.length === 0) {
@@ -62,7 +57,7 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
             <CardContent>
                 <ScrollArea className="h-[400px]">
                     <div className="space-y-4">
-                        {activities.map((activity, index) => (
+                        {activities.map((activity) => (
                             <div
                                 key={activity.id}
                                 className="flex items-start gap-3 pb-4 border-b border-border last:border-0"

@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KeyGuard Client Demo - Interactive Testing</title>
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a25;
+            --border: #2a2a3a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --success: #22c55e;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --pending: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--accent) 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-secondary);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .card h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card h2 .icon {
+            font-size: 1.5rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .status-badge.not-enrolled {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--error);
+            border: 1px solid var(--error);
+        }
+
+        .status-badge.enrolled {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .status-badge.pending {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--pending);
+            border: 1px solid var(--pending);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #16a34a;
+        }
+
+        .btn-danger {
+            background: var(--error);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .log-container {
+            background: #0d0d12;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.875rem;
+        }
+
+        .log-entry {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-entry.info { color: var(--text-secondary); }
+        .log-entry.success { color: var(--success); }
+        .log-entry.error { color: var(--error); }
+        .log-entry.warning { color: var(--warning); }
+        .log-entry.request { color: #60a5fa; }
+        .log-entry.response { color: #a78bfa; }
+
+        .log-time {
+            color: var(--text-secondary);
+            margin-right: 0.5rem;
+        }
+
+        .config-section {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px dashed var(--accent);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .config-section h3 {
+            font-size: 0.875rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .test-step {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-left: 3px solid var(--border);
+        }
+
+        .test-step.active {
+            border-left-color: var(--accent);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .test-step.completed {
+            border-left-color: var(--success);
+        }
+
+        .test-step.failed {
+            border-left-color: var(--error);
+        }
+
+        .test-step h4 {
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .test-step p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .chat-message {
+            max-width: 80%;
+            padding: 1rem;
+            border-radius: 12px;
+        }
+
+        .chat-message.user {
+            background: var(--accent);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-message.assistant {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-message.error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid var(--error);
+            color: var(--error);
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .section-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 1.5rem 0;
+        }
+
+        .info-box {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .info-box strong {
+            color: var(--text-primary);
+        }
+
+        code {
+            background: var(--bg-secondary);
+            padding: 0.125rem 0.375rem;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.875em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 KeyGuard Client Demo</h1>
+            <p>Interactive E2E Testing - OpenAI Integration</p>
+        </header>
+
+        <div class="grid">
+            <!-- Left Column: Configuration & Controls -->
+            <div>
+                <!-- Configuration Card -->
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <h2><span class="icon">⚙️</span> Configuration</h2>
+                    
+                    <div class="config-section">
+                        <h3>⚠️ IMPORTANT: Update these values before testing!</h3>
+                        <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                            Get these from your KeyGuard Dashboard or API
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Backend URL</label>
+                        <input type="text" id="backendUrl" value="http://localhost:4000">
+                    </div>
+
+                    <div class="form-group">
+                        <label>🔑 API Key (from Dashboard → Keys → Create Key → Copy raw key)</label>
+                        <!-- ⬇️⬇️⬇️ PASTE YOUR API KEY HERE ⬇️⬇️⬇️ -->
+                        <input type="text" id="apiKey" placeholder="kg_xxxxx..." value="">
+                        <!-- ⬆️⬆️⬆️ PASTE YOUR API KEY HERE ⬆️⬆️⬆️ -->
+                    </div>
+
+                    <div class="form-group">
+                        <label>📋 Enrollment Code (from Dashboard → Devices → Generate Code)</label>
+                        <!-- ⬇️⬇️⬇️ PASTE YOUR ENROLLMENT CODE HERE ⬇️⬇️⬇️ -->
+                        <input type="text" id="enrollmentCode" placeholder="KG-ENRL-XXXX" value="">
+                        <!-- ⬆️⬆️⬆️ PASTE YOUR ENROLLMENT CODE HERE ⬆️⬆️⬆️ -->
+                    </div>
+                </div>
+
+                <!-- Enrollment Status Card -->
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <h2><span class="icon">📱</span> Device Enrollment Status</h2>
+                    
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                        <span id="enrollmentStatus" class="status-badge not-enrolled">
+                            ❌ Not Enrolled
+                        </span>
+                        <span id="deviceId" style="font-size: 0.75rem; color: var(--text-secondary);"></span>
+                    </div>
+
+                    <div class="btn-group">
+                        <button id="btnEnroll" class="btn btn-success" onclick="enrollDevice()">
+                            🚀 Enroll Device
+                        </button>
+                        <button id="btnUnenroll" class="btn btn-danger" onclick="unenrollDevice()" disabled>
+                            🗑️ Unenroll
+                        </button>
+                        <button id="btnCheckStatus" class="btn btn-secondary" onclick="checkEnrollmentStatus()">
+                            🔄 Check Status
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chat/Message Card -->
+                <div class="card">
+                    <h2><span class="icon">💬</span> Send Message to OpenAI</h2>
+                    
+                    <div class="form-group">
+                        <label>Your Message</label>
+                        <textarea id="userMessage" placeholder="Ask OpenAI anything...">Say hello and confirm KeyGuard is working!</textarea>
+                    </div>
+
+                    <button id="btnSendMessage" class="btn btn-primary" onclick="sendMessage()" style="width: 100%;">
+                        📤 Send Signed Request to OpenAI
+                    </button>
+
+                    <div class="section-divider"></div>
+
+                    <h3 style="font-size: 1rem; margin-bottom: 1rem;">Chat History</h3>
+                    <div id="chatContainer" class="chat-container">
+                        <div class="info-box">
+                            Messages will appear here. Try sending a message <strong>before</strong> enrolling to see the error!
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Test Steps & Logs -->
+            <div>
+                <!-- Test Steps Card -->
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <h2><span class="icon">📋</span> Test Scenarios</h2>
+                    
+                    <div id="step1" class="test-step active">
+                        <h4>Step 1: Try sending WITHOUT enrollment</h4>
+                        <p>Expected: Error - device not enrolled</p>
+                    </div>
+
+                    <div id="step2" class="test-step">
+                        <h4>Step 2: Enroll with valid code</h4>
+                        <p>Expected: Success - auto-activation</p>
+                    </div>
+
+                    <div id="step3" class="test-step">
+                        <h4>Step 3: Send message after enrollment</h4>
+                        <p>Expected: Success - OpenAI responds</p>
+                    </div>
+
+                    <div id="step4" class="test-step">
+                        <h4>Step 4: Unenroll device</h4>
+                        <p>Expected: Device keys cleared</p>
+                    </div>
+
+                    <div id="step5" class="test-step">
+                        <h4>Step 5: Try sending after unenroll</h4>
+                        <p>Expected: Error - not enrolled</p>
+                    </div>
+
+                    <div id="step6" class="test-step">
+                        <h4>Step 6: Re-enroll (new code without auto-activate)</h4>
+                        <p>Expected: PENDING status</p>
+                    </div>
+
+                    <div id="step7" class="test-step">
+                        <h4>Step 7: Try sending while PENDING</h4>
+                        <p>Expected: Error - device not active</p>
+                    </div>
+
+                    <div id="step8" class="test-step">
+                        <h4>Step 8: Approve from Dashboard, then send</h4>
+                        <p>Expected: Success - OpenAI responds</p>
+                    </div>
+                </div>
+
+                <!-- Logs Card -->
+                <div class="card">
+                    <h2>
+                        <span class="icon">📜</span> Activity Log
+                        <button class="btn btn-secondary" onclick="clearLogs()" style="margin-left: auto; padding: 0.25rem 0.75rem; font-size: 0.75rem;">
+                            Clear
+                        </button>
+                    </h2>
+                    
+                    <div id="logContainer" class="log-container">
+                        <div class="log-entry info">
+                            <span class="log-time">[Ready]</span> KeyGuard Demo initialized. Configure your API key and enrollment code above.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================================
+        // KEYGUARD CLIENT - Simulated SDK (Browser-compatible)
+        // ============================================================================
+
+        class KeyGuardClient {
+            constructor() {
+                this.keyPair = null;
+                this.keyId = '';
+                this.publicKeyBase64 = '';
+                this.enrolled = false;
+                this.deviceId = '';
+            }
+
+            async generateKeyPair() {
+                // Generate ECDSA P-256 key pair using Web Crypto API
+                this.keyPair = await crypto.subtle.generateKey(
+                    { name: 'ECDSA', namedCurve: 'P-256' },
+                    true,
+                    ['sign', 'verify']
+                );
+
+                // Export public key in SPKI format
+                const publicKeyBuffer = await crypto.subtle.exportKey('spki', this.keyPair.publicKey);
+                this.publicKeyBase64 = this.arrayBufferToBase64(publicKeyBuffer);
+
+                // Generate keyId as hash of public key (simplified for browser)
+                const hashBuffer = await crypto.subtle.digest('SHA-256', publicKeyBuffer);
+                this.keyId = this.arrayBufferToHex(hashBuffer).substring(0, 32);
+
+                log('success', `Key pair generated. Key ID: ${this.keyId}`);
+            }
+
+            async enroll(apiKey, enrollmentCode, backendUrl) {
+                if (!this.keyPair) {
+                    await this.generateKeyPair();
+                }
+
+                // Generate device fingerprint
+                const fingerprintData = `${Date.now()}-${Math.random().toString(36)}`;
+                const fingerprintBuffer = await crypto.subtle.digest(
+                    'SHA-256',
+                    new TextEncoder().encode(fingerprintData)
+                );
+                const deviceFingerprint = this.arrayBufferToHex(fingerprintBuffer);
+
+                const payload = {
+                    keyId: this.keyId,
+                    publicKey: this.publicKeyBase64,
+                    deviceFingerprint: deviceFingerprint,
+                    label: 'KeyGuard Demo Client',
+                    enrollmentCode: enrollmentCode || undefined,
+                    metadata: {
+                        browser: navigator.userAgent,
+                        timestamp: new Date().toISOString()
+                    }
+                };
+
+                log('request', `POST ${backendUrl}/api/v1/keyguard/enroll`);
+
+                const response = await fetch(`${backendUrl}/api/v1/keyguard/enroll`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-keyguard-api-key': apiKey
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Enrollment failed');
+                }
+
+                this.enrolled = true;
+                this.deviceId = data.id;
+                this.apiKey = apiKey;
+                this.backendUrl = backendUrl;
+
+                // Store in localStorage for persistence
+                localStorage.setItem('keyguard_enrolled', 'true');
+                localStorage.setItem('keyguard_deviceId', data.id);
+                localStorage.setItem('keyguard_keyId', this.keyId);
+
+                return data;
+            }
+
+            async signRequest(method, url, body) {
+                if (!this.keyPair) {
+                    throw new Error('Not enrolled - no key pair available');
+                }
+
+                const timestamp = new Date().toISOString();
+                const nonce = this.generateNonce();
+
+                // Compute body hash
+                const bodyString = body ? JSON.stringify(body) : '';
+                const bodyHashBuffer = await crypto.subtle.digest(
+                    'SHA-256',
+                    new TextEncoder().encode(bodyString)
+                );
+                const bodyHash = this.arrayBufferToBase64(bodyHashBuffer);
+
+                // Extract path from URL
+                let pathAndQuery;
+                try {
+                    const urlObj = new URL(url);
+                    pathAndQuery = urlObj.pathname + urlObj.search;
+                } catch {
+                    pathAndQuery = url;
+                }
+
+                // Build canonical payload
+                // Format: kg-v1|{timestamp}|{METHOD}|{pathAndQuery}|{bodySha256}|{nonce}|{apiKey}|{keyId}
+                const payload = [
+                    'kg-v1',
+                    timestamp,
+                    method.toUpperCase(),
+                    pathAndQuery,
+                    bodyHash,
+                    nonce,
+                    this.apiKey,
+                    this.keyId
+                ].join('|');
+
+                log('info', `Canonical payload: kg-v1|${timestamp}|${method}|${pathAndQuery}|...`);
+
+                // Sign with ECDSA P-256
+                const payloadBuffer = new TextEncoder().encode(payload);
+                const signatureBuffer = await crypto.subtle.sign(
+                    { name: 'ECDSA', hash: 'SHA-256' },
+                    this.keyPair.privateKey,
+                    payloadBuffer
+                );
+                const signature = this.arrayBufferToBase64(signatureBuffer);
+
+                return {
+                    'x-keyguard-api-key': this.apiKey,
+                    'x-keyguard-key-id': this.keyId,
+                    'x-keyguard-timestamp': timestamp,
+                    'x-keyguard-nonce': nonce,
+                    'x-keyguard-body-sha256': bodyHash,
+                    'x-keyguard-alg': 'ECDSA_P256_SHA256_P1363',
+                    'x-keyguard-signature': signature
+                };
+            }
+
+            unenroll() {
+                this.keyPair = null;
+                this.keyId = '';
+                this.publicKeyBase64 = '';
+                this.enrolled = false;
+                this.deviceId = '';
+                this.apiKey = '';
+
+                localStorage.removeItem('keyguard_enrolled');
+                localStorage.removeItem('keyguard_deviceId');
+                localStorage.removeItem('keyguard_keyId');
+
+                log('info', 'Device unenrolled. Keys cleared.');
+            }
+
+            isEnrolled() {
+                return this.enrolled && this.keyPair !== null;
+            }
+
+            // Utility functions
+            arrayBufferToBase64(buffer) {
+                const bytes = new Uint8Array(buffer);
+                let binary = '';
+                for (let i = 0; i < bytes.length; i++) {
+                    binary += String.fromCharCode(bytes[i]);
+                }
+                return btoa(binary);
+            }
+
+            arrayBufferToHex(buffer) {
+                const bytes = new Uint8Array(buffer);
+                return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+            }
+
+            generateNonce() {
+                const array = new Uint8Array(16);
+                crypto.getRandomValues(array);
+                return this.arrayBufferToHex(array);
+            }
+        }
+
+        // ============================================================================
+        // GLOBAL STATE
+        // ============================================================================
+
+        const client = new KeyGuardClient();
+        let currentStep = 1;
+
+        // ============================================================================
+        // UI FUNCTIONS
+        // ============================================================================
+
+        function log(type, message) {
+            const container = document.getElementById('logContainer');
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.innerHTML = `<span class="log-time">[${time}]</span> ${escapeHtml(message)}`;
+            container.appendChild(entry);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function clearLogs() {
+            document.getElementById('logContainer').innerHTML = '';
+            log('info', 'Logs cleared');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function updateEnrollmentUI() {
+            const statusEl = document.getElementById('enrollmentStatus');
+            const deviceIdEl = document.getElementById('deviceId');
+            const btnEnroll = document.getElementById('btnEnroll');
+            const btnUnenroll = document.getElementById('btnUnenroll');
+
+            if (client.isEnrolled()) {
+                statusEl.className = 'status-badge enrolled';
+                statusEl.innerHTML = '✅ Enrolled';
+                deviceIdEl.textContent = `Device: ${client.deviceId}`;
+                btnEnroll.disabled = true;
+                btnUnenroll.disabled = false;
+            } else {
+                statusEl.className = 'status-badge not-enrolled';
+                statusEl.innerHTML = '❌ Not Enrolled';
+                deviceIdEl.textContent = '';
+                btnEnroll.disabled = false;
+                btnUnenroll.disabled = true;
+            }
+        }
+
+        function setStepStatus(stepNum, status) {
+            const stepEl = document.getElementById(`step${stepNum}`);
+            stepEl.className = `test-step ${status}`;
+        }
+
+        function addChatMessage(type, content) {
+            const container = document.getElementById('chatContainer');
+            
+            // Remove info box if it exists
+            const infoBox = container.querySelector('.info-box');
+            if (infoBox) infoBox.remove();
+
+            const msg = document.createElement('div');
+            msg.className = `chat-message ${type}`;
+            msg.textContent = content;
+            container.appendChild(msg);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // ============================================================================
+        // BUSINESS LOGIC
+        // ============================================================================
+
+        async function enrollDevice() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const enrollmentCode = document.getElementById('enrollmentCode').value.trim();
+            const backendUrl = document.getElementById('backendUrl').value.trim();
+
+            if (!apiKey) {
+                log('error', 'Please enter your API Key!');
+                alert('Please enter your API Key from the Dashboard!');
+                return;
+            }
+
+            log('info', 'Starting device enrollment...');
+            document.getElementById('btnEnroll').disabled = true;
+            document.getElementById('btnEnroll').innerHTML = '<div class="spinner"></div> Enrolling...';
+
+            try {
+                const result = await client.enroll(apiKey, enrollmentCode || undefined, backendUrl);
+                
+                log('success', `Enrollment successful! Device ID: ${result.id}`);
+                log('info', `Device Status: ${result.status}`);
+
+                if (result.status === 'ACTIVE') {
+                    log('success', '🎉 Auto-Activation successful! Device is ACTIVE.');
+                    setStepStatus(2, 'completed');
+                } else if (result.status === 'PENDING') {
+                    log('warning', '⏳ Device is PENDING. Approve it from the Dashboard.');
+                    document.getElementById('enrollmentStatus').className = 'status-badge pending';
+                    document.getElementById('enrollmentStatus').innerHTML = '⏳ Pending Approval';
+                }
+
+                updateEnrollmentUI();
+
+            } catch (error) {
+                log('error', `Enrollment failed: ${error.message}`);
+                setStepStatus(2, 'failed');
+            } finally {
+                document.getElementById('btnEnroll').disabled = false;
+                document.getElementById('btnEnroll').innerHTML = '🚀 Enroll Device';
+                updateEnrollmentUI();
+            }
+        }
+
+        function unenrollDevice() {
+            if (confirm('Are you sure you want to unenroll this device? All local keys will be deleted.')) {
+                client.unenroll();
+                updateEnrollmentUI();
+                log('success', 'Device unenrolled successfully.');
+                setStepStatus(4, 'completed');
+            }
+        }
+
+        function checkEnrollmentStatus() {
+            if (client.isEnrolled()) {
+                log('info', `Device is enrolled. Key ID: ${client.keyId}`);
+            } else {
+                log('info', 'Device is NOT enrolled.');
+            }
+            updateEnrollmentUI();
+        }
+
+        async function sendMessage() {
+            const message = document.getElementById('userMessage').value.trim();
+            const backendUrl = document.getElementById('backendUrl').value.trim();
+            const apiKey = document.getElementById('apiKey').value.trim();
+
+            if (!message) {
+                log('error', 'Please enter a message!');
+                return;
+            }
+
+            // Add user message to chat
+            addChatMessage('user', message);
+
+            const btnSend = document.getElementById('btnSendMessage');
+            btnSend.disabled = true;
+            btnSend.innerHTML = '<div class="spinner"></div> Sending...';
+
+            try {
+                // Check if enrolled
+                if (!client.isEnrolled()) {
+                    throw new Error('Device is not enrolled! You must enroll first.');
+                }
+
+                const payload = {
+                    model: 'gpt-3.5-turbo',
+                    messages: [
+                        { role: 'user', content: message }
+                    ],
+                    max_tokens: 150
+                };
+
+                const url = `${backendUrl}/api/v1/proxy/v1/chat/completions`;
+                
+                log('info', 'Signing request...');
+                const headers = await client.signRequest('POST', url, payload);
+
+                log('request', `POST ${url}`);
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...headers
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                log('response', `Status: ${response.status}`);
+
+                if (!response.ok) {
+                    throw new Error(data.message || data.error?.message || 'Request failed');
+                }
+
+                // Extract AI response
+                const aiMessage = data.choices?.[0]?.message?.content || 'No response';
+                addChatMessage('assistant', aiMessage);
+                log('success', `OpenAI responded: "${aiMessage.substring(0, 50)}..."`);
+
+                // Update step status
+                if (currentStep === 3) setStepStatus(3, 'completed');
+                if (currentStep === 8) setStepStatus(8, 'completed');
+
+            } catch (error) {
+                log('error', `Request failed: ${error.message}`);
+                addChatMessage('error', `Error: ${error.message}`);
+
+                // Update step status for expected failures
+                if (currentStep === 1) setStepStatus(1, 'completed');
+                if (currentStep === 5) setStepStatus(5, 'completed');
+                if (currentStep === 7) setStepStatus(7, 'completed');
+
+            } finally {
+                btnSend.disabled = false;
+                btnSend.innerHTML = '📤 Send Signed Request to OpenAI';
+            }
+        }
+
+        // ============================================================================
+        // INITIALIZATION
+        // ============================================================================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateEnrollmentUI();
+            log('info', '🚀 KeyGuard Client Demo ready!');
+            log('info', 'Step 1: Try sending a message WITHOUT enrolling first.');
+        });
+    </script>
+</body>
+</html>

@@ -80,8 +80,10 @@ export function KeysTable({ keys, loading, onViewDetails, onRotate, onRevoke }: 
                 </TableHeader>
                 <TableBody>
                     {keys.map((key) => {
-                        const daysUntilExpiry = key.expiresAt
-                            ? Math.floor((new Date(key.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+                        // Compute expiry days - this is stable per key
+                        const expiresAt = key.expiresAt ? new Date(key.expiresAt) : null;
+                        const daysUntilExpiry = expiresAt
+                            ? Math.floor((expiresAt.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
                             : null;
 
                         return (

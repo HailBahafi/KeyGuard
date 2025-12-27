@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useInView } from 'framer-motion';
-import { useRef, RefObject, useEffect, useState, useMemo } from 'react';
+import { useRef, RefObject, useEffect, useState, useId } from 'react';
 
 interface AnimatedBeamProps {
     containerRef: RefObject<HTMLElement>;
@@ -55,11 +55,9 @@ export function AnimatedBeam({
     const pathRef = useRef<SVGPathElement>(null);
     const isInView = useInView(containerRef, { once: false, margin: '-100px' });
 
-    // Generate unique gradient ID to avoid conflicts
-    const gradientId = useMemo(
-        () => `beam-gradient-${Math.random().toString(36).substr(2, 9)}`,
-        []
-    );
+    // Use useId for stable, unique gradient ID
+    const baseId = useId();
+    const gradientId = `beam-gradient-${baseId.replace(/:/g, '-')}`;
 
     useEffect(() => {
         const updatePath = () => {

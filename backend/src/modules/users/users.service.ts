@@ -4,6 +4,7 @@ import { Hashing } from 'src/common/utils/hashing.util';
 import { PrismaService } from 'src/core/database/prisma.service';
 import { QueryUserDto } from './dto/query-user.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+
 @Injectable()
 export class UsersService {
   constructor(private readonly prismaService: PrismaService) {}

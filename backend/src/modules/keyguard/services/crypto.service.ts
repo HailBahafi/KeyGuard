@@ -47,8 +47,8 @@ export class CryptoService {
             );
 
             return isValid;
-        } catch (error) {
-            console.error('Signature verification failed:', error);
+        } catch {
+            // Signature verification failed silently - return false
             return false;
         }
     }

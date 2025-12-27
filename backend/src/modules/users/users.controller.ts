@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Patch, Query } from '@nestjs/common';
 import { CurrentUser, CurrentUserType } from 'src/common/decorators/current-user.decorator';
 import { RequiredRoles } from 'src/common/decorators/roles.decorator';
-import { UserRole } from 'src/generated/enums';
+import { UserRole } from '@prisma/client';
 import { QueryUserDto } from './dto/query-user.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UsersService } from './users.service';

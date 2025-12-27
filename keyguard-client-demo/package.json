@@ -1,0 +1,12 @@
+{
+    "name": "keyguard-client-demo",
+    "version": "1.0.0",
+    "description": "KeyGuard Client Demo - Interactive Testing UI",
+    "main": "server.js",
+    "scripts": {
+        "dev": "npx http-server . -p 8080 -c-1 --cors",
+        "start": "npx http-server . -p 8080 -c-1 --cors"
+    },
+    "dependencies": {},
+    "devDependencies": {}
+}

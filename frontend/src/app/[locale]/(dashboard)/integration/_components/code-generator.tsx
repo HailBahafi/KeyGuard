@@ -105,13 +105,14 @@ export function CodeGenerator() {
     });
 
     // Get API key value to display in code
+    const keys = keysData?.keys;
     const apiKeyDisplay = useMemo(() => {
-        if (selectedKeyId === 'placeholder' || !keysData?.keys) {
+        if (selectedKeyId === 'placeholder' || !keys) {
             return 'kg_prod_...';
         }
-        const selectedKey = keysData.keys.find(k => k.id === selectedKeyId);
+        const selectedKey = keys.find(k => k.id === selectedKeyId);
         return selectedKey?.maskedValue || 'kg_prod_...';
-    }, [selectedKeyId, keysData?.keys]);
+    }, [selectedKeyId, keys]);
 
     const codeSnippets = useMemo(() => generateCodeSnippets(apiKeyDisplay), [apiKeyDisplay]);
 

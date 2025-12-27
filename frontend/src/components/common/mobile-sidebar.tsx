@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,12 +12,14 @@ interface MobileSidebarProps {
     children: React.ReactNode;
 }
 
-export function MobileSidebar({ isOpen, onClose, children }: MobileSidebarProps) {
-    const [mounted, setMounted] = useState(false);
+// Hydration utilities for SSR compatibility
+const emptySubscribe = (): (() => void) => () => {};
+const getClientSnapshot = (): boolean => true;
+const getServerSnapshot = (): boolean => false;
 
-    useEffect(() => {
-        setMounted(true);
-    }, []);
+export function MobileSidebar({ isOpen, onClose, children }: MobileSidebarProps) {
+    // Use useSyncExternalStore for hydration-safe mounting detection
+    const mounted = useSyncExternalStore(emptySubscribe, getClientSnapshot, getServerSnapshot);
 
     // Prevent body scroll when sidebar is open
     useEffect(() => {

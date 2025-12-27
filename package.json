@@ -1,0 +1,29 @@
+{
+  "name": "keyguard",
+  "version": "0.1.0",
+  "private": true,
+  "description": "KeyGuard - Enterprise-grade device binding and API key protection platform",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/keyguard.git"
+  },
+  "author": "KeyGuard Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "prepare": "husky || true",
+    "lint:backend": "cd backend && npm run lint",
+    "lint:frontend": "cd frontend && npm run lint",
+    "lint:sdk": "cd packages/sdk && npm run typecheck",
+    "lint": "npm run lint:backend && npm run lint:frontend && npm run lint:sdk",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "build:sdk": "cd packages/sdk && npm run build",
+    "build": "npm run build:sdk && npm run build:backend && npm run build:frontend"
+  },
+  "devDependencies": {
+    "husky": "^9.1.0"
+  }
+}

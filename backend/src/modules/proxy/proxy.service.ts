@@ -40,7 +40,7 @@ export class ProxyService {
     // Construct full OpenAI URL
     const url = `${this.openaiBaseUrl}${endpoint}`;
     this.logger.log(`Forwarding ${method} request to: ${url}`);
-    this.logger.debug(`Request body: ${JSON.stringify(body)}`);
+    this.logger.debug(`Request body keys: ${body ? Object.keys(body).join(', ') : 'empty'}`);
     const startTime = Date.now();
     try {
       // Check if streaming is requested

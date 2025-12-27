@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,6 +22,7 @@ export function EnrollmentTab() {
     const [enrollmentCode, setEnrollmentCode] = useState<EnrollmentCode | null>(null);
     const [copied, setCopied] = useState<'code' | 'cli' | null>(null);
     const [timeLeft, setTimeLeft] = useState<string>('');
+    const hasLoadedRef = useRef(false);
 
     const loadEnrollmentCode = () => {
         enrollmentMutation.mutate(undefined, {
@@ -32,12 +33,13 @@ export function EnrollmentTab() {
         });
     };
 
-    // Auto-generate on mount
+    // Auto-generate on mount (only once)
     useEffect(() => {
-        if (!enrollmentCode) {
+        if (!hasLoadedRef.current) {
+            hasLoadedRef.current = true;
             loadEnrollmentCode();
         }
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (!enrollmentCode?.expiresAt) return;

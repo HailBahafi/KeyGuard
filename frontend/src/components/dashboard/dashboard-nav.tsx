@@ -11,8 +11,7 @@ import {
     FileText,
     Code2,
     Settings,
-    Menu,
-    LogOut
+    Menu
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {

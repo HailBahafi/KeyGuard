@@ -155,15 +155,17 @@ npx prisma migrate dev
 # Seed database (creates admin user)
 npm run prisma:seed
 
-# Start development server
+# Start development server (runs on port 4000)
 npm run start:dev
 ```
 
-**Default Admin Credentials:**
+**Admin Credentials:**
 - Email: `admin@keyguard.io`
-- Password: `admin123`
+- Password: Set via `ADMIN_SEED_PASSWORD` environment variable
+  - **Development:** If not set, defaults to a development-only password (printed in seed output)
+  - **Production:** `ADMIN_SEED_PASSWORD` is **required** - the seeder will fail without it
 
-> ⚠️ **Change these credentials in production!**
+> ⚠️ **Security:** Always change the admin password after first login! See [SECURITY.md](SECURITY.md) for best practices.
 
 ### 3. Frontend Setup
 
@@ -174,13 +176,14 @@ cd frontend
 npm install
 
 # Configure environment
-echo "NEXT_PUBLIC_API_URL=http://localhost:3000" > .env
+cp .env.example .env.local
+# Edit .env.local - set NEXT_PUBLIC_API_URL=http://localhost:4000
 
-# Start development server
+# Start development server (runs on port 3000)
 npm run dev
 ```
 
-Visit http://localhost:3001 for the dashboard.
+Visit http://localhost:3000 for the dashboard.
 
 ### 4. SDK Integration
 

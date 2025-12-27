@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+ 
+ 
+ 
 /**
  * Note: ESLint unsafe-* rules are disabled in this file because
  * the Prisma generated client uses @ts-nocheck which causes TypeScript
@@ -8,12 +8,9 @@
  * of the Prisma 7 client generation.
  */
 import { Injectable } from '@nestjs/common';
-import type { InputJsonValue } from '@prisma/client/runtime/client';
 import dayjs from 'dayjs';
 import { PrismaService } from 'src/core/database/prisma.service';
-import { Prisma, type AuditLog } from 'src/generated/client';
-import { ActorType, AuditLogSeverity, AuditLogStatus } from 'src/generated/enums';
-import type { AuditLogWhereInput } from 'src/generated/models/AuditLog';
+import { Prisma, AuditLog, ActorType, AuditLogSeverity, AuditLogStatus } from '@prisma/client';
 import {
   AuditLogDto,
   AuditLogsPaginationResponseDto,
@@ -22,6 +19,7 @@ import {
 } from './dto/audit-log-response.dto';
 import { ExportLogsDto } from './dto/export-logs.dto';
 import { QueryLogsDto } from './dto/query-logs.dto';
+import { InputJsonValue } from '@prisma/client/runtime/client';
 
 type DateRangeKey = 'hour' | 'day' | 'week' | 'month';
 
@@ -48,7 +46,7 @@ export class AuditLogsService {
     const skip = (page - 1) * limit;
 
     // Build where clause
-    const where: AuditLogWhereInput = {};
+    const where: Prisma.AuditLogWhereInput = {};
 
     // Date range filter
     if (startDate && endDate) {
@@ -105,7 +103,7 @@ export class AuditLogsService {
       }),
     ]);
 
-    const mappedLogs: AuditLogDto[] = (logs as AuditLog[]).map((log: AuditLog) => ({
+    const mappedLogs: AuditLogDto[] = (logs).map((log: AuditLog) => ({
       id: log.id,
       timestamp: log.timestamp.toISOString(),
       severity: log.severity.toLowerCase() as 'info' | 'warning' | 'critical',
@@ -143,7 +141,7 @@ export class AuditLogsService {
     const { format, filters } = exportDto;
 
     // Get all logs matching filters (without pagination)
-    const where: AuditLogWhereInput = {};
+    const where: Prisma.AuditLogWhereInput = {};
 
     if (filters) {
       // Apply same filters as listLogs
@@ -209,7 +207,7 @@ export class AuditLogsService {
     targetId?: string | null;
     targetName?: string | null;
     targetType?: string | null;
-    metadata?: InputJsonValue | null;
+    metadata?: Prisma.InputJsonValue | null;
     userId?: string | null;
     deviceId?: string | null;
     apiKeyId?: string | null;
@@ -227,11 +225,11 @@ export class AuditLogsService {
         targetId: logData.targetId ?? null,
         targetName: logData.targetName ?? null,
         targetType: logData.targetType ?? null,
-        metadata: logData.metadata ?? Prisma.DbNull,
+        metadata: logData.metadata ?? Prisma.JsonNull, 
         userId: logData.userId ?? null,
         deviceId: logData.deviceId ?? null,
         apiKeyId: logData.apiKeyId ?? null,
       },
-    })) as AuditLog;
+    }));
   }
 }
